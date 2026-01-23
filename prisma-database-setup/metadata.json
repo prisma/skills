@@ -1,0 +1,8 @@
+{
+  "name": "prisma-database-setup",
+  "version": "1.0.0",
+  "description": "Database configuration guides for Prisma ORM",
+  "author": "prisma",
+  "license": "MIT",
+  "keywords": ["prisma", "database", "setup", "postgres", "mysql", "mongodb", "sqlite"]
+}

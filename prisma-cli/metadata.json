@@ -1,0 +1,9 @@
+{
+  "name": "prisma-cli",
+  "version": "7.0.0",
+  "description": "Prisma CLI commands reference for Prisma ORM 7.x",
+  "author": "prisma",
+  "license": "MIT",
+  "keywords": ["prisma", "cli", "database", "orm", "migrations"],
+  "prismaVersion": ">=7.0.0"
+}

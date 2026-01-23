@@ -1,0 +1,112 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install gray-matter
+
+      - name: Validate SKILL.md files
+        run: |
+          node << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const matter = require('gray-matter');
+
+          const skillsDir = './skills';
+          const errors = [];
+
+          // Find all SKILL.md files
+          function findSkillFiles(dir) {
+            const files = [];
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            
+            for (const entry of entries) {
+              const fullPath = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                files.push(...findSkillFiles(fullPath));
+              } else if (entry.name === 'SKILL.md') {
+                files.push(fullPath);
+              }
+            }
+            return files;
+          }
+
+          const skillFiles = findSkillFiles(skillsDir);
+          console.log(`Found ${skillFiles.length} SKILL.md files\n`);
+
+          for (const file of skillFiles) {
+            console.log(`Validating: ${file}`);
+            
+            try {
+              const content = fs.readFileSync(file, 'utf-8');
+              const { data } = matter(content);
+              
+              // Required fields
+              if (!data.name) {
+                errors.push(`${file}: Missing required 'name' in frontmatter`);
+              } else if (!/^[a-z][a-z0-9-]*$/.test(data.name)) {
+                errors.push(`${file}: 'name' must be lowercase with hyphens only`);
+              }
+              
+              if (!data.description) {
+                errors.push(`${file}: Missing required 'description' in frontmatter`);
+              } else if (data.description.length < 20) {
+                errors.push(`${file}: 'description' should be at least 20 characters`);
+              }
+              
+              // Check for rules directory
+              const skillDir = path.dirname(file);
+              const rulesDir = path.join(skillDir, 'rules');
+              if (!fs.existsSync(rulesDir)) {
+                errors.push(`${file}: Missing 'rules/' directory`);
+              }
+              
+              // Check for metadata.json
+              const metadataFile = path.join(skillDir, 'metadata.json');
+              if (!fs.existsSync(metadataFile)) {
+                errors.push(`${file}: Missing 'metadata.json'`);
+              } else {
+                try {
+                  const metadata = JSON.parse(fs.readFileSync(metadataFile, 'utf-8'));
+                  if (!metadata.version) {
+                    errors.push(`${metadataFile}: Missing 'version'`);
+                  }
+                } catch (e) {
+                  errors.push(`${metadataFile}: Invalid JSON`);
+                }
+              }
+              
+              console.log(`  ✓ Valid\n`);
+            } catch (e) {
+              errors.push(`${file}: ${e.message}`);
+            }
+          }
+
+          if (errors.length > 0) {
+            console.log('\n❌ Validation failed:\n');
+            errors.forEach(err => console.log(`  - ${err}`));
+            process.exit(1);
+          } else {
+            console.log('✅ All skills validated successfully!');
+          }
+          EOF

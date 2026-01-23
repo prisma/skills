@@ -1,0 +1,9 @@
+{
+  "name": "prisma-client-api",
+  "version": "7.0.0",
+  "description": "Prisma Client API reference for Prisma ORM 7.x",
+  "author": "prisma",
+  "license": "MIT",
+  "keywords": ["prisma", "client", "api", "crud", "queries", "database"],
+  "prismaVersion": ">=7.0.0"
+}
