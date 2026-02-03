@@ -4,5 +4,5 @@
   "description": "Database configuration guides for Prisma ORM",
   "author": "prisma",
   "license": "MIT",
-  "keywords": ["prisma", "database", "setup", "postgres", "mysql", "mongodb", "sqlite"]
+  "keywords": ["prisma", "database", "setup", "postgres", "mysql", "mongodb", "sqlite", "client", "prisma-client", "generate"]
 }

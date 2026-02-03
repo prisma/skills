@@ -1,6 +1,6 @@
 # Schema Changes
 
-Prisma v7 requires updates to your generator block in schema.prisma.
+Prisma v7 introduces a new `prisma-client` generator. If you switch to it (recommended), update your generator block and import paths accordingly. You can also keep `prisma-client-js` for compatibility.
 
 ## Generator Provider
 
@@ -18,7 +18,7 @@ generator client {
 ```prisma
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../generated"
 }
 ```
 
@@ -26,39 +26,32 @@ generator client {
 
 ### 1. Provider name
 
-- Old: `prisma-client-js`
-- New: `prisma-client`
+Use `prisma-client` in Prisma v7.
 
-The new provider uses the Rust-free TypeScript client for:
-- Faster queries
-- Smaller bundle size
-- No binary downloads
-- Better serverless/edge support
+### 2. Output is required (for `prisma-client`)
 
-### 2. Output is required
-
-The `output` field is now **mandatory**. Prisma Client no longer generates to `node_modules`.
+The `output` field is **mandatory** when using `prisma-client`. Prisma Client no longer generates to `node_modules` with this generator.
 
 ```prisma
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"  // Required
+  output   = "../generated"  // Required for prisma-client
 }
 ```
 
 ### 3. Engine type removed
 
-The `engineType` option is removed. The new client doesn't use Rust engines.
+`engineType` is removed in Prisma v7. Remove any `engineType` setting from your generator block.
 
-## Recommended Output Paths
+## Example Output Paths (prisma-client)
 
 ### Standard project
 
 ```prisma
-output = "../generated/prisma"
+output = "../generated"
 ```
 
-Creates: `generated/prisma/client/`
+Creates: `generated/client/`
 
 ### Monorepo
 
@@ -76,7 +69,7 @@ Creates: `prisma/generated/client/`
 
 ## Datasource Block
 
-The `url`, `directUrl`, and `shadowDatabaseUrl` in datasource are deprecated. Configure in `prisma.config.ts` instead:
+The `url`, `directUrl`, and `shadowDatabaseUrl` values now live in `prisma.config.ts` in Prisma v7. Keep only the provider in `schema.prisma`:
 
 ### Before (v6)
 
@@ -130,7 +123,7 @@ datasource db {
 ```prisma
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../generated"
 }
 
 datasource db {
@@ -147,16 +140,16 @@ datasource db {
 
 2. Update imports throughout your codebase:
    ```typescript
-   // Before
+   // Before (prisma-client-js)
    import { PrismaClient } from '@prisma/client'
    
-   // After
-   import { PrismaClient } from './generated/prisma/client'
+   // After (prisma-client, output = "../generated")
+   import { PrismaClient } from '../generated/client'
    ```
 
-3. Update .gitignore:
+3. Update .gitignore (if using `prisma-client` output):
    ```
-   generated/prisma
+   generated
    ```
 
 ## Preview Features
@@ -166,7 +159,7 @@ Preview features work the same:
 ```prisma
 generator client {
   provider        = "prisma-client"
-  output          = "../generated/prisma"
+  output          = "../generated"
   previewFeatures = ["relationJoins", "fullTextSearch"]
 }
 ```

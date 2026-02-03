@@ -17,7 +17,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated/"
 }
 ```
 
@@ -52,6 +52,27 @@ file:PATH
 
 - **PATH**: Relative path to the database file (from `prisma/schema.prisma` location usually, but in v7 check `prisma.config.ts` context). Usually relative to the schema file.
 
+## Driver Adapter (Prisma ORM 7 required)
+
+Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter.
+
+1. Install adapter and driver:
+   ```bash
+   npm install @prisma/adapter-better-sqlite3 better-sqlite3
+   ```
+
+2. Instantiate Prisma Client with the adapter:
+   ```typescript
+   import { PrismaClient } from '../generated/client'
+   import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+
+   const adapter = new PrismaBetterSqlite3({
+     url: process.env.DATABASE_URL ?? 'file:./dev.db',
+   })
+
+   const prisma = new PrismaClient({ adapter })
+   ```
+
 ## Using Driver Adapter (LibSQL / Turso)
 
 For edge compatibility or Turso:
@@ -64,15 +85,12 @@ For edge compatibility or Turso:
 2. Instantiate:
    ```typescript
    import { PrismaClient } from '../generated/client'
-   import { PrismaLibSQL } from '@prisma/adapter-libsql'
-   import { createClient } from '@libsql/client'
+   import { PrismaLibSql } from '@prisma/adapter-libsql'
 
-   const libsql = createClient({
+   const adapter = new PrismaLibSql({
      url: process.env.TURSO_DATABASE_URL,
-     authToken: process.env.TURSO_AUTH_TOKEN
+     authToken: process.env.TURSO_AUTH_TOKEN,
    })
-
-   const adapter = new PrismaLibSQL(libsql)
    const prisma = new PrismaClient({ adapter })
    ```
 

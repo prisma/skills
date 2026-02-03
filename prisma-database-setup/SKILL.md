@@ -19,6 +19,7 @@ Reference this skill when:
 - Configuring connection strings and environment variables
 - Troubleshooting database connection issues
 - Setting up database-specific features
+- Generating and instantiating Prisma Client
 
 ## Supported Databases
 
@@ -39,6 +40,65 @@ Prisma v7 uses two main files for configuration:
 1. **`prisma/schema.prisma`**: Defines the `datasource` block.
 2. **`prisma.config.ts`**: Configures the connection URL (replaces env loading in schema).
 
+## Driver Adapters (Prisma ORM 7)
+
+Prisma ORM 7 uses the query compiler by default, which **requires a driver adapter**. Choose the adapter and driver for your database and pass the adapter to `PrismaClient`.
+
+| Database | Adapter | JS Driver |
+|----------|---------|-----------|
+| PostgreSQL | `@prisma/adapter-pg` | `pg` |
+| CockroachDB | `@prisma/adapter-pg` | `pg` |
+| Prisma Postgres | `@prisma/adapter-ppg` | `@prisma/ppg` |
+| MySQL / MariaDB | `@prisma/adapter-mariadb` | `mariadb` |
+| SQLite | `@prisma/adapter-better-sqlite3` | `better-sqlite3` |
+| SQLite (Turso/LibSQL) | `@prisma/adapter-libsql` | `@libsql/client` |
+| SQL Server | `@prisma/adapter-mssql` | `node-mssql` |
+
+Example (PostgreSQL):
+
+```ts
+import 'dotenv/config'
+import { PrismaClient } from '../generated/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+const prisma = new PrismaClient({ adapter })
+```
+
+## Prisma Client Setup (Required)
+
+Prisma Client must be installed and generated for any database.
+
+1. Install Prisma CLI and Prisma Client:
+   ```bash
+   npm install prisma --save-dev
+   npm install @prisma/client
+   ```
+
+1. Add a generator block (output is required in Prisma v7):
+   ```prisma
+   generator client {
+     provider = "prisma-client"
+     output   = "../generated"
+   }
+   ```
+
+1. Generate Prisma Client:
+   ```bash
+   npx prisma generate
+   ```
+
+1. Instantiate Prisma Client with the database-specific driver adapter:
+   ```typescript
+   import { PrismaClient } from '../generated/client'
+   import { PrismaPg } from '@prisma/adapter-pg'
+
+   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   const prisma = new PrismaClient({ adapter })
+   ```
+
+1. Re-run `prisma generate` after every schema change.
+
 ## Quick Reference
 
 ### PostgreSQL
@@ -49,7 +109,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated"
 }
 ```
 
@@ -61,7 +121,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated"
 }
 ```
 
@@ -73,7 +133,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated"
 }
 ```
 
@@ -101,4 +161,5 @@ rules/mongodb.md
 rules/sqlserver.md
 rules/cockroachdb.md
 rules/prisma-postgres.md
+rules/prisma-client-setup.md
 ```
