@@ -8,6 +8,14 @@ Bootstraps a fresh Prisma ORM project in the current directory.
 prisma init [options]
 ```
 
+## Bun Runtime
+
+If you're using Bun, run Prisma with `bunx --bun` so it doesn't fall back to Node.js:
+
+```bash
+bunx --bun prisma init
+```
+
 ## What It Creates
 
 - `prisma/schema.prisma` - Your Prisma schema file

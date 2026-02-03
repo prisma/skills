@@ -25,6 +25,7 @@ Reference this skill when:
 - **MongoDB not yet supported in v7** - Continue using v6 for MongoDB
 - **Node.js 20.19.0+** required
 - **TypeScript 5.4.0+** required
+- **Package manager must support ESM** (Node ESM is required in v7)
 
 ## Upgrade Steps Overview
 

@@ -21,6 +21,11 @@ Reference this skill when:
 - Setting up database-specific features
 - Generating and instantiating Prisma Client
 
+## System Prerequisites (Prisma ORM 7)
+
+- **Node.js 20.19.0+**
+- **TypeScript 5.4.0+**
+
 ## Supported Databases
 
 | Database | Provider String | Notes |

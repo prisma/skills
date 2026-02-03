@@ -8,6 +8,14 @@ Generates assets based on the generator blocks in your Prisma schema, most commo
 prisma generate [options]
 ```
 
+## Bun Runtime
+
+If you're using Bun, run Prisma with `bunx --bun` so it doesn't fall back to Node.js:
+
+```bash
+bunx --bun prisma generate
+```
+
 ## What It Does
 
 1. Reads your `schema.prisma` file
