@@ -55,7 +55,7 @@ Configure for ESM:
 
 ```typescript
 // ESM (v7)
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 
 // Not: require()
 ```
@@ -86,7 +86,7 @@ If you must use CommonJS:
 ```javascript
 // CommonJS file
 async function main() {
-  const { PrismaClient } = await import('./generated/prisma/client.js')
+  const { PrismaClient } = await import('../generated/client.js')
   const prisma = new PrismaClient()
 }
 ```
@@ -97,7 +97,7 @@ Create an ESM wrapper:
 
 ```javascript
 // prisma.mjs
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 export const prisma = new PrismaClient()
 ```
 
@@ -121,7 +121,7 @@ Update entry point:
 ```javascript
 // index.js (with "type": "module")
 import express from 'express'
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 
 const app = express()
 const prisma = new PrismaClient()

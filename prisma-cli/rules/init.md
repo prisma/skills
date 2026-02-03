@@ -30,7 +30,7 @@ bunx --bun prisma init
 | `--datasource-provider` | Database provider: `postgresql`, `mysql`, `sqlite`, `sqlserver`, `mongodb`, `cockroachdb` | `postgresql` |
 | `--db` | Provisions a fully managed Prisma Postgres database on the Prisma Data Platform | - |
 | `--url` | Define a custom datasource url | - |
-| `--generator-provider` | Define the generator provider to use | `prisma-client-js` |
+| `--generator-provider` | Define the generator provider to use | `prisma-client` |
 | `--output` | Define Prisma Client generator output path to use | - |
 | `--preview-feature` | Define a preview feature to use | - |
 | `--with-model` | Add example model to created schema file | - |
@@ -84,7 +84,7 @@ prisma init --preview-feature relationJoins --preview-feature fullTextSearch
 ```prisma
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../generated"
 }
 
 datasource db {

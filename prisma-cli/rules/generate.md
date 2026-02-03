@@ -72,14 +72,14 @@ prisma generate --sql
 
 ```prisma
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "../generated"
 }
 ```
 
 ### Key v7 Changes
 
-- Provider must be `prisma-client` (not `prisma-client-js`)
+- Provider must be `prisma-client`
 - `output` is now **required** - client no longer generates to `node_modules`
 - Update imports after generating:
 
@@ -88,7 +88,7 @@ generator client {
 import { PrismaClient } from '@prisma/client'
 
 // After (v7)
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 ```
 
 ## Common Patterns
@@ -115,7 +115,7 @@ Run before building your application.
 ```prisma
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../generated"
 }
 
 generator zod {
@@ -133,16 +133,15 @@ prisma generate  # Runs all generators
 After running `prisma generate`, your output directory contains:
 
 ```
-generated/prisma/
-├── client/
-│   ├── index.js
-│   ├── index.d.ts
-│   └── ...
+generated/
+├── client.ts
+├── models/
+├── enums.ts
 └── ...
 ```
 
 Import the client:
 
 ```typescript
-import { PrismaClient, Prisma } from './generated/prisma/client'
+import { PrismaClient, Prisma } from '../generated/client'
 ```

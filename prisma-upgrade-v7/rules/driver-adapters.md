@@ -15,8 +15,10 @@ Prisma v7 requires driver adapters for all database connections. This replaces t
 | Database | Adapter Package | Underlying Driver |
 |----------|-----------------|-------------------|
 | PostgreSQL | `@prisma/adapter-pg` | `pg` |
-| MySQL | `@prisma/adapter-mysql2` | `mysql2` |
+| MySQL / MariaDB | `@prisma/adapter-mariadb` | `mariadb` |
 | SQLite | `@prisma/adapter-better-sqlite3` | `better-sqlite3` |
+| Prisma Postgres | `@prisma/adapter-ppg` | `@prisma/ppg` |
+| SQL Server | `@prisma/adapter-mssql` | `mssql` |
 | Neon | `@prisma/adapter-neon` | `@neondatabase/serverless` |
 | PlanetScale | `@prisma/adapter-planetscale` | `@planetscale/database` |
 | Turso/libSQL | `@prisma/adapter-libsql` | `@libsql/client` |
@@ -33,7 +35,7 @@ npm install @prisma/adapter-pg
 ### MySQL
 
 ```bash
-npm install @prisma/adapter-mysql2
+npm install @prisma/adapter-mariadb mariadb
 ```
 
 ### SQLite
@@ -42,12 +44,24 @@ npm install @prisma/adapter-mysql2
 npm install @prisma/adapter-better-sqlite3
 ```
 
+### Prisma Postgres
+
+```bash
+npm install @prisma/adapter-ppg @prisma/ppg
+```
+
+### SQL Server
+
+```bash
+npm install @prisma/adapter-mssql mssql
+```
+
 ## Configuration
 
 ### PostgreSQL
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({
@@ -60,11 +74,16 @@ const prisma = new PrismaClient({ adapter })
 ### MySQL
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
-import { PrismaMySQL } from '@prisma/adapter-mysql2'
+import { PrismaClient } from '../generated/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 
-const adapter = new PrismaMySQL({
-  connectionString: process.env.DATABASE_URL
+const adapter = new PrismaMariaDb({
+  host: 'localhost',
+  port: 3306,
+  connectionLimit: 5,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
 })
 
 const prisma = new PrismaClient({ adapter })
@@ -73,7 +92,7 @@ const prisma = new PrismaClient({ adapter })
 ### SQLite
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 
 const adapter = new PrismaBetterSqlite3({
@@ -86,11 +105,45 @@ const prisma = new PrismaClient({ adapter })
 ### Neon (Serverless PostgreSQL)
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
 
 const adapter = new PrismaNeon({
   connectionString: process.env.DATABASE_URL
+})
+
+const prisma = new PrismaClient({ adapter })
+```
+
+### Prisma Postgres
+
+```typescript
+import { PrismaClient } from '../generated/client'
+import { PrismaPostgresAdapter } from '@prisma/adapter-ppg'
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPostgresAdapter({
+    connectionString: process.env.PRISMA_DIRECT_TCP_URL,
+  }),
+})
+```
+
+### SQL Server
+
+```typescript
+import { PrismaClient } from '../generated/client'
+import { PrismaMssql } from '@prisma/adapter-mssql'
+
+const adapter = new PrismaMssql({
+  server: 'localhost',
+  port: 1433,
+  database: 'mydb',
+  user: process.env.SQLSERVER_USER,
+  password: process.env.SQLSERVER_PASSWORD,
+  options: {
+    encrypt: true,
+    trustServerCertificate: true,
+  },
 })
 
 const prisma = new PrismaClient({ adapter })
@@ -165,7 +218,7 @@ const prisma = new PrismaClient({
 ### After (v7)
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({
@@ -179,7 +232,7 @@ const prisma = new PrismaClient({ adapter })
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {

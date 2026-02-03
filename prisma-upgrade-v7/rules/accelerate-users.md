@@ -42,7 +42,7 @@ export default defineConfig({
 ### 4. Instantiate client with accelerateUrl
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 // Use accelerateUrl instead of adapter
@@ -99,7 +99,7 @@ If using Prisma Postgres cloud database:
 ### Same approach
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 export const prisma = new PrismaClient({
@@ -113,7 +113,7 @@ If you later switch to direct TCP connection:
 
 ```typescript
 // Change from accelerateUrl to adapter
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({
@@ -142,7 +142,7 @@ Accelerate works great in edge runtimes:
 
 ```typescript
 // Works in Vercel Edge, Cloudflare Workers, etc.
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 export const prisma = new PrismaClient({

@@ -58,7 +58,7 @@ seed: 'node prisma/seed.js'
 
 ```typescript
 // prisma/seed.ts
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 
 const prisma = new PrismaClient()
 
