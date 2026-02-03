@@ -38,7 +38,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated/"
 }
 ```
 
@@ -57,6 +57,28 @@ export default defineConfig({
 })
 ```
 
+## Driver Adapter (Prisma ORM 7 required)
+
+Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter. For Prisma Postgres, use the Prisma Postgres serverless driver adapter.
+
+1. Install adapter and driver:
+   ```bash
+   npm install @prisma/adapter-ppg @prisma/ppg
+   ```
+
+2. Use a **direct TCP** connection string for the adapter (from the Prisma Console) and instantiate Prisma Client:
+   ```typescript
+   import 'dotenv/config'
+   import { PrismaClient } from '../generated/client'
+   import { PrismaPostgresAdapter } from '@prisma/adapter-ppg'
+
+   const prisma = new PrismaClient({
+     adapter: new PrismaPostgresAdapter({
+       connectionString: process.env.PRISMA_DIRECT_TCP_URL,
+     }),
+   })
+   ```
+
 ## Features
 
 - **Serverless**: Scales to zero.
@@ -65,11 +87,4 @@ export default defineConfig({
 
 ## Using with Prisma Client
 
-Since it uses the standard PostgreSQL provider, usage is standard:
-
-```typescript
-import { PrismaClient } from '../generated/client'
-const prisma = new PrismaClient()
-```
-
-No special adapter is strictly required for the database connection itself if using the standard client, but `prisma+postgres` protocol handles connection pooling automatically.
+Since Prisma ORM 7 requires a driver adapter, use the Prisma Postgres adapter shown above when instantiating Prisma Client.

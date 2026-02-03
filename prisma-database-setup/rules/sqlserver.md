@@ -18,7 +18,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated/"
 }
 ```
 
@@ -53,6 +53,36 @@ sqlserver://HOST:PORT;database=DB;user=USER;password=PASS;encrypt=true;trustServ
 
 - **encrypt**: Required for Azure (true).
 - **trustServerCertificate**: True for self-signed certs (local dev).
+
+## Driver Adapter (Prisma ORM 7 required)
+
+Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter.
+
+1. Install adapter and driver:
+   ```bash
+   npm install @prisma/adapter-mssql mssql
+   ```
+
+2. Instantiate Prisma Client with the adapter:
+   ```typescript
+   import 'dotenv/config'
+   import { PrismaClient } from '../generated/client'
+   import { PrismaMssql } from '@prisma/adapter-mssql'
+
+   const adapter = new PrismaMssql({
+     server: 'localhost',
+     port: 1433,
+     database: 'mydb',
+     user: process.env.SQLSERVER_USER,
+     password: process.env.SQLSERVER_PASSWORD,
+     options: {
+       encrypt: true,
+       trustServerCertificate: true,
+     },
+   })
+
+   const prisma = new PrismaClient({ adapter })
+   ```
 
 ## Common Issues
 

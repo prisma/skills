@@ -17,7 +17,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/client"
+  output   = "../generated/"
 }
 ```
 
@@ -45,6 +45,25 @@ DATABASE_URL="postgresql://user:password@host:26257/db?sslmode=verify-full"
 ```
 
 Note: CockroachDB uses the PostgreSQL wire protocol, so the URL often looks like postgresql, but the provider **MUST** be `cockroachdb` in the schema to handle specific CRDB features correctly.
+
+## Driver Adapter (Prisma ORM 7 required)
+
+Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter. CockroachDB is PostgreSQL-compatible, so use the PostgreSQL adapter.
+
+1. Install adapter and driver:
+   ```bash
+   npm install @prisma/adapter-pg pg
+   ```
+
+2. Instantiate Prisma Client with the adapter:
+   ```typescript
+   import 'dotenv/config'
+   import { PrismaClient } from '../generated/client'
+   import { PrismaPg } from '@prisma/adapter-pg'
+
+   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   const prisma = new PrismaClient({ adapter })
+   ```
 
 ## ID Generation
 
