@@ -24,7 +24,7 @@ Reference this skill when:
 ## Client Instantiation (v7)
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({

@@ -188,7 +188,7 @@ See `raw-queries.md` for details.
 ### Prisma namespace
 
 ```typescript
-import { Prisma } from './generated/prisma/client'
+import { Prisma } from '../generated/client'
 
 // Input types
 type UserCreateInput = Prisma.UserCreateInput
@@ -206,7 +206,7 @@ type UserWithPosts = Prisma.UserGetPayload<{
 Type-safe query fragments:
 
 ```typescript
-import { Prisma } from './generated/prisma/client'
+import { Prisma } from '../generated/client'
 
 const userSelect = Prisma.validator<Prisma.UserSelect>()({
   id: true,

@@ -27,7 +27,7 @@ const users = await prisma.$queryRaw<User[]>`
 Use `Prisma.raw()` for identifiers (not safe for user input):
 
 ```typescript
-import { Prisma } from './generated/prisma/client'
+import { Prisma } from '../generated/client'
 
 const column = 'email'
 const users = await prisma.$queryRaw`
@@ -40,7 +40,7 @@ const users = await prisma.$queryRaw`
 Build queries dynamically:
 
 ```typescript
-import { Prisma } from './generated/prisma/client'
+import { Prisma } from '../generated/client'
 
 const email = 'alice@prisma.io'
 const query = Prisma.sql`SELECT * FROM "User" WHERE email = ${email}`
@@ -50,7 +50,7 @@ const users = await prisma.$queryRaw(query)
 ### Join multiple SQL fragments
 
 ```typescript
-import { Prisma } from './generated/prisma/client'
+import { Prisma } from '../generated/client'
 
 const conditions = [
   Prisma.sql`role = ${'ADMIN'}`,

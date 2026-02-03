@@ -94,7 +94,7 @@ For your application, load env vars at startup:
 // index.ts
 import 'dotenv/config'
 
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({

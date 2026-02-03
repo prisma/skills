@@ -1,6 +1,6 @@
 # Schema Changes
 
-Prisma v7 introduces a new `prisma-client` generator. If you switch to it (recommended), update your generator block and import paths accordingly. You can also keep `prisma-client-js` for compatibility.
+Prisma v7 introduces a new `prisma-client` generator. Update your generator block and import paths accordingly.
 
 ## Generator Provider
 
@@ -51,7 +51,7 @@ generator client {
 output = "../generated"
 ```
 
-Creates: `generated/client/`
+Creates: `generated/client`
 
 ### Monorepo
 
@@ -65,7 +65,7 @@ output = "../../packages/database/generated"
 output = "./generated"
 ```
 
-Creates: `prisma/generated/client/`
+Creates: `prisma/generated/client`
 
 ## Datasource Block
 

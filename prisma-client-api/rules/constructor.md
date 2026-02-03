@@ -5,7 +5,7 @@ Configure Prisma Client when instantiating.
 ## Basic Instantiation (v7)
 
 ```typescript
-import { PrismaClient } from './generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({
@@ -110,7 +110,7 @@ Prevent multiple client instances in development:
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
@@ -135,7 +135,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaClient } from '@/generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const createAdapter = () => new PrismaPg({
