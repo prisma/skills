@@ -26,6 +26,10 @@ Reference this skill when:
 - **Node.js 20.19.0+**
 - **TypeScript 5.4.0+**
 
+## Bun Runtime
+
+If you're using Bun, run Prisma CLI commands with `bunx --bun prisma ...` so Prisma uses the Bun runtime instead of falling back to Node.js.
+
 ## Supported Databases
 
 | Database | Provider String | Notes |
