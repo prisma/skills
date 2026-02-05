@@ -1,0 +1,6 @@
+{
+  "name": "prisma-upgrade-v7-schema-changes",
+  "version": "7.0.0",
+  "author": "prisma",
+  "license": "MIT"
+}

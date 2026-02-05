@@ -7,7 +7,6 @@ See [AGENTS.md](./AGENTS.md) for complete documentation on repository structure,
 ## Quick Reference
 
 - Skills are in `skills/{skill-name}/` directories
-- Each skill has `SKILL.md` (required), `rules/` directory, and `metadata.json`
-- Rule files follow `{category}-{rule-name}.md` naming
+- Each skill has `SKILL.md` (required) and `metadata.json` — no `rules/` directory
 - Use `prisma-` prefix for all skill names
-- Keep SKILL.md under 500 lines, put details in rule files
+- Skill names are granular (e.g. `prisma-cli-init`, `prisma-client-api-transactions`)

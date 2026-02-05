@@ -74,12 +74,7 @@ jobs:
                 errors.push(`${file}: 'description' should be at least 20 characters`);
               }
               
-              // Check for rules directory
               const skillDir = path.dirname(file);
-              const rulesDir = path.join(skillDir, 'rules');
-              if (!fs.existsSync(rulesDir)) {
-                errors.push(`${file}: Missing 'rules/' directory`);
-              }
               
               // Check for metadata.json
               const metadataFile = path.join(skillDir, 'metadata.json');
