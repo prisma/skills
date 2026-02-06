@@ -2,7 +2,7 @@
 
 A collection of skills for AI coding agents working with Prisma ORM. Skills are packaged instructions that extend agent capabilities for database development.
 
-Skills follow the [Agent Skills](https://agentskills.io/) format and are compatible with `npx add-skill`.
+Skills follow the [Agent Skills](https://agentskills.io/) format and are compatible with `npx skills add`.
 
 ## Available Skills
 
@@ -82,27 +82,55 @@ Guides for configuring Prisma with different database providers.
 - SQL Server
 - CockroachDB
 
+---
+
+### prisma-postgres
+
+Prisma Postgres workflows across Console, `create-db`, Management API, and SDK integrations.
+
+**Use when:**
+- Setting up and managing Prisma Postgres in Prisma Console
+- Creating instant databases with `npx create-db`
+- Integrating programmatic provisioning with Management API
+- Building typed API integrations using `@prisma/management-api-sdk`
+- Handling auth, regions, claim flow, and connection details
+
+**Workflows covered:**
+- `npx create-db@latest`
+- `npx create-db@latest create --help`
+- `npx create-db@latest regions --help`
+- Console operations (`https://console.prisma.io`)
+- Management API (`https://api.prisma.io/v1`)
+- Management API SDK (`@prisma/management-api-sdk`)
+
 ## Installation
 
 Install all skills:
 
 ```bash
-npx add-skill prisma/skills
+npx skills add prisma/skills
 ```
 
 Or install specific skills:
 
 ```bash
-npx add-skill prisma/skills --skill prisma-cli
-npx add-skill prisma/skills --skill prisma-upgrade-v7
-npx add-skill prisma/skills --skill prisma-client-api
-npx add-skill prisma/skills --skill prisma-database-setup
+npx skills add prisma/skills --skill prisma-cli
+npx skills add prisma/skills --skill prisma-upgrade-v7
+npx skills add prisma/skills --skill prisma-client-api
+npx skills add prisma/skills --skill prisma-database-setup
+npx skills add prisma/skills --skill prisma-postgres
 ```
 
 List available skills:
 
 ```bash
-npx add-skill prisma/skills --list
+npx skills add prisma/skills --list
+```
+
+List installed skills:
+
+```bash
+npx skills list
 ```
 
 ## Usage

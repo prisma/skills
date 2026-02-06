@@ -4,6 +4,22 @@
   "description": "Migration guide from Prisma ORM v6 to v7",
   "author": "prisma",
   "license": "MIT",
-  "keywords": ["prisma", "upgrade", "migration", "v7", "breaking-changes"],
-  "prismaVersion": ">=7.0.0"
+  "keywords": [
+    "prisma",
+    "upgrade",
+    "migration",
+    "v7",
+    "breaking-changes"
+  ],
+  "prismaVersion": ">=7.0.0",
+  "categories": [
+    "esm-support",
+    "schema-changes",
+    "driver-adapters",
+    "prisma-config",
+    "env-variables",
+    "removed-features",
+    "accelerate-users"
+  ],
+  "ruleCount": 7
 }
