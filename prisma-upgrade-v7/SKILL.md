@@ -1,6 +1,6 @@
 ---
 name: prisma-upgrade-v7
-description: Complete migration guide from Prisma ORM v6 to v7 covering all breaking changes. Use when upgrading Prisma versions, encountering v7 errors, or migrating existing projects. Triggers on "upgrade to prisma 7", "prisma 7 migration", "prisma-client-js to prisma-client", "driver adapter required".
+description: Complete migration guide from Prisma ORM v6 to v7 covering all breaking changes. Use when upgrading Prisma versions, encountering v7 errors, or migrating existing projects. Triggers on "upgrade to prisma 7", "prisma 7 migration", "prisma-client generator", "driver adapter required".
 license: MIT
 metadata:
   author: prisma
@@ -15,10 +15,31 @@ Complete guide for migrating from Prisma ORM v6 to v7. This upgrade introduces s
 
 Reference this skill when:
 - Upgrading from Prisma v6 to v7
-- Switching from `prisma-client-js` to `prisma-client`
+- Updating to the `prisma-client` generator
 - Setting up driver adapters
 - Configuring `prisma.config.ts`
 - Fixing import errors after upgrade
+
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Schema Migration | CRITICAL | `schema-changes` |
+| 2 | Database Connectivity | CRITICAL | `driver-adapters` |
+| 3 | Module System | CRITICAL | `esm-support` |
+| 4 | Config and Env | HIGH | `prisma-config`, `env-variables` |
+| 5 | Removed Features | HIGH | `removed-features` |
+| 6 | Accelerate | HIGH | `accelerate-users` |
+
+## Quick Reference
+
+- `schema-changes` - generator and output migration for Prisma v7
+- `driver-adapters` - required adapter installation and client wiring
+- `esm-support` - package/module requirements for ESM
+- `prisma-config` - creating and using `prisma.config.ts`
+- `env-variables` - explicit environment loading
+- `removed-features` - removed middleware, metrics, and flags
+- `accelerate-users` - migration notes for Accelerate users
 
 ## Important Notes
 
@@ -79,10 +100,8 @@ rules/schema-changes.md     - Generator and schema updates
 rules/driver-adapters.md    - Required driver adapter setup
 rules/prisma-config.md      - New configuration file
 rules/env-variables.md      - Environment variable loading
-rules/client-imports.md     - Updated import paths
-rules/removed-features.md   - Middleware, metrics, CLI flags
+rules/removed-features.md   - Middleware, metrics, and CLI flags
 rules/accelerate-users.md   - Special handling for Accelerate
-rules/ssl-certificates.md   - SSL validation changes
 ```
 
 ## Step-by-Step Migration
@@ -203,3 +222,7 @@ npx prisma migrate dev  # if needed
 - [Official v7 Upgrade Guide](https://www.prisma.io/docs/orm/more/upgrade-guides/upgrading-versions/upgrading-to-prisma-7)
 - [Driver Adapters Documentation](https://www.prisma.io/docs/orm/overview/databases/database-drivers)
 - [Prisma Config Reference](https://www.prisma.io/docs/orm/reference/prisma-config-reference)
+
+## How to Use
+
+Follow `rules/schema-changes.md` and `rules/driver-adapters.md` first, then apply the remaining rule files based on your project setup.

@@ -21,6 +21,14 @@ Reference this skill when:
 - Setting up database-specific features
 - Generating and instantiating Prisma Client
 
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Provider Guides | CRITICAL | provider names |
+| 2 | Prisma Postgres | HIGH | `prisma-postgres` |
+| 3 | Client Setup | CRITICAL | `prisma-client-setup` |
+
 ## System Prerequisites (Prisma ORM 7)
 
 - **Node.js 20.19.0+**
@@ -172,3 +180,7 @@ rules/cockroachdb.md
 rules/prisma-postgres.md
 rules/prisma-client-setup.md
 ```
+
+## How to Use
+
+Read `rules/_sections.md` first, choose the provider rule for your database, then apply `rules/prisma-client-setup.md` to complete client generation and adapter setup.

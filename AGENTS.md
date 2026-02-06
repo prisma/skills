@@ -181,9 +181,9 @@ To test a skill before committing:
 
 Document these installation methods for users:
 
-**Via add-skill CLI:**
+**Via skills CLI:**
 ```bash
-npx add-skill prisma/skills
+npx skills add prisma/skills
 ```
 
 **Manual (Claude Code):**

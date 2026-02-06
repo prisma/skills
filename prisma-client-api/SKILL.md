@@ -21,6 +21,30 @@ Reference this skill when:
 - Using transactions
 - Configuring client options
 
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Client Construction | HIGH | `constructor` |
+| 2 | Model Queries | CRITICAL | `model-queries` |
+| 3 | Query Shape | HIGH | `query-options` |
+| 4 | Filtering | HIGH | `filters` |
+| 5 | Relations | HIGH | `relations` |
+| 6 | Transactions | CRITICAL | `transactions` |
+| 7 | Raw SQL | CRITICAL | `raw-queries` |
+| 8 | Client Methods | MEDIUM | `client-methods` |
+
+## Quick Reference
+
+- `constructor` - `PrismaClient` setup and adapter wiring
+- `model-queries` - CRUD operations and bulk operations
+- `query-options` - `select`, `include`, `omit`, sort, pagination
+- `filters` - scalar and logical filter operators
+- `relations` - relation reads and nested writes
+- `transactions` - array and interactive transaction patterns
+- `raw-queries` - `$queryRaw` and `$executeRaw` safety
+- `client-methods` - lifecycle and extension methods
+
 ## Client Instantiation (v7)
 
 ```typescript
@@ -186,3 +210,7 @@ rules/client-methods.md     - $connect, $disconnect, $on, $extends
 - [Prisma Client API Reference](https://www.prisma.io/docs/orm/reference/prisma-client-reference)
 - [CRUD Operations](https://www.prisma.io/docs/orm/prisma-client/queries/crud)
 - [Filtering and Sorting](https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting)
+
+## How to Use
+
+Start with `rules/_sections.md` to pick the category, then open the matching rule file for implementation details and examples.
