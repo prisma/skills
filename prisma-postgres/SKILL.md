@@ -20,6 +20,22 @@ Reference this skill when:
 - Using `@prisma/management-api-sdk` in TypeScript/JavaScript
 - Handling claim URLs, connection strings, regions, and auth flows
 
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | CLI Provisioning | CRITICAL | `create-db-cli` |
+| 2 | Management API | CRITICAL | `management-api` |
+| 3 | Management API SDK | HIGH | `management-api-sdk` |
+| 4 | Console and Connections | HIGH | `console-and-connections` |
+
+## Quick Reference
+
+- `create-db-cli` - instant databases and CLI options
+- `management-api` - service token and OAuth API workflows
+- `management-api-sdk` - typed SDK usage with token storage
+- `console-and-connections` - Console operations and connection setup
+
 ## Core Workflows
 
 ### 1. Console-first workflow
@@ -45,6 +61,8 @@ Aliases:
 npx create-pg@latest
 npx create-postgres@latest
 ```
+
+For app integrations, you can also use the programmatic API (`create()` / `regions()`) from the `create-db` npm package.
 
 Temporary databases auto-delete after ~24 hours unless claimed.
 
@@ -86,3 +104,7 @@ rules/create-db-cli.md
 rules/management-api.md
 rules/management-api-sdk.md
 ```
+
+## How to Use
+
+Start with `rules/create-db-cli.md` for fast setup, then switch to `rules/management-api.md` or `rules/management-api-sdk.md` when you need programmatic provisioning.

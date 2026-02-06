@@ -99,6 +99,7 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 - `npx create-db@latest`
 - `npx create-db@latest create --help`
 - `npx create-db@latest regions --help`
+- Programmatic `create-db` usage (`create()` and `regions()`)
 - Console operations (`https://console.prisma.io`)
 - Management API (`https://api.prisma.io/v1`)
 - Management API SDK (`@prisma/management-api-sdk`)

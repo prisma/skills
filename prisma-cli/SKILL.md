@@ -21,6 +21,17 @@ Reference this skill when:
 - Using local development database (`prisma dev`)
 - Debugging Prisma issues (`prisma debug`)
 
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Setup | HIGH | `init` |
+| 2 | Generation | HIGH | `generate` |
+| 3 | Development | HIGH | `dev` |
+| 4 | Database | HIGH | `db-` |
+| 5 | Migrations | CRITICAL | `migrate-` |
+| 6 | Utility | MEDIUM | `studio`, `validate`, `format`, `debug` |
+
 ## Command Categories
 
 | Category | Commands | Purpose |
@@ -226,3 +237,7 @@ rules/validate.md       - Schema validation
 rules/format.md         - Schema formatting
 rules/debug.md          - Debug info
 ```
+
+## How to Use
+
+Read `rules/_sections.md` first for category navigation, then open the specific command rule file you need.

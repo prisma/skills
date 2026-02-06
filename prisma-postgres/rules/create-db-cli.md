@@ -25,6 +25,21 @@ npx create-pg@latest
 npx create-postgres@latest
 ```
 
+## Command discovery (`--help`)
+
+Always use `--help` first when integrating CLI commands:
+
+```bash
+npx create-db@latest --help
+npx create-db@latest create --help
+npx create-db@latest regions --help
+```
+
+Top-level commands currently exposed:
+
+- `create` (default) to provision a database
+- `regions` to list available regions
+
 ## `create` options
 
 | Flag | Shorthand | Description |
@@ -40,6 +55,50 @@ npx create-postgres@latest
 - Databases are temporary by default.
 - Unclaimed databases are auto-deleted after ~24 hours.
 - Claim the database using the URL shown in command output to keep it permanently.
+
+## Programmatic usage (library API)
+
+You can also use `create-db` programmatically in Node.js/Bun instead of shelling out to the CLI.
+
+Install:
+
+```bash
+npm install create-db
+# or
+bun add create-db
+```
+
+Create a database:
+
+```ts
+import { create, isDatabaseSuccess, isDatabaseError } from "create-db";
+
+const result = await create({
+  region: "us-east-1",
+  userAgent: "my-app/1.0.0",
+});
+
+if (isDatabaseSuccess(result)) {
+  console.log(result.connectionString);
+  console.log(result.claimUrl);
+  console.log(result.deletionDate);
+}
+
+if (isDatabaseError(result)) {
+  console.error(result.error, result.message);
+}
+```
+
+List regions programmatically:
+
+```ts
+import { regions } from "create-db";
+
+const available = await regions();
+console.log(available);
+```
+
+Programmatic `create()` defaults to `us-east-1` if no region is passed.
 
 ## Common patterns
 
