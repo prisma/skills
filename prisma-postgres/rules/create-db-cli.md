@@ -48,7 +48,6 @@ Top-level commands currently exposed:
 | `--interactive [boolean]` | `-i` | Open region selector |
 | `--json [boolean]` | `-j` | Output machine-readable JSON |
 | `--env [string]` | `-e` | Write `DATABASE_URL` and `CLAIM_URL` into a target `.env` |
-| `--user-agent [string]` | `-u` | Custom user-agent for attribution/testing |
 
 ## Lifecycle and claim flow
 
