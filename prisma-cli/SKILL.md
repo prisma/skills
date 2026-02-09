@@ -219,25 +219,25 @@ import 'dotenv/config'
 See individual rule files for detailed command documentation:
 
 ```
-rules/init.md           - Project initialization
-rules/generate.md       - Client generation
-rules/dev.md            - Local development database
-rules/db-pull.md        - Database introspection
-rules/db-push.md        - Schema push
-rules/db-seed.md        - Database seeding
-rules/db-execute.md     - Raw SQL execution
-rules/migrate-dev.md    - Development migrations
-rules/migrate-deploy.md - Production migrations
-rules/migrate-reset.md  - Database reset
-rules/migrate-status.md - Migration status
-rules/migrate-resolve.md - Migration resolution
-rules/migrate-diff.md   - Schema diffing
-rules/studio.md         - Database GUI
-rules/validate.md       - Schema validation
-rules/format.md         - Schema formatting
-rules/debug.md          - Debug info
+references/init.md           - Project initialization
+references/generate.md       - Client generation
+references/dev.md            - Local development database
+references/db-pull.md        - Database introspection
+references/db-push.md        - Schema push
+references/db-seed.md        - Database seeding
+references/db-execute.md     - Raw SQL execution
+references/migrate-dev.md    - Development migrations
+references/migrate-deploy.md - Production migrations
+references/migrate-reset.md  - Database reset
+references/migrate-status.md - Migration status
+references/migrate-resolve.md - Migration resolution
+references/migrate-diff.md   - Schema diffing
+references/studio.md         - Database GUI
+references/validate.md       - Schema validation
+references/format.md         - Schema formatting
+references/debug.md          - Debug info
 ```
 
 ## How to Use
 
-Read `rules/_sections.md` first for category navigation, then open the specific command rule file you need.
+Use the command categories above for navigation, then open the specific command reference file you need.

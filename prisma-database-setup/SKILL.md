@@ -171,16 +171,16 @@ generator client {
 See individual rule files for detailed setup instructions:
 
 ```
-rules/postgresql.md
-rules/mysql.md
-rules/sqlite.md
-rules/mongodb.md
-rules/sqlserver.md
-rules/cockroachdb.md
-rules/prisma-postgres.md
-rules/prisma-client-setup.md
+references/postgresql.md
+references/mysql.md
+references/sqlite.md
+references/mongodb.md
+references/sqlserver.md
+references/cockroachdb.md
+references/prisma-postgres.md
+references/prisma-client-setup.md
 ```
 
 ## How to Use
 
-Read `rules/_sections.md` first, choose the provider rule for your database, then apply `rules/prisma-client-setup.md` to complete client generation and adapter setup.
+Choose the provider reference file for your database, then apply `references/prisma-client-setup.md` to complete client generation and adapter setup.

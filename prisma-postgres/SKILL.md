@@ -99,12 +99,12 @@ Use `createManagementApiClient` for existing tokens, or `createManagementApiSdk`
 Detailed guidance lives in:
 
 ```
-rules/console-and-connections.md
-rules/create-db-cli.md
-rules/management-api.md
-rules/management-api-sdk.md
+references/console-and-connections.md
+references/create-db-cli.md
+references/management-api.md
+references/management-api-sdk.md
 ```
 
 ## How to Use
 
-Start with `rules/create-db-cli.md` for fast setup, then switch to `rules/management-api.md` or `rules/management-api-sdk.md` when you need programmatic provisioning.
+Start with `references/create-db-cli.md` for fast setup, then switch to `references/management-api.md` or `references/management-api-sdk.md` when you need programmatic provisioning.

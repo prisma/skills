@@ -74,26 +74,11 @@ jobs:
                 errors.push(`${file}: 'description' should be at least 20 characters`);
               }
               
-              // Check for rules directory
+              // Check for references directory
               const skillDir = path.dirname(file);
-              const rulesDir = path.join(skillDir, 'rules');
-              if (!fs.existsSync(rulesDir)) {
-                errors.push(`${file}: Missing 'rules/' directory`);
-              }
-              
-              // Check for metadata.json
-              const metadataFile = path.join(skillDir, 'metadata.json');
-              if (!fs.existsSync(metadataFile)) {
-                errors.push(`${file}: Missing 'metadata.json'`);
-              } else {
-                try {
-                  const metadata = JSON.parse(fs.readFileSync(metadataFile, 'utf-8'));
-                  if (!metadata.version) {
-                    errors.push(`${metadataFile}: Missing 'version'`);
-                  }
-                } catch (e) {
-                  errors.push(`${metadataFile}: Invalid JSON`);
-                }
+              const refsDir = path.join(skillDir, 'references');
+              if (!fs.existsSync(refsDir)) {
+                errors.push(`${file}: Missing 'references/' directory`);
               }
               
               console.log(`  ✓ Valid\n`);

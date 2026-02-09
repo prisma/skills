@@ -95,13 +95,13 @@ npx prisma generate
 Detailed migration guides for each breaking change:
 
 ```
-rules/esm-support.md        - ESM module configuration
-rules/schema-changes.md     - Generator and schema updates
-rules/driver-adapters.md    - Required driver adapter setup
-rules/prisma-config.md      - New configuration file
-rules/env-variables.md      - Environment variable loading
-rules/removed-features.md   - Middleware, metrics, and CLI flags
-rules/accelerate-users.md   - Special handling for Accelerate
+references/esm-support.md        - ESM module configuration
+references/schema-changes.md     - Generator and schema updates
+references/driver-adapters.md    - Required driver adapter setup
+references/prisma-config.md      - New configuration file
+references/env-variables.md      - Environment variable loading
+references/removed-features.md   - Middleware, metrics, and CLI flags
+references/accelerate-users.md   - Special handling for Accelerate
 ```
 
 ## Step-by-Step Migration
@@ -225,4 +225,4 @@ npx prisma migrate dev  # if needed
 
 ## How to Use
 
-Follow `rules/schema-changes.md` and `rules/driver-adapters.md` first, then apply the remaining rule files based on your project setup.
+Follow `references/schema-changes.md` and `references/driver-adapters.md` first, then apply the remaining reference files based on your project setup.

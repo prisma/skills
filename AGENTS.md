@@ -14,17 +14,15 @@ A collection of skills for AI coding agents working with Prisma ORM. Skills are 
 skills/
   {skill-name}/           # kebab-case directory name
     SKILL.md              # Required: skill definition with frontmatter
-    rules/                # Required: individual rule files
-      _sections.md        # Category overview
-      {category}-{rule}.md # Individual rules
-    metadata.json         # Required: version and author info
+    references/           # Required: individual reference files
+      {category}-{rule}.md # Individual references
 ```
 
 ### Naming Conventions
 
 - **Skill directory**: `kebab-case`, prefixed with `prisma-` (e.g., `prisma-schema-best-practices`)
 - **SKILL.md**: Always uppercase, always this exact filename
-- **Rule files**: `{category}-{rule-name}.md` in kebab-case (e.g., `relations-explicit-names.md`)
+- **Reference files**: `{category}-{rule-name}.md` in kebab-case (e.g., `relations-explicit-names.md`)
 - **Categories**: Use consistent prefixes matching the skill's category table
 
 ### SKILL.md Format
@@ -67,20 +65,20 @@ metadata:
 
 ## How to Use
 
-Read individual rule files for detailed explanations and code examples:
+Read individual reference files for detailed explanations and code examples:
 
 ```
-rules/{prefix}-{rule}.md
+references/{prefix}-{rule}.md
 ```
 
-Each rule file contains:
+Each reference file contains:
 - Brief explanation of why it matters
 - Incorrect code example with explanation
 - Correct code example with explanation
 - Additional context and references
 ```
 
-### Individual Rule File Format
+### Individual Reference File Format
 
 ```markdown
 # {category}-{rule-name}
@@ -116,29 +114,16 @@ Each rule file contains:
 - [Prisma Documentation Link](https://prisma.io/docs/...)
 ```
 
-### metadata.json Format
-
-```json
-{
-  "name": "prisma-{skill-name}",
-  "version": "1.0.0",
-  "author": "prisma",
-  "license": "MIT",
-  "categories": ["category1", "category2"],
-  "ruleCount": 15
-}
-```
-
 ## Best Practices for Context Efficiency
 
 Skills are loaded on-demand — only the skill name and description are loaded at startup. The full `SKILL.md` loads into context only when the agent decides the skill is relevant. To minimize context usage:
 
-- **Keep SKILL.md under 500 lines** — put detailed explanations in rule files
+- **Keep SKILL.md under 500 lines** — put detailed explanations in reference files
 - **Write specific descriptions** — helps the agent know exactly when to activate the skill
-- **Use progressive disclosure** — reference rule files that get read only when needed
+- **Use progressive disclosure** — reference files get read only when needed
 - **Include trigger phrases** — explicit phrases like "review my schema" in the description
 
-## Rule Writing Guidelines
+## Reference File Guidelines
 
 ### Code Examples
 

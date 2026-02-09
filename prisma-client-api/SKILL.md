@@ -170,14 +170,14 @@ const [user, post] = await prisma.$transaction([
 Detailed API documentation:
 
 ```
-rules/constructor.md        - PrismaClient constructor options
-rules/model-queries.md      - CRUD operations
-rules/query-options.md      - select, include, omit, where, orderBy
-rules/filters.md            - Filter conditions and operators
-rules/relations.md          - Relation queries and nested operations
-rules/transactions.md       - Transaction API
-rules/raw-queries.md        - $queryRaw, $executeRaw
-rules/client-methods.md     - $connect, $disconnect, $on, $extends
+references/constructor.md        - PrismaClient constructor options
+references/model-queries.md      - CRUD operations
+references/query-options.md      - select, include, omit, where, orderBy
+references/filters.md            - Filter conditions and operators
+references/relations.md          - Relation queries and nested operations
+references/transactions.md       - Transaction API
+references/raw-queries.md        - $queryRaw, $executeRaw
+references/client-methods.md     - $connect, $disconnect, $on, $extends
 ```
 
 ## Filter Operators
@@ -213,4 +213,4 @@ rules/client-methods.md     - $connect, $disconnect, $on, $extends
 
 ## How to Use
 
-Start with `rules/_sections.md` to pick the category, then open the matching rule file for implementation details and examples.
+Pick the category from the table above, then open the matching reference file for implementation details and examples.
