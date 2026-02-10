@@ -21,6 +21,14 @@ Reference this skill when:
 - Setting up database-specific features
 - Generating and instantiating Prisma Client
 
+## Rule Categories by Priority
+
+| Priority | Category | Impact | Prefix |
+|----------|----------|--------|--------|
+| 1 | Provider Guides | CRITICAL | provider names |
+| 2 | Prisma Postgres | HIGH | `prisma-postgres` |
+| 3 | Client Setup | CRITICAL | `prisma-client-setup` |
+
 ## System Prerequisites (Prisma ORM 7)
 
 - **Node.js 20.19.0+**
@@ -163,12 +171,16 @@ generator client {
 See individual rule files for detailed setup instructions:
 
 ```
-rules/postgresql.md
-rules/mysql.md
-rules/sqlite.md
-rules/mongodb.md
-rules/sqlserver.md
-rules/cockroachdb.md
-rules/prisma-postgres.md
-rules/prisma-client-setup.md
+references/postgresql.md
+references/mysql.md
+references/sqlite.md
+references/mongodb.md
+references/sqlserver.md
+references/cockroachdb.md
+references/prisma-postgres.md
+references/prisma-client-setup.md
 ```
+
+## How to Use
+
+Choose the provider reference file for your database, then apply `references/prisma-client-setup.md` to complete client generation and adapter setup.
