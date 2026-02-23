@@ -74,11 +74,11 @@ jobs:
                 errors.push(`${file}: 'description' should be at least 20 characters`);
               }
               
-              // Check for references directory
+              // references/ is optional. If present, it must be a directory.
               const skillDir = path.dirname(file);
               const refsDir = path.join(skillDir, 'references');
-              if (!fs.existsSync(refsDir)) {
-                errors.push(`${file}: Missing 'references/' directory`);
+              if (fs.existsSync(refsDir) && !fs.statSync(refsDir).isDirectory()) {
+                errors.push(`${file}: 'references' exists but is not a directory`);
               }
               
               console.log(`  ✓ Valid\n`);

@@ -7,7 +7,7 @@ See [AGENTS.md](./AGENTS.md) for complete documentation on repository structure,
 ## Quick Reference
 
 - Skills are in `skills/{skill-name}/` directories
-- Each skill has `SKILL.md` (required) and `references/` directory
+- Each skill has `SKILL.md` (required); `references/` is optional
 - Reference files follow `{category}-{rule-name}.md` naming
 - Use `prisma-` prefix for all skill names
 - Keep SKILL.md under 500 lines, put details in reference files

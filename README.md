@@ -174,7 +174,7 @@ How do I use transactions in Prisma?
 
 Each skill contains:
 - `SKILL.md` - Main instructions with YAML frontmatter (name, description, metadata)
-- `references/` - Individual reference files with detailed explanations and code examples
+- `references/` (optional) - Individual reference files with detailed explanations and code examples
 
 ## Prisma Version
 
