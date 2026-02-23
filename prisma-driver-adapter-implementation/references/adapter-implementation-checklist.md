@@ -64,5 +64,5 @@ Driver adapters sit on the correctness boundary between Prisma and the database 
 
 ## References
 
-- [Prisma Driver Adapters](https://www.prisma.io/docs/orm/overview/databases/database-drivers#driver-adapters)
+- [Prisma Driver Adapters](https://www.prisma.io/docs/orm/core-concepts/supported-databases/database-drivers)
 - [Prisma Driver Adapter Utils Package](https://www.npmjs.com/package/@prisma/driver-adapter-utils)
