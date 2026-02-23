@@ -64,6 +64,26 @@ Comprehensive Prisma Client API reference for v7.
 
 ---
 
+### prisma-driver-adapter-implementation
+
+Implementation guide for Prisma ORM v7 SQL driver adapter development.
+
+**Use when:**
+- Implementing a new SQL driver adapter
+- Modifying `SqlDriverAdapter` or `Transaction` behavior
+- Wiring migration-aware adapter factories
+- Debugging adapter type mapping or transaction issues
+
+**Topics covered:**
+- Required adapter interfaces and contracts
+- Transaction lifecycle protocol (including nested transactions)
+- `SqlQuery` argument mapping and `SqlResultSet` mapping
+- `ColumnTypeEnum` mapping strategy
+- Error conversion to `DriverAdapterError` / `MappedError`
+- Unit and E2E verification checklist
+
+---
+
 ### prisma-database-setup
 
 Guides for configuring Prisma with different database providers.
@@ -118,6 +138,7 @@ Or install specific skills:
 npx skills add prisma/skills --skill prisma-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-client-api
+npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres
 ```
@@ -153,7 +174,7 @@ How do I use transactions in Prisma?
 
 Each skill contains:
 - `SKILL.md` - Main instructions with YAML frontmatter (name, description, metadata)
-- `references/` - Individual reference files with detailed explanations and code examples
+- `references/` (optional) - Individual reference files with detailed explanations and code examples
 
 ## Prisma Version
 

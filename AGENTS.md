@@ -14,7 +14,7 @@ A collection of skills for AI coding agents working with Prisma ORM. Skills are 
 skills/
   {skill-name}/           # kebab-case directory name
     SKILL.md              # Required: skill definition with frontmatter
-    references/           # Required: individual reference files
+    references/           # Optional: individual reference files
       {category}-{rule}.md # Individual references
 ```
 
@@ -63,9 +63,9 @@ metadata:
 ### 2. {Category} (HIGH)
 ...
 
-## How to Use
+## How to Use (Optional)
 
-Read individual reference files for detailed explanations and code examples:
+If the skill includes references, read individual reference files for detailed explanations and code examples:
 
 ```
 references/{prefix}-{rule}.md
