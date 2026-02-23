@@ -11,10 +11,6 @@ metadata:
 
 This skill provides everything needed to implement a Prisma ORM v7 driver adapter for any database.
 
-## Companion Reference
-
-- `references/adapter-implementation-checklist.md` - Final pre-ship checks for adapter contract compliance.
-
 ## Architecture Overview
 
 ```
