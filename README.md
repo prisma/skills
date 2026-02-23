@@ -64,7 +64,7 @@ Comprehensive Prisma Client API reference for v7.
 
 ---
 
-### prisma-driver-adapter
+### prisma-driver-adapter-implementation
 
 Implementation guide for Prisma ORM v7 SQL driver adapter development.
 
@@ -138,7 +138,7 @@ Or install specific skills:
 npx skills add prisma/skills --skill prisma-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-client-api
-npx skills add prisma/skills --skill prisma-driver-adapter
+npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres
 ```

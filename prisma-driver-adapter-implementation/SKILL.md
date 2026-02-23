@@ -1,5 +1,5 @@
 ---
-name: prisma-driver-adapter
+name: prisma-driver-adapter-implementation
 description: Required reference for Prisma v7 driver adapter work. Use when implementing or modifying adapters, adding database drivers, or touching SqlDriverAdapter/Transaction interfaces. Contains critical contract details not inferable from code examples — including the transaction lifecycle protocol, error mapping requirements, and verification checklist. Existing implementations do not replace this skill.
 license: MIT
 metadata:
