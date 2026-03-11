@@ -1,8 +1,55 @@
+Here's an updated README that reflects your changes:
+
+---
+
 # Prisma Skills
 
 A collection of skills for AI coding agents working with Prisma ORM. Skills are packaged instructions that extend agent capabilities for database development.
 
 Skills follow the [Agent Skills](https://agentskills.io/) format and are compatible with `npx skills add`.
+
+## Installation
+
+### As a Claude Code Plugin
+
+Add to your Claude Code settings or team configuration:
+
+```bash
+claude plugin add https://github.com/prisma/skills
+```
+
+Skills will be namespaced as `prisma-skills:skill-name`.
+
+### As skills
+
+Install all skills:
+
+```bash
+npx skills add prisma/skills
+```
+
+Or install specific skills:
+
+```bash
+npx skills add prisma/skills --skill prisma-cli
+npx skills add prisma/skills --skill prisma-upgrade-v7
+npx skills add prisma/skills --skill prisma-client-api
+npx skills add prisma/skills --skill prisma-driver-adapter-implementation
+npx skills add prisma/skills --skill prisma-database-setup
+npx skills add prisma/skills --skill prisma-postgres
+```
+
+List available skills:
+
+```bash
+npx skills add prisma/skills --list
+```
+
+List installed skills:
+
+```bash
+npx skills list
+```
 
 ## Available Skills
 
@@ -124,37 +171,6 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 - Management API (`https://api.prisma.io/v1`)
 - Management API SDK (`@prisma/management-api-sdk`)
 
-## Installation
-
-Install all skills:
-
-```bash
-npx skills add prisma/skills
-```
-
-Or install specific skills:
-
-```bash
-npx skills add prisma/skills --skill prisma-cli
-npx skills add prisma/skills --skill prisma-upgrade-v7
-npx skills add prisma/skills --skill prisma-client-api
-npx skills add prisma/skills --skill prisma-driver-adapter-implementation
-npx skills add prisma/skills --skill prisma-database-setup
-npx skills add prisma/skills --skill prisma-postgres
-```
-
-List available skills:
-
-```bash
-npx skills add prisma/skills --list
-```
-
-List installed skills:
-
-```bash
-npx skills list
-```
-
 ## Usage
 
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected.
@@ -168,6 +184,19 @@ Upgrade my project from Prisma 6 to Prisma 7
 ```
 ```
 How do I use transactions in Prisma?
+```
+
+## Repository Structure
+
+```
+.claude-plugin/
+  plugin.json        # Claude Code plugin manifest
+skills/
+  prisma-cli/
+    SKILL.md
+  prisma-upgrade-v7/
+    SKILL.md
+  ...
 ```
 
 ## Skill Structure
