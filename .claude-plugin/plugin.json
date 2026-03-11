@@ -1,8 +1,5 @@
 {
-  "name": "prisma-plugin",
-  "description": "A plugin to help you with Prisma ORM and Prisma Postgres",
-  "version": "1.0.0",
-  "author": {
-    "name": "Prisma"
-  }
+  "name": "prisma-skills",
+  "description": "A collection of skills for AI coding agents working with Prisma ORM and Prisma Postgres",
+  "version": "1.0.0"
 }

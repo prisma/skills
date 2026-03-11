@@ -12,10 +12,11 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 
 ### As a Claude Code Plugin
 
-Add to your Claude Code settings or team configuration:
+From within Claude Code:
 
 ```bash
-claude plugin add https://github.com/prisma/skills
+/plugin marketplace add prisma/skills
+/plugin install prisma-skills@prisma
 ```
 
 Skills will be namespaced as `prisma-skills:skill-name`.

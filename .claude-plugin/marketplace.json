@@ -1,0 +1,13 @@
+{
+  "name": "prisma",
+  "owner": {
+    "name": "Prisma"
+  },
+  "plugins": [
+    {
+      "name": "prisma-skills",
+      "source": "./",
+      "description": "A collection of skills for AI coding agents working with Prisma ORM and Prisma Postgres"
+    }
+  ]
+}
