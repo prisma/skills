@@ -4,7 +4,7 @@ description: Prisma Postgres setup and operations guidance across Console, creat
 license: MIT
 metadata:
   author: prisma
-  version: "1.0.0"
+  version: "7.6.0"
 ---
 
 # Prisma Postgres
@@ -31,10 +31,10 @@ Reference this skill when:
 
 ## Quick Reference
 
-- `create-db-cli` - instant databases and CLI options
+- `create-db-cli` - instant databases and current CLI flags (`--ttl`, `--copy`, `--quiet`, `--open`)
 - `management-api` - service token and OAuth API workflows
 - `management-api-sdk` - typed SDK usage with token storage
-- `console-and-connections` - Console operations and connection setup
+- `console-and-connections` - Console operations, direct TCP connections, and serverless-driver choices
 
 ## Core Workflows
 

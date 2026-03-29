@@ -93,6 +93,7 @@ Useful for remote servers.
 - Development tool only
 - Not for production use
 - Limited to configured database
+- Prisma Studio in Prisma 7 currently targets PostgreSQL, MySQL, and SQLite first
 - No advanced queries (use Prisma Client for that)
 
 ## Common Workflow

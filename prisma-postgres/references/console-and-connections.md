@@ -30,8 +30,19 @@ npx prisma studio
 For direct PostgreSQL tools and drivers:
 
 - Generate/copy direct connection credentials from the project connection UI.
-- Use the resulting PostgreSQL URL as `DATABASE_URL`.
+- Use the resulting PostgreSQL URL as `DATABASE_URL` for `pg` and `@prisma/adapter-pg`.
 - For Prisma Postgres direct TCP, include `sslmode=require`.
+
+Typical direct TCP format:
+
+```env
+DATABASE_URL="postgres://identifier:key@db.prisma.io:5432/postgres?sslmode=require"
+```
+
+## Adapter choices
+
+- Standard Node.js apps: prefer `@prisma/adapter-pg` with the direct TCP URL above.
+- Edge/serverless runtimes: use `@prisma/adapter-ppg` with `@prisma/ppg` only when you specifically need the Prisma Postgres serverless driver.
 
 ## References
 

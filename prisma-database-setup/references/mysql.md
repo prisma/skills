@@ -22,7 +22,7 @@ generator client {
 }
 ```
 
-## 2. Config Configuration (v7)
+## 2. Config Configuration
 
 In `prisma.config.ts`:
 
@@ -57,9 +57,9 @@ mysql://USER:PASSWORD@HOST:PORT/DATABASE
 - **PORT**: Port (default 3306)
 - **DATABASE**: Database name
 
-## Driver Adapter (Prisma ORM 7 required)
+## Driver Adapter
 
-Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter.
+Use a driver adapter for the standard SQL workflow.
 
 1. Install adapter and driver:
    ```bash

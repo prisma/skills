@@ -2,7 +2,7 @@
 
 Configure Prisma Client when instantiating.
 
-## Basic Instantiation (v7)
+## Basic Instantiation
 
 ```typescript
 import { PrismaClient } from '../generated/client'
@@ -17,7 +17,7 @@ const prisma = new PrismaClient({ adapter })
 
 ## Constructor Options
 
-### adapter (Required in v7)
+### adapter (Required for the SQL provider workflow)
 
 Driver adapter instance:
 

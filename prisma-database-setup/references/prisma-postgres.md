@@ -21,10 +21,12 @@ This will:
 
 ## Connection String
 
-The connection string starts with `prisma+postgres://`.
+For Prisma CLI flows and Accelerate-style usage, you may see a `prisma+postgres://` URL.
+
+For Prisma Client with a driver adapter in Node.js, prefer the direct TCP connection string from the Prisma Postgres dashboard:
 
 ```env
-DATABASE_URL="prisma+postgres://api_key@host.prisma-data.net/env_id"
+DATABASE_URL="postgres://identifier:key@db.prisma.io:5432/postgres?sslmode=require"
 ```
 
 ## 1. Schema Configuration
@@ -57,27 +59,47 @@ export default defineConfig({
 })
 ```
 
-## Driver Adapter (Prisma ORM 7 required)
+## Driver Adapter
 
-Prisma ORM 7 uses the query compiler by default, so you must use a driver adapter. For Prisma Postgres, use the Prisma Postgres serverless driver adapter.
+Use a driver adapter for Prisma Postgres in the standard SQL workflow.
+
+### Recommended for standard Node.js apps
 
 1. Install adapter and driver:
    ```bash
-   npm install @prisma/adapter-ppg @prisma/ppg
+   npm install @prisma/adapter-pg pg
    ```
 
-2. Use a **direct TCP** connection string for the adapter (from the Prisma Console) and instantiate Prisma Client:
+2. Use the direct TCP connection string from Prisma Console:
    ```typescript
    import 'dotenv/config'
    import { PrismaClient } from '../generated/client'
-   import { PrismaPostgresAdapter } from '@prisma/adapter-ppg'
+   import { PrismaPg } from '@prisma/adapter-pg'
 
-   const prisma = new PrismaClient({
-     adapter: new PrismaPostgresAdapter({
-       connectionString: process.env.PRISMA_DIRECT_TCP_URL,
-     }),
-   })
+   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   const prisma = new PrismaClient({ adapter })
    ```
+
+### Edge/serverless option
+
+Use the Prisma Postgres serverless driver only when you need HTTP/WebSocket transport in environments like Workers or Edge Functions:
+
+```bash
+npm install @prisma/adapter-ppg @prisma/ppg
+```
+
+```typescript
+import { PrismaClient } from '../generated/client'
+import { PrismaPostgresAdapter } from '@prisma/adapter-ppg'
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPostgresAdapter({
+    connectionString: process.env.PRISMA_DIRECT_TCP_URL,
+  }),
+})
+```
+
+This serverless driver is the specialized path for HTTP/WebSocket-based edge and serverless runtimes, not the default recommendation for standard Node.js apps.
 
 ## Features
 
@@ -87,4 +109,4 @@ Prisma ORM 7 uses the query compiler by default, so you must use a driver adapte
 
 ## Using with Prisma Client
 
-Since Prisma ORM 7 requires a driver adapter, use the Prisma Postgres adapter shown above when instantiating Prisma Client.
+Use the Prisma Postgres adapter shown above when instantiating Prisma Client.

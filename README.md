@@ -8,7 +8,7 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 
 ### prisma-cli
 
-Complete reference for Prisma CLI commands in Prisma ORM v7.
+Complete reference for current Prisma CLI commands.
 
 **Use when:**
 - Running Prisma commands
@@ -20,7 +20,7 @@ Complete reference for Prisma CLI commands in Prisma ORM v7.
 - `init`, `generate`, `dev` (local Prisma Postgres)
 - `migrate dev`, `migrate deploy`, `migrate reset`
 - `db push`, `db pull`, `db seed`, `db execute`
-- `studio`
+- `studio`, `mcp`
 
 ---
 
@@ -34,10 +34,12 @@ Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes
 - Understanding what changed in v7
 
 **Topics covered:**
-- ESM module configuration
+- ESM-first module configuration plus CommonJS fallback
 - Driver adapter requirements
 - New `prisma.config.ts` file
 - Manual environment variable loading
+- Generated client entrypoints (`client`, `browser`, `models`, `enums`)
+- `Prisma.validator` to `satisfies` migration
 - Removed features (middleware, metrics, CLI flags)
 - Special handling for Accelerate users
 
@@ -45,7 +47,7 @@ Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes
 
 ### prisma-client-api
 
-Comprehensive Prisma Client API reference for v7.
+Comprehensive Prisma Client API reference.
 
 **Use when:**
 - Writing Prisma Client queries
@@ -66,7 +68,7 @@ Comprehensive Prisma Client API reference for v7.
 
 ### prisma-driver-adapter-implementation
 
-Implementation guide for Prisma ORM v7 SQL driver adapter development.
+Implementation guide for Prisma SQL driver adapter development.
 
 **Use when:**
 - Implementing a new SQL driver adapter
@@ -178,13 +180,9 @@ Each skill contains:
 
 ## Prisma Version
 
-These skills target **Prisma ORM v7.x**. Key v7 changes:
-- ESM-first module system
-- Driver adapters are required
-- New `prisma.config.ts` configuration file
-- Manual environment variable loading
+These skills target **Prisma ORM 7.6.x**.
 
-For v6 projects, use the `prisma-upgrade-v7` skill to migrate.
+If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migration-specific guidance.
 
 ## Contributing
 
