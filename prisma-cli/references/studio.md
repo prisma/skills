@@ -81,6 +81,20 @@ Useful for remote servers.
 - See counts of related items
 - Follow relation links
 
+## Recent Studio Capabilities
+
+Recent Prisma Studio releases added richer editor workflows:
+
+- multi-cell selection and editing
+- full-table search and more intuitive filtering
+- command palette shortcuts
+- dark mode
+- copy selections as Markdown
+- back-relation navigation
+- SQL workflows including raw SQL queries
+
+Some recent builds also expose AI-assisted SQL authoring. Treat these as interactive Studio features rather than a replacement for checked-in migrations or application queries.
+
 ## Use Cases
 
 - **Development**: Quick data inspection
@@ -94,7 +108,7 @@ Useful for remote servers.
 - Not for production use
 - Limited to configured database
 - Prisma Studio in Prisma 7 currently targets PostgreSQL, MySQL, and SQLite first
-- No advanced queries (use Prisma Client for that)
+- For reproducible application logic, prefer Prisma Client and checked-in SQL scripts
 
 ## Common Workflow
 

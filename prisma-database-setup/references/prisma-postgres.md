@@ -80,6 +80,24 @@ Use a driver adapter for Prisma Postgres in the standard SQL workflow.
    const prisma = new PrismaClient({ adapter })
    ```
 
+`PrismaPg` also accepts the connection string directly:
+
+```typescript
+const adapter = new PrismaPg(process.env.DATABASE_URL!)
+const prisma = new PrismaClient({ adapter })
+```
+
+For PostgreSQL prepared statement naming, pass adapter options as the second argument:
+
+```typescript
+import { createHash } from 'node:crypto'
+
+const adapter = new PrismaPg(process.env.DATABASE_URL!, {
+  statementNameGenerator: ({ sql }) =>
+    `prisma_${createHash('sha1').update(sql).digest('hex').slice(0, 16)}`,
+})
+```
+
 ### Edge/serverless option
 
 Use the Prisma Postgres serverless driver only when you need HTTP/WebSocket transport in environments like Workers or Edge Functions:

@@ -152,3 +152,13 @@ generator client {
   previewFeatures = ["relationJoins", "fullTextSearch"]
 }
 ```
+
+Recent preview-feature examples also include `partialIndexes` for PostgreSQL, SQLite, SQL Server, and CockroachDB:
+
+```prisma
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+```

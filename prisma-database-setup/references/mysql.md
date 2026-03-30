@@ -84,6 +84,23 @@ Use a driver adapter for the standard SQL workflow.
    const prisma = new PrismaClient({ adapter })
    ```
 
+### Text protocol option
+
+If you need the MariaDB driver's text protocol instead of the default binary `execute()` path, enable `useTextProtocol` explicitly:
+
+```typescript
+import { PrismaClient } from '../generated/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+
+const adapter = new PrismaMariaDb(process.env.DATABASE_URL!, {
+  useTextProtocol: true,
+})
+
+const prisma = new PrismaClient({ adapter })
+```
+
+Use this only when you specifically need text-protocol compatibility for your MariaDB setup.
+
 ## PlanetScale Setup
 
 PlanetScale uses MySQL but requires specific settings because it doesn't support foreign key constraints.

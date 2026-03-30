@@ -36,7 +36,7 @@ Reference this skill when:
 
 ## Quick Reference
 
-- `constructor` - `PrismaClient` setup and adapter wiring
+- `constructor` - `PrismaClient` setup, adapter wiring, logging, and SQL commenter plugins
 - `model-queries` - CRUD operations and bulk operations
 - `query-options` - `select`, `include`, `omit`, sort, pagination
 - `filters` - scalar and logical filter operators
