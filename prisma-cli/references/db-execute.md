@@ -23,9 +23,9 @@ prisma db execute [options]
 | `--stdin` | Use terminal standard input as the script |
 | `--config` | Custom path to your Prisma config file |
 
-## Prisma 7 Breaking Change
+## Current Option Surface
 
-`prisma db execute` no longer accepts `--schema` or `--url`. Configure the target datasource in `prisma.config.ts` instead, and use `--config` if you need a separate production config.
+`prisma db execute` uses the datasource configured in `prisma.config.ts`. Use `--config` if you need a separate config file for another environment.
 
 ## Examples
 
