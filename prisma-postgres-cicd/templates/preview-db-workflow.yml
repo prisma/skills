@@ -1,0 +1,121 @@
+name: Preview Database
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+env:
+  PRISMA_SERVICE_TOKEN: ${{ secrets.PRISMA_SERVICE_TOKEN }}
+  PRISMA_API_URL: https://api.prisma.io/v1
+  DB_NAME: preview-pr-${{ github.event.number }}
+  # Default region. Override if your project uses a different region.
+  DB_REGION: us-east-1
+
+jobs:
+  provision:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create preview database
+        id: create-db
+        run: |
+          RESPONSE=$(curl -sf -X POST "$PRISMA_API_URL/projects" \
+            -H "Authorization: Bearer $PRISMA_SERVICE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"name\": \"$DB_NAME\",
+              \"region\": \"$DB_REGION\",
+              \"createDatabase\": true
+            }")
+
+          PROJECT_ID=$(echo "$RESPONSE" | jq -r '.data.id')
+          DATABASE_ID=$(echo "$RESPONSE" | jq -r '.data.database.id')
+          DATABASE_URL=$(echo "$RESPONSE" | jq -r '.data.database.connections[0].endpoints.pooled.connectionString')
+          DIRECT_URL=$(echo "$RESPONSE" | jq -r '.data.database.connections[0].endpoints.direct.connectionString')
+
+          echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+          echo "database_id=$DATABASE_ID" >> "$GITHUB_OUTPUT"
+          echo "database_url=$DATABASE_URL" >> "$GITHUB_OUTPUT"
+          echo "direct_url=$DIRECT_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for database ready
+        run: |
+          for i in $(seq 1 12); do
+            STATUS=$(curl -sf "$PRISMA_API_URL/databases/${{ steps.create-db.outputs.database_id }}" \
+              -H "Authorization: Bearer $PRISMA_SERVICE_TOKEN" | jq -r '.data.status')
+            if [ "$STATUS" = "ready" ]; then
+              echo "Database is ready"
+              exit 0
+            fi
+            echo "Database status: $STATUS — waiting 5s..."
+            sleep 5
+          done
+          echo "::error::Database did not become ready within 60 seconds"
+          exit 1
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ steps.create-db.outputs.database_url }}
+          DIRECT_URL: ${{ steps.create-db.outputs.direct_url }}
+        run: npx prisma migrate deploy
+
+      - name: Seed database
+        env:
+          DATABASE_URL: ${{ steps.create-db.outputs.database_url }}
+          DIRECT_URL: ${{ steps.create-db.outputs.direct_url }}
+        run: npx prisma db seed
+        continue-on-error: true
+
+      - name: Comment on PR
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: [
+                '## 🗄️ Preview Database',
+                '',
+                `**Project:** \`${{ steps.create-db.outputs.project_id }}\``,
+                `**Database:** \`${{ steps.create-db.outputs.database_id }}\``,
+                `**Region:** \`${{ env.DB_REGION }}\``,
+                '',
+                'Migrations applied and database seeded.',
+                '',
+                '_This database will be deleted when the PR is closed._'
+              ].join('\n')
+            })
+
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find and delete preview project
+        run: |
+          # List projects and find the one matching this PR
+          PROJECTS=$(curl -sf "$PRISMA_API_URL/projects" \
+            -H "Authorization: Bearer $PRISMA_SERVICE_TOKEN")
+
+          PROJECT_ID=$(echo "$PROJECTS" | jq -r --arg name "$DB_NAME" \
+            '.data[] | select(.name == $name) | .id')
+
+          if [ -z "$PROJECT_ID" ] || [ "$PROJECT_ID" = "null" ]; then
+            echo "No preview project found for $DB_NAME — nothing to clean up"
+            exit 0
+          fi
+
+          echo "Deleting project $PROJECT_ID..."
+          curl -sf -X DELETE "$PRISMA_API_URL/projects/$PROJECT_ID" \
+            -H "Authorization: Bearer $PRISMA_SERVICE_TOKEN"
+          echo "Preview project deleted"
