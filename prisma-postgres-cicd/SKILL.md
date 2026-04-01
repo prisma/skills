@@ -47,8 +47,10 @@ Check if the user already has a project they want to use for CI preview database
 curl -s -X POST https://api.prisma.io/v1/projects \
   -H "Authorization: Bearer $PRISMA_SERVICE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name": "<repo-name>-ci", "region": "<region>"}'
+  -d '{"name": "<repo-name>-ci", "region": "<region>", "createDatabase": false}'
 ```
+
+The `"createDatabase": false` flag is important — without it, the project ships with an empty database that counts toward the workspace limit. The workflow creates databases on demand per PR.
 
 **Set the region** to match the project's existing database region. Check `prisma.config.ts` comments, the Prisma Console, or query `GET /v1/projects` with the service token. If unsure, ask the user.
 

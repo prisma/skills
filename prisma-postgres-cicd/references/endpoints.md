@@ -15,9 +15,12 @@ Use this once during setup to create a dedicated CI project that will hold all p
 ```json
 {
   "name": "my-app-ci",
-  "region": "us-east-1"
+  "region": "us-east-1",
+  "createDatabase": false
 }
 ```
+
+Set `createDatabase` to `false` so the project starts empty — the workflow creates databases per PR.
 
 **Response:**
 
