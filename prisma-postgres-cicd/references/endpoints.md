@@ -2,27 +2,22 @@
 
 Management API endpoint details for CI/CD preview database workflows.
 
-## Create project (with database)
+## Create project (for CI)
 
 ```
 POST /v1/projects
 ```
 
+Use this once during setup to create a dedicated CI project that will hold all preview databases.
+
 **Request body:**
 
 ```json
 {
-  "name": "preview-pr-42",
-  "region": "us-east-1",
-  "createDatabase": true
+  "name": "my-app-ci",
+  "region": "us-east-1"
 }
 ```
-
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `name` | string | No | Auto-generated | Project display name. Use a deterministic name (e.g., `preview-pr-{number}`) so the cleanup job can find it. |
-| `region` | string | No | `us-east-1` | Region for the database |
-| `createDatabase` | boolean | No | `true` | Create a default database with the project |
 
 **Response:**
 
@@ -31,40 +26,124 @@ POST /v1/projects
   "data": {
     "id": "proj_clx7abc123",
     "type": "project",
-    "name": "preview-pr-42",
-    "database": {
-      "id": "db_def456",
-      "status": "ready",
-      "connections": [
-        {
-          "id": "con_ghi789",
-          "kind": "postgres",
-          "endpoints": {
-            "direct": {
-              "host": "db.prisma.io",
-              "port": 5432,
-              "connectionString": "postgres://user:pass@db.prisma.io:5432/postgres?sslmode=require"
-            },
-            "pooled": {
-              "host": "pooled.db.prisma.io",
-              "port": 5432,
-              "connectionString": "postgres://user:pass@pooled.db.prisma.io:5432/postgres?sslmode=require"
-            }
+    "name": "my-app-ci",
+    "createdAt": "2025-06-15T10:30:00.000Z"
+  }
+}
+```
+
+Store `data.id` as `PRISMA_PROJECT_ID` in your CI secrets.
+
+## List databases in a project
+
+```
+GET /v1/projects/{projectId}/databases
+```
+
+Use to check if a preview database already exists before creating a new one.
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "id": "db_abc123",
+      "type": "database",
+      "name": "pr_42_feature_branch",
+      "status": "ready"
+    }
+  ],
+  "pagination": { "hasMore": false, "nextCursor": null }
+}
+```
+
+Filter by name client-side to find the preview database matching the PR.
+
+## Create database in a project
+
+```
+POST /v1/projects/{projectId}/databases
+```
+
+Creates an ephemeral preview database within the CI project.
+
+**Request body:**
+
+```json
+{
+  "name": "pr_42_feature_branch",
+  "region": "us-east-1"
+}
+```
+
+| Field | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `name` | string | No | Auto-generated | Database name. Use a deterministic name (e.g., `pr_{number}_{branch}`) for idempotent lookup and cleanup. |
+| `region` | string | No | `us-east-1` | Region for the database |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "db_def456",
+    "type": "database",
+    "status": "ready",
+    "name": "pr_42_feature_branch",
+    "connections": [
+      {
+        "id": "con_ghi789",
+        "kind": "postgres",
+        "endpoints": {
+          "direct": {
+            "host": "db.prisma.io",
+            "port": 5432,
+            "connectionString": "postgres://user:pass@db.prisma.io:5432/postgres?sslmode=require"
           }
         }
-      ],
-      "region": { "id": "us-east-1", "name": "US East (N. Virginia)" }
-    }
+      }
+    ],
+    "region": { "id": "us-east-1", "name": "US East (N. Virginia)" }
   }
 }
 ```
 
 Key fields:
 
-- `data.id` — project ID (needed for cleanup via `DELETE /v1/projects/{id}`)
-- `data.database.id` — database ID (needed to poll status)
-- `data.database.connections[0].endpoints.pooled.connectionString` → `DATABASE_URL`
-- `data.database.connections[0].endpoints.direct.connectionString` → `DIRECT_URL`
+- `data.id` — database ID (needed to poll status and for cleanup)
+- `data.connections[0].endpoints.direct.connectionString` → `DATABASE_URL`
+
+## Create connection (for existing database)
+
+```
+POST /v1/databases/{databaseId}/connections
+```
+
+Use when the preview database already exists (on `synchronize` events) and you need a fresh connection string.
+
+**Request body:**
+
+```json
+{
+  "name": "ci-run-123"
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "id": "con_new123",
+    "endpoints": {
+      "direct": {
+        "connectionString": "postgres://user:pass@db.prisma.io:5432/postgres?sslmode=require"
+      }
+    }
+  }
+}
+```
 
 ## Get database (poll for status)
 
@@ -74,37 +153,13 @@ GET /v1/databases/{databaseId}
 
 Use to poll until `data.status` is `ready`. If status is `provisioning`, wait and retry.
 
-## List projects (for cleanup)
+## Delete database
 
 ```
-GET /v1/projects
+DELETE /v1/databases/{databaseId}
 ```
 
-Returns all projects in the workspace. Use to find the preview project by name during cleanup.
-
-**Response:**
-
-```json
-{
-  "data": [
-    { "id": "proj_abc", "type": "project", "name": "preview-pr-42" },
-    { "id": "proj_def", "type": "project", "name": "production" }
-  ],
-  "pagination": { "hasMore": false, "nextCursor": null }
-}
-```
-
-Filter by name client-side to find the preview project matching the PR number.
-
-## Delete project
-
-```
-DELETE /v1/projects/{projectId}
-```
-
-Permanently deletes the project and all its databases. Returns `204 No Content`.
-
-Use in the cleanup job when a PR is closed or merged.
+Permanently deletes a single database. Returns `204 No Content`. Use in the cleanup job when a PR is closed — deletes only the preview database, not the project.
 
 ## List regions
 
@@ -112,4 +167,4 @@ Use in the cleanup job when a PR is closed or merged.
 GET /v1/regions/postgres
 ```
 
-Returns available regions. Use to validate the region before creating a project, or to let the user choose a region.
+Returns available regions. Use to validate or select the region for the CI project.
