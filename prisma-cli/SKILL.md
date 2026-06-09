@@ -1,6 +1,6 @@
 ---
 name: prisma-cli
-description: Prisma CLI commands reference covering all available commands, options, and usage patterns. Use when running Prisma CLI commands, setting up projects, generating client, running migrations, managing databases, or starting Prisma's MCP server. Triggers on "prisma init", "prisma generate", "prisma migrate", "prisma db", "prisma studio", "prisma mcp".
+description: Prisma ORM CLI commands reference covering init, generate, migrate, db, dev, studio, validate, format, debug, and mcp. Use for ORM/database CLI workflows, not Prisma Compute app deployment. For Prisma Compute, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, apps, deployments, logs, or domains, use the `prisma-compute` skill instead. Triggers on "prisma init", "prisma generate", "prisma migrate", "prisma db", "prisma studio", "prisma mcp".
 license: MIT
 metadata:
   author: prisma
@@ -9,7 +9,11 @@ metadata:
 
 # Prisma CLI Reference
 
-Complete reference for all Prisma CLI commands. This skill provides guidance on command usage, options, and best practices for current Prisma releases.
+Reference for Prisma ORM CLI commands. This skill provides guidance on command usage, options, and best practices for current Prisma ORM releases.
+
+## Boundary: Compute
+
+Do not use this skill for Prisma Compute app deployment. Use `prisma-compute` for `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, Compute apps, deployments, logs, domains, and framework deploy readiness.
 
 ## When to Apply
 

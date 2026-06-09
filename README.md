@@ -8,10 +8,10 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 
 ### prisma-cli
 
-Complete reference for current Prisma CLI commands.
+Complete reference for current Prisma ORM CLI commands. For Prisma Compute app deployment, use `prisma-compute`.
 
 **Use when:**
-- Running Prisma commands
+- Running Prisma ORM/database commands
 - Setting up new projects (`prisma init`)
 - Managing migrations and database schema
 - Generating Prisma Client
@@ -126,6 +126,27 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 - Management API (`https://api.prisma.io/v1`)
 - Management API SDK (`@prisma/management-api-sdk`)
 
+---
+
+### prisma-compute
+
+Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
+
+**Use when:**
+- Creating a new Prisma app with optional Compute deploy
+- Deploying or redeploying an existing app to Prisma Compute
+- Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, or Turborepo
+- Managing Compute app logs, deployments, environment variables, branches, and domains
+- Building programmatic Compute integrations with SDK/API tooling
+
+**Workflows covered:**
+- `@prisma/cli app build/run/deploy`
+- Generated `compute:deploy` scripts
+- `create-prisma --deploy` for new project scaffolds
+- Framework-specific build output requirements
+- `@prisma/compute-sdk` and Management API service/version concepts
+- Troubleshooting auth, env, build, deploy, log, and port issues
+
 ## Installation
 
 Install all skills:
@@ -143,6 +164,7 @@ npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres
+npx skills add prisma/skills --skill prisma-compute
 ```
 
 List available skills:
@@ -180,7 +202,9 @@ Each skill contains:
 
 ## Prisma Version
 
-These skills target **Prisma ORM 7.6.x**.
+The ORM-focused skills target **Prisma ORM 7.6.x**.
+
+The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 
 If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migration-specific guidance.
 
