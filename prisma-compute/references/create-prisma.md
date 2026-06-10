@@ -9,11 +9,11 @@ Do not use `create-prisma` as the deploy path for an existing app. For existing 
 Verify current scaffold behavior:
 
 ```bash
-bunx create-prisma@pr34 --help
-bunx create-prisma@pr34 --version
+bunx create-prisma@latest --help
+bunx create-prisma@latest --version
 ```
 
-The Compute launch flow is currently in the `create-prisma@pr34` prerelease tag. Use `create-prisma@pr34` until that PR is released to `create-prisma@latest`; after launch, verify `--deploy` appears in `create-prisma@latest --help` and switch these examples to `@latest`.
+Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy` appears in `create-prisma@latest --help`.
 
 ## Supported Templates
 
@@ -38,13 +38,13 @@ The distinction matters: a template can be scaffold-ready but not wired into the
 Interactive creation:
 
 ```bash
-bunx create-prisma@pr34
+bunx create-prisma@latest
 ```
 
 Non-interactive scaffold only:
 
 ```bash
-bunx create-prisma@pr34 \
+bunx create-prisma@latest \
   --name my-api \
   --template hono \
   --provider postgresql \
@@ -57,7 +57,7 @@ bunx create-prisma@pr34 \
 Create and deploy a supported template:
 
 ```bash
-bunx create-prisma@pr34 \
+bunx create-prisma@latest \
   --name my-api \
   --template hono \
   --provider postgresql \
@@ -78,7 +78,7 @@ With PostgreSQL, no explicit `--database-url`, and no `--no-prisma-postgres`, th
 For unattended local tests, pass `--no-prisma-postgres` unless you intentionally want provisioning:
 
 ```bash
-bunx create-prisma@pr34 \
+bunx create-prisma@latest \
   --name smoke-app \
   --template hono \
   --provider postgresql \
