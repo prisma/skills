@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 
 const DEFAULT_TIMEOUT_MS = 45_000;
 const CREATE_PRISMA_PACKAGE =
-  process.env.PRISMA_CREATE_PRISMA_PACKAGE || "create-prisma@pr34";
+  process.env.PRISMA_CREATE_PRISMA_PACKAGE || "create-prisma@latest";
 
 const checks = [
   {
@@ -188,7 +188,7 @@ function printResult(result) {
 console.log("# Prisma Compute CLI Surface");
 console.log(`runner: ${runnerCommand().command}`);
 console.log("Set PRISMA_COMPUTE_RUNNER=bunx to use bunx instead of npx.");
-console.log("Set PRISMA_CREATE_PRISMA_PACKAGE=create-prisma@latest after the Compute create-prisma PR is released.");
+console.log("Set PRISMA_CREATE_PRISMA_PACKAGE to test another create-prisma tag or local package.");
 
 let hasFailure = false;
 for (const check of checks) {

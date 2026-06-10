@@ -243,7 +243,7 @@ Verify the actual output path before using this command.
 
 Use these notes only when the project was scaffolded with `create-prisma` or the user is creating a new app. They are not the general definition of Compute framework support.
 
-`create-prisma@pr34` scaffolds these templates until the Compute create-prisma PR is released to `@latest`:
+`create-prisma@latest` scaffolds these templates:
 
 | Template | Scaffolds | Integrated `--deploy` support | Generated deploy shape |
 |----------|-----------|----------------------------------------|------------------------|

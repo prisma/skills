@@ -37,7 +37,7 @@ If a local project has a `compute:deploy` script, prefer that script.
 `--yes` skips prompts and does not opt into deploy. Pass `--deploy` explicitly:
 
 ```bash
-bunx create-prisma@pr34 --name my-api --template hono --provider postgresql --deploy
+bunx create-prisma@latest --name my-api --template hono --provider postgresql --deploy
 ```
 
 If the template is not deployable in the integrated flow, scaffold succeeds but deploy should be skipped or reported as unsupported.

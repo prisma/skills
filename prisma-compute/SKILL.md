@@ -18,10 +18,10 @@ Prisma Compute is actively moving into the Prisma Platform CLI. Before giving co
 ```bash
 bunx @prisma/cli@latest app deploy --help
 bunx @prisma/cli@latest app --help
-bunx create-prisma@pr34 --help
+bunx create-prisma@latest --help
 ```
 
-Use `@prisma/cli@latest` for Compute app deployment unless current help output shows the command has moved. Use `create-prisma@pr34` for new-project scaffolding until the Compute create-prisma PR is released to `@latest`; after that, verify `create-prisma@latest --help` and switch the scaffold examples to `@latest`.
+Use `@prisma/cli@latest` for Compute app deployment unless current help output shows the command has moved. Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy` appears in `create-prisma@latest --help`.
 
 For a compact agent-readable summary, run:
 
