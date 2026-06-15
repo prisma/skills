@@ -27,12 +27,6 @@ When a config is discovered, its directory becomes the Compute project directory
 
 Import `defineComputeConfig` from `@prisma/compute-sdk/config`. The CLI aliases this helper when loading the config, so the command can evaluate the config without a local SDK install solely for runtime loading.
 
-For TypeScript type checking in user projects, install the current SDK:
-
-```bash
-npm install -D @prisma/compute-sdk@latest
-```
-
 ```typescript
 import { defineComputeConfig } from "@prisma/compute-sdk/config";
 

@@ -23,8 +23,6 @@ bunx create-prisma@latest --help
 
 Use `@prisma/cli@latest` for Compute app deployment unless current help output shows the command has moved. Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy` appears in `create-prisma@latest --help`.
 
-When installing the Compute SDK for type checking or automation, use `@prisma/compute-sdk@latest` unless the user's project already pins a version intentionally.
-
 For a compact agent-readable summary, run:
 
 ```bash
@@ -141,7 +139,6 @@ Use this skill for:
 ### 7. SDK and API
 
 - `sdk-use-cli-first` - Prefer `@prisma/cli app deploy` for app workflows; use `create-prisma` only to scaffold a new app unless the user is building lower-level automation.
-- `sdk-use-latest-package` - Install `@prisma/compute-sdk@latest` for new SDK/config work instead of copying a pinned semver range from another project.
 - `sdk-result-handling` - `@prisma/compute-sdk` returns `Result` values; check `isOk()`/`isErr()` instead of relying on exceptions.
 
 ## Preferred Workflow
