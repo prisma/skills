@@ -117,7 +117,7 @@ Use this skill for:
 - `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts`.
 - `config-app-vs-apps` - Use `app` for a single deploy target and `apps` for monorepos or multi-app repos; define exactly one.
 - `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
-- `config-targets` - In multi-app configs, `@prisma/cli app deploy web` selects the `apps.web` target, while a bare deploy can deploy every target when the CLI supports deploy-all.
+- `config-targets` - In multi-app configs, `@prisma/cli app deploy web` selects the `apps.web` target. Without `[app]`, commands can infer the target from the current directory; otherwise deploy can run all targets while build/run require one.
 - `config-no-project-branch-secrets` - Do not commit Workspace, Project, Branch, production intent, service tokens, or secret values in `prisma.compute.ts`; keep those in flags, `.prisma/local.json`, env storage, or CI secrets.
 - `config-flags-win` - Explicit deploy flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values.
 
@@ -129,12 +129,15 @@ Use this skill for:
 - `env-cli-token-name` - Current `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth.
 - `env-branch-scope` - Branch deploys, branch env vars, and branch databases must use the same branch name; pass `--branch <git-name>` explicitly when targeting a preview branch.
 - `env-production-vs-preview` - Use `--role production` for production env, `--role preview` for preview template env, and `--branch <git-name>` for branch-specific overrides.
+- `env-db-explicit` - `--db` creates and wires one Prisma Postgres database for the branch; it never runs migrations, never creates one database per app, and conflicts with database URLs supplied through `--env`.
 
 ### 6. Deploy Operations
 
 - `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
 - `deploy-noninteractive-auth` - Non-interactive deploys need either stored CLI login or a supported service token env var; never print the token.
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
+- `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
+- `deploy-ops-targets` - App show/open/logs/list-deploys/promote/rollback/remove and domain commands can also accept `[app]` targets from `prisma.compute.ts`.
 
 ### 7. SDK and API
 

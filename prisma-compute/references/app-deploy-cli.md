@@ -118,6 +118,8 @@ If `prisma.compute.ts` defines a `name` or an `apps` key, that config can provid
 bunx @prisma/cli@latest app deploy api --project proj_123 --branch feature/login --json
 ```
 
+Without an `[app]` argument, a command run from inside a configured target root can infer that target. In a multi-app config, a bare `app deploy` from the repo root can deploy all targets in declaration order when no single target is inferred. `app build` and `app run` still need one target because local build/run commands do not operate on every app at once.
+
 Branch scope must line up across deploys, databases, and env vars:
 
 - `app deploy --branch <git-name>` creates a deployment for that branch.
@@ -131,6 +133,8 @@ Do not assume a local Git branch was used by the CLI unless the generated script
 Promotion is a separate production action: `app promote <deployment-id>` rebuilds a deployment with production env vars. Do not treat a preview branch deploy as production promotion.
 
 The current `app show`, `app list-deploys`, and `app logs` help exposes `--app`, `--project`, and for logs `--deployment`, not `--branch`. For branch debugging, capture the deployment id from deploy JSON and inspect that deployment or its logs.
+
+`app deploy --create-project <name>` creates and links a new Project before deploying. Use it only when the user wants a new Project. It conflicts with `--project` and `PRISMA_PROJECT_ID`, and `--yes` alone does not choose Project scope.
 
 ## Database and Env
 
@@ -156,6 +160,15 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 If the deploy should create and wire a Prisma Postgres database for the deploy target, current `app deploy` exposes `--db`; use `--no-db` to skip database setup. Treat any generated connection URL as a one-time secret.
 
 Database setup is not part of `prisma.compute.ts` in the current beta. Keep database intent explicit with `--db`, `--no-db`, `database create`, and project env commands.
+
+Database setup guardrails:
+
+- `--db` and `--no-db` are mutually exclusive.
+- `--yes` alone never creates a database; CI must pass `--db --yes`.
+- `--db` creates and wires one branch database. In deploy-all, every target on that branch shares it.
+- `--db` does not run migrations, seed data, or schema push. Run the app's own Prisma database command after deploy setup when needed.
+- Database env values supplied through `--env DATABASE_URL=...`, `--env DIRECT_URL=...`, or an env file suppress automatic database prompting; combining those values with `--db` is rejected.
+- Known non-PostgreSQL Prisma schema sources do not trigger database prompting; explicit `--db` is rejected because it creates Prisma Postgres.
 
 ## Build and Run Locally
 
@@ -274,6 +287,8 @@ bunx @prisma/cli@latest app deploy \
   --env .env
 ```
 
+`--entry <path>` without `--framework` is treated as a Bun app deploy by the current CLI.
+
 Config-backed Bun-style app:
 
 ```bash
@@ -298,6 +313,7 @@ bunx @prisma/cli@latest app list-deploys --json
 bunx @prisma/cli@latest app show-deploy <deployment-id> --json
 bunx @prisma/cli@latest app promote <deployment-id> --yes
 bunx @prisma/cli@latest app rollback --to <deployment-id> --yes
+bunx @prisma/cli@latest app remove --app my-api --yes
 ```
 
 Logs:
@@ -312,10 +328,13 @@ Domains:
 
 ```bash
 bunx @prisma/cli@latest app domain add shop.example.com
+bunx @prisma/cli@latest app domain show shop.example.com
 bunx @prisma/cli@latest app domain wait shop.example.com --timeout 15m
 bunx @prisma/cli@latest app domain retry shop.example.com
 bunx @prisma/cli@latest app domain remove shop.example.com
 ```
+
+Custom domain commands target production branch runtime during the current beta. Do not use a preview branch for production domain setup.
 
 ## Output Handling
 

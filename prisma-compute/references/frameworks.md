@@ -35,7 +35,7 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 | Next.js | `--framework nextjs` | Yes | standalone `server.js` output | Requires `output: "standalone"` |
 | Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | CLI owns framework build output; do not add a config `build` block |
 | Astro | `--framework astro` | Yes | standalone Node server artifact | CLI owns framework build output; do not add a config `build` block |
-| Hono | `--framework hono` | Yes | Bun entry from `main`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
+| Hono | `--framework hono` | Yes | Bun entry from `main`, `module`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
 | Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia, Nest, custom HTTP servers |
 | Elysia | `--framework bun --entry src/index.ts` | No dedicated deploy key | Bun entrypoint | Preserve port/host handling |
@@ -117,7 +117,7 @@ export default defineComputeConfig({
 
 Project expectations:
 
-- `package.json` has `main: "src/index.ts"` or deploy passes `--entry src/index.ts`
+- `package.json` has `main` or `module` pointing at the entrypoint, or deploy passes `--entry src/index.ts`
 - server uses `@hono/node-server`
 - code reads `process.env.PORT` and defaults to the same port used by `--http-port`
 - code does not set `hostname` to `localhost` or `127.0.0.1`; if hostname is set explicitly, use `0.0.0.0`
@@ -243,9 +243,11 @@ bunx @prisma/cli@latest app deploy \
   --env .env
 ```
 
+Current `app deploy` also treats `--entry <path>` without `--framework` as a Bun app deploy.
+
 Requirements:
 
-- pass `--entry` unless `package.json` `main` points at the runtime entrypoint
+- pass `--entry` unless `package.json` `main` or `module` points at the runtime entrypoint
 - ensure the entrypoint starts an HTTP server, not only exports handlers
 - read `process.env.PORT` or align `--http-port` with the fixed listener port
 - bind on all interfaces

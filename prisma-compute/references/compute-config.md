@@ -138,15 +138,21 @@ bunx @prisma/cli@latest app build api
 bunx @prisma/cli@latest app run api --port 8080
 ```
 
-When the CLI supports deploy-all, a bare deploy in a multi-app config can deploy all targets in declaration order:
+If no `[app]` argument is passed, commands can infer the target from the invocation directory when it is inside a configured `root`. The deepest matching root wins. If no target is inferred from a multi-app config, a bare deploy can deploy all targets in declaration order:
 
 ```bash
 bunx @prisma/cli@latest app deploy --branch feature/foo --json --no-interactive
 ```
 
-Deploy-all rejects per-app overrides such as `--app`, `--framework`, `--entry`, `--http-port`, and `--env`. Project and branch flags still apply to the whole run.
+Deploy-all rejects per-app overrides such as `--app`, `--framework`, `--entry`, `--http-port`, `--env`, and `PRISMA_APP_ID`. Project, branch, database, production, and confirmation flags still apply to the whole run.
 
 `app build` and `app run` still need one target in multi-app configs because a local build/run command cannot operate N apps at once.
+
+Additional target rules:
+
+- A single-entry `apps` map can deploy its only target without an argument.
+- With a single `app` config, `[app]` is accepted only when it equals the configured `name`.
+- `[app]` without any compute config file is a usage error.
 
 ## Precedence
 

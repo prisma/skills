@@ -139,6 +139,23 @@ bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .e
 
 If `PRISMA_SERVICE_TOKEN` is set but empty, the CLI errors before trying browser-login credentials. Unset it or provide a valid workspace service token. Never echo, log, or paste the token value; only check whether it is present.
 
+## Project Setup Fails
+
+Symptoms:
+
+- `PROJECT_SETUP_REQUIRED`
+- non-interactive deploy cannot choose a Project
+- deploy was expected to create a Project but did not
+
+Fix:
+
+```bash
+bunx @prisma/cli@latest app deploy --project <id-or-name> --json --no-interactive
+bunx @prisma/cli@latest app deploy --create-project <name> --yes
+```
+
+Do not rely on `--yes` alone to choose Project scope. `--project`, `--create-project`, and `PRISMA_PROJECT_ID` are mutually exclusive.
+
 ## Missing or Placeholder `DATABASE_URL`
 
 Symptoms:
@@ -191,6 +208,23 @@ Fix:
 - do not assume `app show`, `app list-deploys`, or `app logs` can filter by branch unless current help output adds that flag
 - treat `app promote <deployment-id>` as a production action because it rebuilds with production env vars
 - do not expect `prisma.compute.ts` to select Project, Branch, production, or database scope; it only supplies app deploy defaults
+
+## `--db` Rejected or Did Not Apply Schema
+
+Symptoms:
+
+- `app deploy --db` is rejected
+- `--db` created env vars but the database is empty
+- a deploy-all run created one database while multiple apps deployed
+
+Fix:
+
+- pass either `--db` or `--no-db`, not both
+- pass `--db --yes` for non-interactive database creation; `--yes` alone does not create a database
+- remove `DATABASE_URL` or `DIRECT_URL` from `--env` inputs when using `--db`
+- use `--db` only for Prisma Postgres; known non-PostgreSQL schemas are rejected
+- run migrations, seed, or schema push yourself after database setup
+- for multi-app deploy-all, expect one branch database shared by all targets; create and assign separate databases explicitly when apps need isolation
 
 ## Next.js Standalone Missing
 
