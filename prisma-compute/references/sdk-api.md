@@ -15,7 +15,7 @@ For normal app deployment:
 Install:
 
 ```bash
-npm install @prisma/compute-sdk @prisma/management-api-sdk
+npm install @prisma/compute-sdk@latest @prisma/management-api-sdk
 ```
 
 Config helper:
