@@ -27,11 +27,11 @@ Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy
 | `tanstack-start` | Yes | Yes |
 | `nest` | Yes | No |
 | `svelte` | Yes | No |
-| `astro` | Yes | No |
-| `nuxt` | Yes | No |
-| `turborepo` | Yes | No |
+| `astro` | Yes | Verify current release |
+| `nuxt` | Yes | Verify current release |
+| `turborepo` | Yes | Verify current release; config target is usually `api` |
 
-The distinction matters: a template can be scaffold-ready but not wired into the integrated deploy prompt yet.
+The distinction matters: a template can be scaffold-ready while deploy/config generation is still rolling out. Check generated `package.json`, `prisma.compute.ts`, and README instead of assuming from the template name alone.
 
 ## Basic Commands
 
@@ -91,29 +91,29 @@ Do not deploy placeholder database URLs. If `DATABASE_URL` came from a placehold
 
 ## Generated Deploy Script
 
-When the deploy flow is selected, `create-prisma` adds:
+When the deploy flow is selected, `create-prisma` can add:
 
 ```json
 {
   "scripts": {
-    "compute:deploy": "bunx @prisma/cli@latest app deploy --prod --yes --env .env ..."
+    "compute:deploy": "bunx @prisma/cli@latest app deploy --prod --yes ..."
   }
 }
 ```
 
-Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code and env from `.env`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
+Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code using generated flags and/or `prisma.compute.ts`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
 
-Current `create-prisma` does not emit `prisma.compute.ts`. For reusable deploy defaults after scaffolding, add `prisma.compute.ts` yourself and keep the generated `compute:deploy` script as a convenient command wrapper.
+Current and near-term `create-prisma` behavior can differ by release. Some Compute-ready templates generate `prisma.compute.ts` with framework, port, target, and env-file defaults; older generated projects may only have a `compute:deploy` script with explicit flags. Treat missing `prisma.compute.ts` as normal for a simple app, not as a deploy blocker.
 
-Example for a generated Hono app:
+Example config for a generated Hono app:
 
 ```typescript
 import { defineComputeConfig } from "@prisma/compute-sdk/config";
 
 export default defineComputeConfig({
   app: {
+    name: "my-api",
     framework: "hono",
-    entry: "src/index.ts",
     httpPort: 8080,
     env: ".env",
   },

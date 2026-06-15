@@ -24,7 +24,7 @@ If a future Prisma ORM CLI exposes `prisma app deploy`, use the local project co
 
 ## Typed Compute Config
 
-For reusable deploy defaults, prefer `prisma.compute.ts` over long command lines. Read [`compute-config.md`](compute-config.md) before creating or editing it.
+`prisma.compute.ts` is optional for a normal single-app deploy. Use it when a project has reusable deploy defaults, generated Compute config, or multiple deploy targets. For one-off/simple apps, explicit flags are fine. Read [`compute-config.md`](compute-config.md) before creating or editing it.
 
 Minimal single-app config:
 
@@ -69,6 +69,8 @@ bunx @prisma/cli@latest app deploy api --branch feature/login --json
 ```
 
 Config values are deploy defaults. Explicit flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values. `prisma.compute.ts` does not select Workspace, Project, Branch, database, or production scope; continue to use flags, project linking, env storage, and CI secrets for those.
+
+For monorepos, use `prisma.compute.ts` at the repo/workspace root to declare `apps` targets and their `root`, `framework`, `entry`, `httpPort`, and `env` values. Without it, the CLI cannot reliably know which package root to deploy.
 
 ## Auth and Project Binding
 
@@ -149,7 +151,7 @@ bunx @prisma/cli@latest project env list --branch feature/foo
 bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 ```
 
-`app deploy --env .env` loads environment variables from a file for the deployment. It is not a migration command and does not seed data.
+`app deploy --env .env` loads environment variables from a file for the deployment. A config-backed deploy can instead load env through `prisma.compute.ts` `env`. Neither path is a migration command or seed command.
 
 If the deploy should create and wire a Prisma Postgres database for the deploy target, current `app deploy` exposes `--db`; use `--no-db` to skip database setup. Treat any generated connection URL as a one-time secret.
 
@@ -185,7 +187,7 @@ bunx @prisma/cli@latest app run api --port 8080
 For deploys, check both pieces:
 
 - Port: current `@prisma/cli app deploy` uses HTTP `3000` by default when `--http-port` is omitted.
-- Generated scripts: Hono/Elysia `compute:deploy` scripts pass `--http-port 8080`; trust the generated script unless you are intentionally changing the app port.
+- Generated scripts/config: Hono/Elysia usually set HTTP port `8080` either through `prisma.compute.ts` or older `--http-port 8080` script flags; trust the actual generated file/script unless you are intentionally changing the app port.
 - Host: deployed servers must bind all interfaces. Do not hard-code `localhost` or `127.0.0.1`; use `0.0.0.0` or the framework equivalent.
 
 If a fixed-port Bun app listens on `8080`, deploy it with `--http-port 8080`. If a framework server reads `process.env.PORT`, keep the code path intact and avoid deploy env that overrides the host to loopback.

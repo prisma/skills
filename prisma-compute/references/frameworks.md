@@ -35,7 +35,7 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 | Next.js | `--framework nextjs` | Yes | standalone `server.js` output | Requires `output: "standalone"` |
 | Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | CLI owns framework build output; do not add a config `build` block |
 | Astro | `--framework astro` | Yes | standalone Node server artifact | CLI owns framework build output; do not add a config `build` block |
-| Hono | `--framework hono` | Yes | Bun entry from `main`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated scripts |
+| Hono | `--framework hono` | Yes | Bun entry from `main`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
 | Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia, Nest, custom HTTP servers |
 | Elysia | `--framework bun --entry src/index.ts` | No dedicated deploy key | Bun entrypoint | Preserve port/host handling |
@@ -332,17 +332,17 @@ Use these notes only when the project was scaffolded with `create-prisma` or the
 
 | Template | Scaffolds | Integrated `--deploy` support | Generated deploy shape |
 |----------|-----------|----------------------------------------|------------------------|
-| `hono` | Yes | Yes | `@prisma/cli app deploy --framework hono --http-port 8080 ...` |
-| `elysia` | Yes | Yes | `@prisma/cli app deploy --framework bun --http-port 8080 ...` |
-| `next` | Yes | Yes | `@prisma/cli app deploy --framework nextjs ...` |
-| `tanstack-start` | Yes | Yes | `@prisma/cli app deploy --framework tanstack-start ...` |
+| `hono` | Yes | Yes | `prisma.compute.ts` or older `--framework hono --http-port 8080` script |
+| `elysia` | Yes | Yes | `prisma.compute.ts` or older `--framework bun --http-port 8080` script |
+| `next` | Yes | Yes | `prisma.compute.ts` or older `--framework nextjs` script |
+| `tanstack-start` | Yes | Yes | `prisma.compute.ts` or older `--framework tanstack-start` script |
 | `nest` | Yes | No | scaffold only |
 | `svelte` | Yes | No | scaffold only |
-| `astro` | Yes | No | scaffold only, even though CLI source has an Astro deploy key |
-| `nuxt` | Yes | No | scaffold only, even though CLI source has a Nuxt deploy key |
-| `turborepo` | Yes | No | scaffold only |
+| `astro` | Yes | Verify current release | `prisma.compute.ts` with `framework: "astro"` when generated |
+| `nuxt` | Yes | Verify current release | `prisma.compute.ts` with `framework: "nuxt"` when generated |
+| `turborepo` | Yes | Verify current release | `prisma.compute.ts` with `apps.api`; script may run `app deploy api` |
 
-The distinction matters: a template can be scaffold-ready without being wired into the integrated `create-prisma --deploy` prompt. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.
+The distinction matters: generated deploy/config support is rolling out independently from template scaffolding. Inspect the generated `package.json`, `prisma.compute.ts`, and README before assuming support from the template name alone. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.
 
 The generated templates import Prisma Client from local generated paths such as:
 

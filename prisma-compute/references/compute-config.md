@@ -2,6 +2,10 @@
 
 Use this reference when creating or updating `prisma.compute.ts`, especially for monorepos, multi-app deploys, reusable framework defaults, env inputs, ports, entrypoints, or build settings.
 
+`prisma.compute.ts` is not required for every deploy. A simple app can deploy with `@prisma/cli app deploy --framework ... --entry ... --http-port ... --env ...`. The config file exists to make those app-level defaults typed and repeatable.
+
+For monorepos or multi-app repositories, use `prisma.compute.ts`: it is the practical way to tell Compute which app target lives at which `root` and which framework/entry/env defaults belong to each target.
+
 ## File Names and Discovery
 
 The canonical file is `prisma.compute.ts`. The loader also accepts:
@@ -97,7 +101,7 @@ Use `command: null` to skip the build step only when the app root already contai
 
 ## Monorepos and Multi-App Repos
 
-For monorepos, put `prisma.compute.ts` at the repo or workspace root and use `apps`.
+For monorepos, put `prisma.compute.ts` at the repo or workspace root and use `apps`. This keeps project binding and local `.prisma/` state at the repo root while each app builds from its own `root`.
 
 ```typescript
 import { defineComputeConfig } from "@prisma/compute-sdk/config";

@@ -113,16 +113,18 @@ Use this skill for:
 
 ### 4. Typed Compute Config
 
+- `config-optional-simple-app` - `prisma.compute.ts` is not required to deploy a normal single app; use flags when there is no durable config.
 - `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts` or legacy `prisma.app.json`.
 - `config-app-vs-apps` - Use `app` for a single deploy target and `apps` for monorepos or multi-app repos; define exactly one.
-- `config-targets` - In multi-app configs, `prisma-cli app deploy web` selects the `apps.web` target, while a bare deploy can deploy every target when the CLI supports deploy-all.
+- `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
+- `config-targets` - In multi-app configs, `@prisma/cli app deploy web` selects the `apps.web` target, while a bare deploy can deploy every target when the CLI supports deploy-all.
 - `config-no-project-branch-secrets` - Do not commit Workspace, Project, Branch, production intent, service tokens, or secret values in `prisma.compute.ts`; keep those in flags, `.prisma/local.json`, env storage, or CI secrets.
 - `config-flags-win` - Explicit deploy flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values.
 
 ### 5. Branch, Environment, and Database
 
 - `env-do-not-leak-secrets` - Never print full `DATABASE_URL`, service tokens, or secret values.
-- `env-deploy-loads-dotenv` - The generated deploy script passes `--env .env`; ensure production values are present before deploy.
+- `env-deploy-loads-dotenv` - Generated deploy scripts may load env via `prisma.compute.ts` or `--env .env`; inspect the actual script/config before redeploy.
 - `env-migrations-separate` - Redeploy scripts do not run migrations or seed data. Run the appropriate Prisma database scripts separately.
 - `env-cli-token-name` - Current `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth; older Compute CLI and SDK examples may use `PRISMA_API_TOKEN`.
 - `env-branch-scope` - Branch deploys, branch env vars, and branch databases must use the same branch name; pass `--branch <git-name>` explicitly when targeting a preview branch.
@@ -144,7 +146,7 @@ Use this skill for:
 1. Inspect the project: package manager, template/framework, `package.json` scripts, Prisma version, Prisma client location, `prisma.compute.ts`, and existing `compute:deploy`.
 2. Verify CLI help output for the package actually being used, or run `scripts/verify-compute-surface.mjs` for the standard Compute surface check.
 3. Choose the path:
-   - existing app deploy: `prisma.compute.ts` target, generated `compute:deploy`, or `@prisma/cli app build/run/deploy`
+   - existing app deploy: config-backed target when present, generated `compute:deploy`, or `@prisma/cli app build/run/deploy` flags
    - new app scaffold: `create-prisma`, then generated `compute:deploy` or `@prisma/cli app deploy`
    - low-level automation: `@prisma/compute-sdk` or Management API
 4. Check framework readiness plus host/port/env/runtime requirements, including project and branch scope.

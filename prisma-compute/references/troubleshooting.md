@@ -35,6 +35,8 @@ If a local project has a `compute:deploy` script, prefer that script.
 
 ## `prisma.compute.ts` Not Picked Up
 
+This only matters when the project is supposed to use a config-backed deploy. A simple app without `prisma.compute.ts` can still deploy with explicit `app deploy` flags.
+
 Symptoms:
 
 - deploy ignores the expected framework, entrypoint, port, env file, or app root
@@ -300,7 +302,7 @@ Fix:
 - read `process.env.PORT`
 - pass `--http-port <port>` when the app has a fixed port
 - use the generated `compute:deploy` script when it exists
-- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia `compute:deploy` scripts pass `--http-port 8080`
+- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia projects usually configure `8080` through `prisma.compute.ts` or older `--http-port 8080` script flags
 - use the template defaults: Hono/Elysia `8080`, Next/TanStack/Nuxt `3000`, Astro `4321`
 
 ## Public URL Smoke Test Fails
@@ -346,7 +348,7 @@ Fix:
 
 ## Env Changes Did Not Apply
 
-Generated `compute:deploy` scripts redeploy with `--env .env`; they do not run migrations or seed data.
+Generated `compute:deploy` scripts redeploy using the generated flags and/or `prisma.compute.ts`; they do not run migrations or seed data.
 
 After env changes:
 
