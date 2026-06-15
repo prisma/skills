@@ -114,7 +114,7 @@ Use this skill for:
 ### 4. Typed Compute Config
 
 - `config-optional-simple-app` - `prisma.compute.ts` is not required to deploy a normal single app; use flags when there is no durable config.
-- `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts` or legacy `prisma.app.json`.
+- `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts`.
 - `config-app-vs-apps` - Use `app` for a single deploy target and `apps` for monorepos or multi-app repos; define exactly one.
 - `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
 - `config-targets` - In multi-app configs, `@prisma/cli app deploy web` selects the `apps.web` target, while a bare deploy can deploy every target when the CLI supports deploy-all.
@@ -126,7 +126,7 @@ Use this skill for:
 - `env-do-not-leak-secrets` - Never print full `DATABASE_URL`, service tokens, or secret values.
 - `env-deploy-loads-dotenv` - Generated deploy scripts may load env via `prisma.compute.ts` or `--env .env`; inspect the actual script/config before redeploy.
 - `env-migrations-separate` - Redeploy scripts do not run migrations or seed data. Run the appropriate Prisma database scripts separately.
-- `env-cli-token-name` - Current `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth; older Compute CLI and SDK examples may use `PRISMA_API_TOKEN`.
+- `env-cli-token-name` - Current `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth.
 - `env-branch-scope` - Branch deploys, branch env vars, and branch databases must use the same branch name; pass `--branch <git-name>` explicitly when targeting a preview branch.
 - `env-production-vs-preview` - Use `--role production` for production env, `--role preview` for preview template env, and `--branch <git-name>` for branch-specific overrides.
 
@@ -159,7 +159,6 @@ Use this skill for:
 - Do not run `create-prisma` inside an existing app just to deploy it; use the generated `compute:deploy` script or `@prisma/cli app deploy`.
 - Do not tell users that every `create-prisma` template can auto-deploy.
 - Do not put Compute deploy defaults in `prisma.config.ts`; use `prisma.compute.ts` until the CLI ships a unified config shape.
-- Do not use legacy `prisma.app.json` for build settings; migrate custom build settings into `prisma.compute.ts`.
 - Do not deploy with placeholder `DATABASE_URL` values.
 - Do not assume `next start` is the Compute runtime path; Next.js deploys need standalone output.
 - Do not expose secret values from `.env`, CLI output, Management API responses, or logs.

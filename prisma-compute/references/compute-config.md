@@ -179,25 +179,6 @@ bunx @prisma/cli@latest app deploy web --no-db
 
 In multi-app deploy-all runs, `--db` creates and wires one branch database and reuses it for the remaining targets. If apps need separate databases, create and assign those env vars explicitly instead of expecting `--db` to infer app-to-database ownership.
 
-## Legacy `prisma.app.json`
-
-`prisma.app.json` is legacy. Do not create or update it. If a project has custom build settings in `prisma.app.json`, move them into the app target's `build` block in `prisma.compute.ts` and delete the legacy file.
-
-Example migration:
-
-```typescript
-export default defineComputeConfig({
-  app: {
-    framework: "bun",
-    entry: "src/server.ts",
-    build: {
-      command: "bun run build",
-      outputDirectory: "dist",
-    },
-  },
-});
-```
-
 ## Relationship to `prisma.config.ts`
 
 Do not put Compute deploy defaults in `prisma.config.ts` today. Prisma ORM uses `prisma.config.ts`, while Compute uses `prisma.compute.ts`.

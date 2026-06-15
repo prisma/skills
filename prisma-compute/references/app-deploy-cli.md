@@ -101,7 +101,7 @@ bunx @prisma/cli@latest auth whoami
 bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .env
 ```
 
-Do not print the token value. Historical standalone Compute CLI examples and low-level SDK snippets may use `PRISMA_API_TOKEN`; do not assume that name works for `@prisma/cli app deploy` unless the current CLI source/help confirms it.
+Do not print the token value.
 
 ## Project, Branch, Database, and Env Scope
 
@@ -187,7 +187,7 @@ bunx @prisma/cli@latest app run api --port 8080
 For deploys, check both pieces:
 
 - Port: current `@prisma/cli app deploy` uses HTTP `3000` by default when `--http-port` is omitted.
-- Generated scripts/config: Hono/Elysia usually set HTTP port `8080` either through `prisma.compute.ts` or older `--http-port 8080` script flags; trust the actual generated file/script unless you are intentionally changing the app port.
+- Generated scripts/config: Hono/Elysia usually set HTTP port `8080` either through `prisma.compute.ts` or flag-backed `--http-port 8080` scripts; trust the actual generated file/script unless you are intentionally changing the app port.
 - Host: deployed servers must bind all interfaces. Do not hard-code `localhost` or `127.0.0.1`; use `0.0.0.0` or the framework equivalent.
 
 If a fixed-port Bun app listens on `8080`, deploy it with `--http-port 8080`. If a framework server reads `process.env.PORT`, keep the code path intact and avoid deploy env that overrides the host to loopback.
@@ -281,10 +281,6 @@ bunx @prisma/cli@latest app deploy api --prod --yes --env .env
 ```
 
 Use config for stable app defaults, and flags for one-off project, branch, env, database, and production choices.
-
-## Legacy Config
-
-Do not create `prisma.app.json`. It is legacy and no longer the Compute app config path. If a project has custom build settings there, move them into the relevant `build` block in `prisma.compute.ts` and delete `prisma.app.json`.
 
 ## Operations
 

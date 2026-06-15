@@ -93,33 +93,6 @@ export default defineComputeConfig({
 });
 ```
 
-## Legacy `prisma.app.json`
-
-Symptoms:
-
-- deploy reports `BUILD_SETTINGS_MIGRATION_REQUIRED`
-- a project still has committed `prisma.app.json`
-- custom build command or output directory was stored in legacy config
-
-Fix:
-
-Move build settings into `prisma.compute.ts`:
-
-```typescript
-export default defineComputeConfig({
-  app: {
-    framework: "bun",
-    entry: "src/server.ts",
-    build: {
-      command: "bun run build",
-      outputDirectory: "dist",
-    },
-  },
-});
-```
-
-Then delete `prisma.app.json`. Do not recreate it.
-
 ## `create-prisma --yes` Did Not Deploy
 
 `--yes` skips prompts and does not opt into deploy. Pass `--deploy` explicitly:
@@ -165,8 +138,6 @@ bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .e
 ```
 
 If `PRISMA_SERVICE_TOKEN` is set but empty, the CLI errors before trying browser-login credentials. Unset it or provide a valid workspace service token. Never echo, log, or paste the token value; only check whether it is present.
-
-Older `@prisma/compute-cli` and SDK examples may use `PRISMA_API_TOKEN`. Treat that as legacy or SDK-specific until the current `@prisma/cli` source/help says otherwise.
 
 ## Missing or Placeholder `DATABASE_URL`
 
@@ -302,7 +273,7 @@ Fix:
 - read `process.env.PORT`
 - pass `--http-port <port>` when the app has a fixed port
 - use the generated `compute:deploy` script when it exists
-- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia projects usually configure `8080` through `prisma.compute.ts` or older `--http-port 8080` script flags
+- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia projects usually configure `8080` through `prisma.compute.ts` or flag-backed `--http-port 8080` scripts
 - use the template defaults: Hono/Elysia `8080`, Next/TanStack/Nuxt `3000`, Astro `4321`
 
 ## Public URL Smoke Test Fails

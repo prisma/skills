@@ -332,10 +332,10 @@ Use these notes only when the project was scaffolded with `create-prisma` or the
 
 | Template | Scaffolds | Integrated `--deploy` support | Generated deploy shape |
 |----------|-----------|----------------------------------------|------------------------|
-| `hono` | Yes | Yes | `prisma.compute.ts` or older `--framework hono --http-port 8080` script |
-| `elysia` | Yes | Yes | `prisma.compute.ts` or older `--framework bun --http-port 8080` script |
-| `next` | Yes | Yes | `prisma.compute.ts` or older `--framework nextjs` script |
-| `tanstack-start` | Yes | Yes | `prisma.compute.ts` or older `--framework tanstack-start` script |
+| `hono` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework hono --http-port 8080` script |
+| `elysia` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework bun --http-port 8080` script |
+| `next` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework nextjs` script |
+| `tanstack-start` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework tanstack-start` script |
 | `nest` | Yes | No | scaffold only |
 | `svelte` | Yes | No | scaffold only |
 | `astro` | Yes | Verify current release | `prisma.compute.ts` with `framework: "astro"` when generated |
