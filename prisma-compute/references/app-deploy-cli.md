@@ -22,6 +22,54 @@ pnpm dlx @prisma/cli@latest app deploy
 
 If a future Prisma ORM CLI exposes `prisma app deploy`, use the local project command after verifying `prisma app deploy --help`.
 
+## Typed Compute Config
+
+For reusable deploy defaults, prefer `prisma.compute.ts` over long command lines. Read [`compute-config.md`](compute-config.md) before creating or editing it.
+
+Minimal single-app config:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+
+export default defineComputeConfig({
+  app: {
+    name: "api",
+    framework: "hono",
+    entry: "src/index.ts",
+    httpPort: 8080,
+    env: ".env",
+  },
+});
+```
+
+Monorepo config:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+
+export default defineComputeConfig({
+  apps: {
+    web: { root: "apps/web", framework: "nextjs" },
+    api: {
+      root: "apps/api",
+      framework: "bun",
+      entry: "src/index.ts",
+      httpPort: 8080,
+      env: "apps/api/.env",
+    },
+  },
+});
+```
+
+Targeted deploys:
+
+```bash
+bunx @prisma/cli@latest app deploy web
+bunx @prisma/cli@latest app deploy api --branch feature/login --json
+```
+
+Config values are deploy defaults. Explicit flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values. `prisma.compute.ts` does not select Workspace, Project, Branch, database, or production scope; continue to use flags, project linking, env storage, and CI secrets for those.
+
 ## Auth and Project Binding
 
 Useful commands:
@@ -62,6 +110,12 @@ bunx @prisma/cli@latest project show --json
 bunx @prisma/cli@latest app deploy --project proj_123 --app my-api --branch feature/login --json
 ```
 
+If `prisma.compute.ts` defines a `name` or an `apps` key, that config can provide the app name. `--app` and `PRISMA_APP_ID` rank above the config value. `[app]` selects a target from `apps` when the installed CLI supports typed compute config:
+
+```bash
+bunx @prisma/cli@latest app deploy api --project proj_123 --branch feature/login --json
+```
+
 Branch scope must line up across deploys, databases, and env vars:
 
 - `app deploy --branch <git-name>` creates a deployment for that branch.
@@ -99,6 +153,8 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 
 If the deploy should create and wire a Prisma Postgres database for the deploy target, current `app deploy` exposes `--db`; use `--no-db` to skip database setup. Treat any generated connection URL as a one-time secret.
 
+Database setup is not part of `prisma.compute.ts` in the current beta. Keep database intent explicit with `--db`, `--no-db`, `database create`, and project env commands.
+
 ## Build and Run Locally
 
 Before deploy, verify that the app can produce a Compute artifact:
@@ -113,6 +169,13 @@ For Bun/server entrypoints:
 ```bash
 bunx @prisma/cli@latest app build --build-type bun --entry src/index.ts
 bunx @prisma/cli@latest app run --build-type bun --entry src/index.ts --port 8080
+```
+
+With a compute config, pass the target name instead of repeating framework/entry/port flags:
+
+```bash
+bunx @prisma/cli@latest app build api
+bunx @prisma/cli@latest app run api --port 8080
 ```
 
 `app run --port` sets `PORT` for local development. It does not rewrite an app's explicit host binding, so a local run is not enough to prove the deployed server is reachable from ingress.
@@ -208,6 +271,18 @@ bunx @prisma/cli@latest app deploy \
   --yes \
   --env .env
 ```
+
+Config-backed Bun-style app:
+
+```bash
+bunx @prisma/cli@latest app deploy api --prod --yes --env .env
+```
+
+Use config for stable app defaults, and flags for one-off project, branch, env, database, and production choices.
+
+## Legacy Config
+
+Do not create `prisma.app.json`. It is legacy and no longer the Compute app config path. If a project has custom build settings there, move them into the relevant `build` block in `prisma.compute.ts` and delete `prisma.app.json`.
 
 ## Operations
 

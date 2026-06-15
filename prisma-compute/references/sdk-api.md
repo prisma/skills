@@ -18,6 +18,14 @@ Install:
 npm install @prisma/compute-sdk @prisma/management-api-sdk
 ```
 
+Config helper:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+```
+
+Use this import in `prisma.compute.ts` for type checking. The helper is an identity function; the CLI loader aliases the import when it evaluates config files, so a user project does not need the SDK solely to load a Compute config.
+
 Create an authenticated Management API client:
 
 ```typescript

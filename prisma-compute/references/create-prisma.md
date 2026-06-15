@@ -103,6 +103,23 @@ When the deploy flow is selected, `create-prisma` adds:
 
 Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code and env from `.env`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
 
+Current `create-prisma` does not emit `prisma.compute.ts`. For reusable deploy defaults after scaffolding, add `prisma.compute.ts` yourself and keep the generated `compute:deploy` script as a convenient command wrapper.
+
+Example for a generated Hono app:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+
+export default defineComputeConfig({
+  app: {
+    framework: "hono",
+    entry: "src/index.ts",
+    httpPort: 8080,
+    env: ".env",
+  },
+});
+```
+
 ## Template Defaults to Preserve
 
 Hono and Elysia:

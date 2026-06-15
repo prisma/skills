@@ -17,6 +17,7 @@ Then inspect:
 ```bash
 pwd
 cat package.json
+find .. -maxdepth 3 \( -name 'prisma.compute.ts' -o -name 'prisma.compute.mts' -o -name 'prisma.compute.js' -o -name 'prisma.compute.mjs' -o -name 'prisma.compute.cjs' \) -print
 test -f .env && sed -n 's/=.*/=<redacted>/p' .env
 ```
 
@@ -31,6 +32,91 @@ bunx @prisma/cli@latest app deploy --help
 ```
 
 If a local project has a `compute:deploy` script, prefer that script.
+
+## `prisma.compute.ts` Not Picked Up
+
+Symptoms:
+
+- deploy ignores the expected framework, entrypoint, port, env file, or app root
+- a monorepo target such as `api` is not recognized
+- local state appears in the wrong `.prisma/` directory
+
+Check:
+
+```bash
+pwd
+find .. -maxdepth 4 \( -name 'prisma.compute.ts' -o -name 'prisma.compute.mts' -o -name 'prisma.compute.js' -o -name 'prisma.compute.mjs' -o -name 'prisma.compute.cjs' \) -print
+bunx @prisma/cli@latest app deploy --help
+```
+
+Fix:
+
+- keep exactly one compute config file in the directory where it lives
+- put repo-wide or monorepo config at the repository/workspace root
+- run commands from inside the repo or workspace boundary so discovery can walk up to the config
+- use `[app]` targets from the `apps` keys, such as `bunx @prisma/cli@latest app deploy api`
+- remember that config-relative paths such as `root` and `env.file` resolve from the config file directory
+
+If the installed `@prisma/cli@latest` help does not mention `prisma.compute.ts` or `[app]`, the published package may lag the CLI source. Either test with the intended CLI version or fall back to explicit flags until the new package is available.
+
+## Compute Config Invalid
+
+Symptoms:
+
+- `COMPUTE_CONFIG_INVALID`
+- `COMPUTE_CONFIG_TARGET_REQUIRED`
+- `COMPUTE_CONFIG_TARGET_UNKNOWN`
+- "Multiple compute config files found"
+
+Fix:
+
+- export `defineComputeConfig({ app: ... })` or `defineComputeConfig({ apps: ... })`
+- define exactly one of `app` or `apps`
+- remove unknown top-level keys
+- pass a target for multi-app build/run commands, such as `app build web`
+- pass an existing `apps` key for multi-app deploys, such as `app deploy api`
+- remove custom `build` blocks from `nuxt` and `astro` targets
+
+Minimal recovery config:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+
+export default defineComputeConfig({
+  app: {
+    framework: "hono",
+    entry: "src/index.ts",
+    httpPort: 8080,
+  },
+});
+```
+
+## Legacy `prisma.app.json`
+
+Symptoms:
+
+- deploy reports `BUILD_SETTINGS_MIGRATION_REQUIRED`
+- a project still has committed `prisma.app.json`
+- custom build command or output directory was stored in legacy config
+
+Fix:
+
+Move build settings into `prisma.compute.ts`:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "bun",
+    entry: "src/server.ts",
+    build: {
+      command: "bun run build",
+      outputDirectory: "dist",
+    },
+  },
+});
+```
+
+Then delete `prisma.app.json`. Do not recreate it.
 
 ## `create-prisma --yes` Did Not Deploy
 
@@ -131,6 +217,7 @@ Fix:
 - capture the deployment id and URL from deploy JSON, then inspect logs with `app logs --deployment <deployment-id>`
 - do not assume `app show`, `app list-deploys`, or `app logs` can filter by branch unless current help output adds that flag
 - treat `app promote <deployment-id>` as a production action because it rebuilds with production env vars
+- do not expect `prisma.compute.ts` to select Project, Branch, production, or database scope; it only supplies app deploy defaults
 
 ## Next.js Standalone Missing
 

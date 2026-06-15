@@ -6,10 +6,12 @@ Use this reference when deciding whether and how an app can deploy to Prisma Com
 
 Treat `@prisma/cli app deploy` as the deployment surface. Treat `create-prisma` as a new-project scaffold that can generate useful defaults and, for some templates, a `compute:deploy` script.
 
-Current `@prisma/cli app deploy --framework` choices are:
+Current `@prisma/cli` source supports these deploy framework keys:
 
 ```text
 nextjs
+nuxt
+astro
 hono
 tanstack-start
 bun
@@ -18,30 +20,40 @@ bun
 Current auto-detection:
 
 - Next.js: `next.config.*` or `next` dependency
+- Nuxt: `nuxt.config.*` or `nuxt` dependency
+- Astro: `astro.config.*` or `astro` dependency
 - Hono: `hono` dependency
-- TanStack Start: `@tanstack/react-start`, `@tanstack/solid-start`, or `@tanstack/start`
+- TanStack Start: `@tanstack/react-start` or `@tanstack/solid-start`
 - Bun: explicit `--entry <path>` or `--framework bun`
 
-If detection is ambiguous, pass a supported `--framework` value. If the app is a plain server or a framework without a dedicated deploy key, use `--framework bun --entry <path>` after verifying the server entrypoint and build output.
+If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supported `--framework` value. If the app is a plain server or a framework without a dedicated deploy key, use `framework: "bun"` plus `entry`, or pass `--framework bun --entry <path>`, after verifying the server entrypoint and build output.
 
 ## Current CLI Matrix
 
 | App shape | Deploy command shape | Auto-detected | Required output/entry | Notes |
 |-----------|----------------------|---------------|-----------------------|-------|
 | Next.js | `--framework nextjs` | Yes | standalone `server.js` output | Requires `output: "standalone"` |
+| Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | CLI owns framework build output; do not add a config `build` block |
+| Astro | `--framework astro` | Yes | standalone Node server artifact | CLI owns framework build output; do not add a config `build` block |
 | Hono | `--framework hono` | Yes | Bun entry from `main`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated scripts |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
 | Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia, Nest, custom HTTP servers |
 | Elysia | `--framework bun --entry src/index.ts` | No dedicated deploy key | Bun entrypoint | Preserve port/host handling |
 | Nest | `--framework bun --entry src/main.ts` or built JS entry | No dedicated deploy key | server entrypoint | Ensure `app.listen(..., "0.0.0.0")` |
-| Astro | Not a current deploy framework key | No | Node server artifact | Use only if current CLI adds support or via SDK/prebuilt path |
-| Nuxt | Not a current deploy framework key | No | Nitro node server artifact | Use only if current CLI adds support or via SDK/prebuilt path |
 | SvelteKit | Not a current deploy framework key | No | Node adapter/prebuilt artifact | Do not deploy `vite preview` |
-| Turborepo | Deploy a concrete app package | No | app-specific entry/output | Do not deploy repo root by default |
+| Turborepo | Deploy concrete app targets | No | app-specific entry/output | Prefer `prisma.compute.ts` with `apps` |
 
-`app build --build-type` is broader than `app deploy --framework`: current build types include `auto`, `bun`, `nextjs`, `nuxt`, `astro`, and `tanstack-start`, while current deploy framework keys are `nextjs`, `hono`, `tanstack-start`, and `bun`. Do not assume a successful local `app build --build-type astro` or `nuxt` means `app deploy --framework astro` or `nuxt` exists.
+`app build --build-type` uses the framework build type. Current build types include `auto`, `bun`, `nextjs`, `nuxt`, `astro`, and `tanstack-start`. Verify installed help before assuming the published package has caught up to source.
 
 `app run --build-type` is local-dev oriented and currently supports `auto`, `bun`, and `nextjs`. It streams the local dev server and is not proof that the deployed app is reachable through public ingress.
+
+`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, and build settings. Custom `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, and `bun`. Current CLI source rejects `build` blocks for `nuxt` and `astro` because their framework CLI build paths are owned by the framework strategy.
+
+Config snippets below assume:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+```
 
 ## Universal Runtime Requirements
 
@@ -88,6 +100,19 @@ bunx @prisma/cli@latest app deploy \
   --framework hono \
   --http-port 8080 \
   --env .env
+```
+
+Config shape:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "hono",
+    entry: "src/index.ts",
+    httpPort: 8080,
+    env: ".env",
+  },
+});
 ```
 
 Project expectations:
@@ -150,6 +175,62 @@ Do not deploy TanStack Start as a Bun entrypoint such as `src/router.tsx`. If `.
 
 Make sure Nitro does not bind only to localhost in deployment. If host env/config is customized, use the framework's all-interface host setting rather than `localhost`.
 
+## Nuxt
+
+Deploy shape:
+
+```bash
+bunx @prisma/cli@latest app deploy --framework nuxt --env .env
+```
+
+Config shape:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "nuxt",
+    env: ".env",
+  },
+});
+```
+
+Nuxt uses Nitro output at `.output/server/index.mjs`. Keep the Nitro preset compatible with a Node server runtime. Do not add a `build` block for Nuxt in `prisma.compute.ts`; the Compute framework strategy owns the build command and output.
+
+## Astro
+
+Deploy shape:
+
+```bash
+bunx @prisma/cli@latest app deploy --framework astro --env .env
+```
+
+Config shape:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "astro",
+    httpPort: 4321,
+    env: ".env",
+  },
+});
+```
+
+Astro Compute-style server output usually needs:
+
+```javascript
+import { defineConfig } from "astro/config"
+import node from "@astrojs/node"
+
+export default defineConfig({
+  output: "server",
+  adapter: node({ mode: "standalone" }),
+  server: { host: true },
+})
+```
+
+Do not add a `build` block for Astro in `prisma.compute.ts`; the Compute framework strategy owns the build command and output.
+
 ## Bun, Elysia, Nest, and Custom Servers
 
 Use the Bun deploy key for app shapes without a dedicated `--framework` value:
@@ -183,40 +264,21 @@ const port = Number(process.env.PORT ?? "3000")
 await app.listen(port, "0.0.0.0")
 ```
 
-## Astro, Nuxt, and SvelteKit
+## SvelteKit and Other Frameworks
 
-Current `@prisma/cli app deploy --framework` does not expose `astro`, `nuxt`, or `svelte` framework keys. Do not claim these are directly deployable with those names unless current help/source has changed.
+Current `@prisma/cli app deploy --framework` does not expose a `svelte` framework key. Do not claim SvelteKit is directly deployable with that name unless current help/source has changed.
 
-For these frameworks, use one of these paths:
+For unsupported frameworks, use one of these paths:
 
 - wait for current CLI deploy support and verify the exact `--framework` value
 - produce a Node server artifact and deploy through a supported prebuilt/SDK flow
 - if the app has a plain Node/Bun server entrypoint, deploy that entrypoint through `--framework bun --entry <path>`
 
-Astro Compute-style server output usually needs:
-
-```javascript
-import { defineConfig } from "astro/config"
-import node from "@astrojs/node"
-
-export default defineConfig({
-  output: "server",
-  adapter: node({ mode: "standalone" }),
-  server: { host: true },
-})
-```
-
-Nuxt/TanStack-style Nitro output expects:
-
-```text
-.output/server/index.mjs
-```
-
 SvelteKit should use a Node adapter or another production server artifact. Do not use `vite preview` as the deployed runtime.
 
 ## Turborepo
 
-Deploy a concrete app package, not the monorepo root by default.
+Deploy concrete app packages, not the monorepo root by default. Prefer `prisma.compute.ts` at the repo root with one `apps` entry per deploy target.
 
 Checklist:
 
@@ -226,7 +288,30 @@ Checklist:
 - pass the correct env file, which may live outside the app package
 - keep branch env/database scope aligned with the deployed app
 
-Example shape after verifying output paths:
+Example config:
+
+```typescript
+export default defineComputeConfig({
+  apps: {
+    web: { root: "apps/web", framework: "nextjs" },
+    api: {
+      root: "apps/api",
+      framework: "bun",
+      entry: "src/index.ts",
+      httpPort: 3000,
+      env: "packages/db/.env",
+    },
+  },
+});
+```
+
+Deploy one target:
+
+```bash
+bunx @prisma/cli@latest app deploy api --branch feature/foo --json
+```
+
+Flag-only shape after verifying output paths:
 
 ```bash
 bun run build
@@ -253,8 +338,8 @@ Use these notes only when the project was scaffolded with `create-prisma` or the
 | `tanstack-start` | Yes | Yes | `@prisma/cli app deploy --framework tanstack-start ...` |
 | `nest` | Yes | No | scaffold only |
 | `svelte` | Yes | No | scaffold only |
-| `astro` | Yes | No | scaffold only |
-| `nuxt` | Yes | No | scaffold only |
+| `astro` | Yes | No | scaffold only, even though CLI source has an Astro deploy key |
+| `nuxt` | Yes | No | scaffold only, even though CLI source has a Nuxt deploy key |
 | `turborepo` | Yes | No | scaffold only |
 
 The distinction matters: a template can be scaffold-ready without being wired into the integrated `create-prisma --deploy` prompt. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.

@@ -34,6 +34,7 @@ const checks = [
       ["has app build", /\bbuild\b/],
       ["has app run", /\brun\b/],
       ["has app logs", /\blogs\b/],
+      ["has [app] target arguments", /\b(deploy|build|run|show|logs) \[app\]/],
     ],
   },
   {
@@ -41,6 +42,7 @@ const checks = [
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
     probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --framework", /--framework\b/],
       ["has --entry", /--entry\b/],
       ["has --http-port", /--http-port\b/],
@@ -56,8 +58,20 @@ const checks = [
     packageName: "@prisma/cli@latest",
     args: ["app", "build", "--help"],
     probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --build-type", /--build-type\b/],
       ["has --entry", /--entry\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app run",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "run", "--help"],
+    probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
+      ["has --build-type", /--build-type\b/],
+      ["has --entry", /--entry\b/],
+      ["has --port", /--port\b/],
     ],
   },
   {
@@ -157,7 +171,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--prod|app deploy|project env|database create|version|create-prisma|hono|elysia|next|tanstack|bun)/i.test(line))
+    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--prod|--build-type|--port|app deploy|app build|app run|project env|database create|prisma\.compute\.ts|App target|\[app\]|version|create-prisma|hono|elysia|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 
