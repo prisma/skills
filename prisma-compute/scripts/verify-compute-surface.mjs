@@ -16,7 +16,10 @@ const checks = [
       ["has hono template", /\bhono\b/i],
       ["has elysia template", /\belysia\b/i],
       ["has next template", /\bnext\b/i],
+      ["has astro template", /\bastro\b/i],
+      ["has nuxt template", /\bnuxt\b/i],
       ["has tanstack-start template", /\btanstack-start\b/i],
+      ["has turborepo template", /\bturborepo\b/i],
     ],
   },
   {

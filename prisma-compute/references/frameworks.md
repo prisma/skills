@@ -340,11 +340,11 @@ Use these notes only when the project was scaffolded with `create-prisma` or the
 | `tanstack-start` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework tanstack-start` script |
 | `nest` | Yes | No | scaffold only |
 | `svelte` | Yes | No | scaffold only |
-| `astro` | Yes | Verify current release | `prisma.compute.ts` with `framework: "astro"` when generated |
-| `nuxt` | Yes | Verify current release | `prisma.compute.ts` with `framework: "nuxt"` when generated |
-| `turborepo` | Yes | Verify current release | `prisma.compute.ts` with `apps.api`; script may run `app deploy api` |
+| `astro` | Yes | Yes | `prisma.compute.ts` with `framework: "astro"` |
+| `nuxt` | Yes | Yes | `prisma.compute.ts` with `framework: "nuxt"` |
+| `turborepo` | Yes | Yes | `prisma.compute.ts` with `apps.api`; script may run `app deploy api` |
 
-The distinction matters: generated deploy/config support is rolling out independently from template scaffolding. Inspect the generated `package.json`, `prisma.compute.ts`, and README before assuming support from the template name alone. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.
+The distinction matters for non-latest releases: generated deploy/config support can differ from template scaffolding. Inspect the generated `package.json`, `prisma.compute.ts`, and README before assuming support from the template name alone. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.
 
 The generated templates import Prisma Client from local generated paths such as:
 

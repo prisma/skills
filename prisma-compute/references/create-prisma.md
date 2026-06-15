@@ -27,11 +27,11 @@ Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy
 | `tanstack-start` | Yes | Yes |
 | `nest` | Yes | No |
 | `svelte` | Yes | No |
-| `astro` | Yes | Verify current release |
-| `nuxt` | Yes | Verify current release |
-| `turborepo` | Yes | Verify current release; config target is usually `api` |
+| `astro` | Yes | Yes |
+| `nuxt` | Yes | Yes |
+| `turborepo` | Yes | Yes; config target is usually `api` |
 
-The distinction matters: a template can be scaffold-ready while deploy/config generation is still rolling out. Check generated `package.json`, `prisma.compute.ts`, and README instead of assuming from the template name alone.
+The distinction matters for non-latest releases: a template can be scaffold-ready while deploy/config generation differs by version. Check generated `package.json`, `prisma.compute.ts`, and README instead of assuming from the template name alone.
 
 ## Basic Commands
 
