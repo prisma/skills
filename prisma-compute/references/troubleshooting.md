@@ -17,6 +17,7 @@ Then inspect:
 ```bash
 pwd
 cat package.json
+find .. -maxdepth 3 \( -name 'prisma.compute.ts' -o -name 'prisma.compute.mts' -o -name 'prisma.compute.js' -o -name 'prisma.compute.mjs' -o -name 'prisma.compute.cjs' \) -print
 test -f .env && sed -n 's/=.*/=<redacted>/p' .env
 ```
 
@@ -31,6 +32,66 @@ bunx @prisma/cli@latest app deploy --help
 ```
 
 If a local project has a `compute:deploy` script, prefer that script.
+
+## `prisma.compute.ts` Not Picked Up
+
+This only matters when the project is supposed to use a config-backed deploy. A simple app without `prisma.compute.ts` can still deploy with explicit `app deploy` flags.
+
+Symptoms:
+
+- deploy ignores the expected framework, entrypoint, port, env file, or app root
+- a monorepo target such as `api` is not recognized
+- local state appears in the wrong `.prisma/` directory
+
+Check:
+
+```bash
+pwd
+find .. -maxdepth 4 \( -name 'prisma.compute.ts' -o -name 'prisma.compute.mts' -o -name 'prisma.compute.js' -o -name 'prisma.compute.mjs' -o -name 'prisma.compute.cjs' \) -print
+bunx @prisma/cli@latest app deploy --help
+```
+
+Fix:
+
+- keep exactly one compute config file in the directory where it lives
+- put repo-wide or monorepo config at the repository/workspace root
+- run commands from inside the repo or workspace boundary so discovery can walk up to the config
+- use `[app]` targets from the `apps` keys, such as `bunx @prisma/cli@latest app deploy api`
+- remember that config-relative paths such as `root` and `env.file` resolve from the config file directory
+
+If the installed `@prisma/cli@latest` help does not mention `prisma.compute.ts` or `[app]`, the published package may lag the CLI source. Either test with the intended CLI version or fall back to explicit flags until the new package is available.
+
+## Compute Config Invalid
+
+Symptoms:
+
+- `COMPUTE_CONFIG_INVALID`
+- `COMPUTE_CONFIG_TARGET_REQUIRED`
+- `COMPUTE_CONFIG_TARGET_UNKNOWN`
+- "Multiple compute config files found"
+
+Fix:
+
+- export `defineComputeConfig({ app: ... })` or `defineComputeConfig({ apps: ... })`
+- define exactly one of `app` or `apps`
+- remove unknown top-level keys
+- pass a target for multi-app build/run commands, such as `app build web`
+- pass an existing `apps` key for multi-app deploys, such as `app deploy api`
+- remove custom `build` blocks from `nuxt` and `astro` targets
+
+Minimal recovery config:
+
+```typescript
+import { defineComputeConfig } from "@prisma/compute-sdk/config";
+
+export default defineComputeConfig({
+  app: {
+    framework: "hono",
+    entry: "src/index.ts",
+    httpPort: 8080,
+  },
+});
+```
 
 ## `create-prisma --yes` Did Not Deploy
 
@@ -78,7 +139,22 @@ bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .e
 
 If `PRISMA_SERVICE_TOKEN` is set but empty, the CLI errors before trying browser-login credentials. Unset it or provide a valid workspace service token. Never echo, log, or paste the token value; only check whether it is present.
 
-Older `@prisma/compute-cli` and SDK examples may use `PRISMA_API_TOKEN`. Treat that as legacy or SDK-specific until the current `@prisma/cli` source/help says otherwise.
+## Project Setup Fails
+
+Symptoms:
+
+- `PROJECT_SETUP_REQUIRED`
+- non-interactive deploy cannot choose a Project
+- deploy was expected to create a Project but did not
+
+Fix:
+
+```bash
+bunx @prisma/cli@latest app deploy --project <id-or-name> --json --no-interactive
+bunx @prisma/cli@latest app deploy --create-project <name> --yes
+```
+
+Do not rely on `--yes` alone to choose Project scope. `--project`, `--create-project`, and `PRISMA_PROJECT_ID` are mutually exclusive.
 
 ## Missing or Placeholder `DATABASE_URL`
 
@@ -131,6 +207,21 @@ Fix:
 - capture the deployment id and URL from deploy JSON, then inspect logs with `app logs --deployment <deployment-id>`
 - do not assume `app show`, `app list-deploys`, or `app logs` can filter by branch unless current help output adds that flag
 - treat `app promote <deployment-id>` as a production action because it rebuilds with production env vars
+- do not expect `prisma.compute.ts` to select Project, Branch, production, or database scope; it only supplies app deploy defaults
+
+## `--db` Rejected or Did Not Apply Schema
+
+Symptoms:
+
+- `app deploy --db` is rejected
+- `--db` created env vars but the database is empty
+- a deploy-all run created one database while multiple apps deployed
+
+Fix:
+
+- read [`app-deploy-cli.md`](app-deploy-cli.md) `Database and Env` for the `--db` guardrails
+- run migrations, seed, or schema push yourself after database setup; Compute never applies schema changes for you
+- for multi-app deploy-all with app-specific database isolation, create and assign those database env vars explicitly before deploy
 
 ## Next.js Standalone Missing
 
@@ -213,7 +304,7 @@ Fix:
 - read `process.env.PORT`
 - pass `--http-port <port>` when the app has a fixed port
 - use the generated `compute:deploy` script when it exists
-- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia `compute:deploy` scripts pass `--http-port 8080`
+- remember the current `@prisma/cli app deploy` default is HTTP `3000`; generated Hono/Elysia projects usually configure `8080` through `prisma.compute.ts` or flag-backed `--http-port 8080` scripts
 - use the template defaults: Hono/Elysia `8080`, Next/TanStack/Nuxt `3000`, Astro `4321`
 
 ## Public URL Smoke Test Fails
@@ -259,7 +350,7 @@ Fix:
 
 ## Env Changes Did Not Apply
 
-Generated `compute:deploy` scripts redeploy with `--env .env`; they do not run migrations or seed data.
+Generated `compute:deploy` scripts redeploy using the generated flags and/or `prisma.compute.ts`; they do not run migrations or seed data.
 
 After env changes:
 

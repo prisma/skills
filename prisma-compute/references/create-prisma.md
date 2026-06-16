@@ -17,21 +17,11 @@ Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy
 
 ## Supported Templates
 
-`create-prisma` scaffolds these templates:
+`create-prisma@latest` scaffolds `hono`, `elysia`, `nest`, `next`, `svelte`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`.
 
-| Template | Scaffolds | Integrated `--deploy` support |
-|----------|-----------|--------------------------------|
-| `hono` | Yes | Yes |
-| `elysia` | Yes | Yes |
-| `next` | Yes | Yes |
-| `tanstack-start` | Yes | Yes |
-| `nest` | Yes | No |
-| `svelte` | Yes | No |
-| `astro` | Yes | No |
-| `nuxt` | Yes | No |
-| `turborepo` | Yes | No |
+Integrated `--deploy` support currently applies to `hono`, `elysia`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
 
-The distinction matters: a template can be scaffold-ready but not wired into the integrated deploy prompt yet.
+`nest` and `svelte` are scaffold-only for Compute. For non-latest releases, verify generated `package.json`, `prisma.compute.ts`, and README before assuming deploy/config support.
 
 ## Basic Commands
 
@@ -91,41 +81,23 @@ Do not deploy placeholder database URLs. If `DATABASE_URL` came from a placehold
 
 ## Generated Deploy Script
 
-When the deploy flow is selected, `create-prisma` adds:
+When the deploy flow is selected, `create-prisma` can add:
 
 ```json
 {
   "scripts": {
-    "compute:deploy": "bunx @prisma/cli@latest app deploy --prod --yes --env .env ..."
+    "compute:deploy": "bunx @prisma/cli@latest app deploy --prod --yes ..."
   }
 }
 ```
 
-Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code and env from `.env`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
+Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code using generated flags and/or `prisma.compute.ts`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
 
-## Template Defaults to Preserve
+Current and near-term `create-prisma` behavior can differ by release. Inspect the generated `package.json`, `prisma.compute.ts`, and README before editing deploy behavior.
 
-Hono and Elysia:
+## Generated Files to Preserve
 
-- include `main: "src/index.ts"` for entrypoint detection
-- default to port `8080`
-- read `PORT` from the environment
-- do not bind the deployed server to `localhost` or `127.0.0.1`; use the framework default if it binds all interfaces, or set `0.0.0.0`
-
-Next.js:
-
-- uses `output: "standalone"` in `next.config.ts`
-- must not deploy with `HOSTNAME=localhost` or another loopback-only host override
-
-TanStack Start:
-
-- uses `vite build`
-- expects Nitro output at `.output/server/index.mjs`
-- includes `nitro` as a dependency
-- imports `nitro` from `nitro/vite`
-- uses `plugins: [tanstackStart(), nitro(), viteReact()]` in `vite.config.ts`
-- uses `start: "node .output/server/index.mjs"`
-- should keep Nitro on an all-interface runtime host for deployed Compute apps
+Preserve generated framework runtime files and `prisma.compute.ts` unless you are intentionally changing the deploy target. For framework-specific deploy/runtime details, read [`frameworks.md`](frameworks.md).
 
 All Prisma 7 scaffolds:
 

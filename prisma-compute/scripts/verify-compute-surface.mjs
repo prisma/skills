@@ -16,7 +16,10 @@ const checks = [
       ["has hono template", /\bhono\b/i],
       ["has elysia template", /\belysia\b/i],
       ["has next template", /\bnext\b/i],
+      ["has astro template", /\bastro\b/i],
+      ["has nuxt template", /\bnuxt\b/i],
       ["has tanstack-start template", /\btanstack-start\b/i],
+      ["has turborepo template", /\bturborepo\b/i],
     ],
   },
   {
@@ -34,6 +37,10 @@ const checks = [
       ["has app build", /\bbuild\b/],
       ["has app run", /\brun\b/],
       ["has app logs", /\blogs\b/],
+      ["has app domain", /\bdomain\b/],
+      ["has app show-deploy", /\bshow-deploy\b/],
+      ["has app remove", /\bremove\b/],
+      ["has [app] target arguments", /\b(deploy|build|run|show|logs) \[app\]/],
     ],
   },
   {
@@ -41,6 +48,7 @@ const checks = [
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
     probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --framework", /--framework\b/],
       ["has --entry", /--entry\b/],
       ["has --http-port", /--http-port\b/],
@@ -49,15 +57,46 @@ const checks = [
       ["has --db", /--db\b/],
       ["has --no-db", /--no-db\b/],
       ["has --prod", /--prod\b/],
+      ["has --create-project", /--create-project\b/],
     ],
+  },
+  {
+    label: "@prisma/cli@latest app domain",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "domain", "--help"],
+    probes: [
+      ["has add", /\badd\b/],
+      ["has show", /\bshow\b/],
+      ["has remove", /\bremove\b/],
+      ["has retry", /\bretry\b/],
+      ["has wait", /\bwait\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app show-deploy",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "show-deploy", "--help"],
+    probes: [["takes deployment id", /<deployment>|show-deploy dep_/i]],
   },
   {
     label: "@prisma/cli@latest app build",
     packageName: "@prisma/cli@latest",
     args: ["app", "build", "--help"],
     probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --build-type", /--build-type\b/],
       ["has --entry", /--entry\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app run",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "run", "--help"],
+    probes: [
+      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
+      ["has --build-type", /--build-type\b/],
+      ["has --entry", /--entry\b/],
+      ["has --port", /--port\b/],
     ],
   },
   {
@@ -157,7 +196,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--prod|app deploy|project env|database create|version|create-prisma|hono|elysia|next|tanstack|bun)/i.test(line))
+    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|database create|prisma\.compute\.ts|App target|\[app\]|version|create-prisma|hono|elysia|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 
