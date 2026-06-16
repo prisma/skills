@@ -17,21 +17,11 @@ Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy
 
 ## Supported Templates
 
-`create-prisma` scaffolds these templates:
+`create-prisma@latest` scaffolds `hono`, `elysia`, `nest`, `next`, `svelte`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`.
 
-| Template | Scaffolds | Integrated `--deploy` support |
-|----------|-----------|--------------------------------|
-| `hono` | Yes | Yes |
-| `elysia` | Yes | Yes |
-| `next` | Yes | Yes |
-| `tanstack-start` | Yes | Yes |
-| `nest` | Yes | No |
-| `svelte` | Yes | No |
-| `astro` | Yes | Yes |
-| `nuxt` | Yes | Yes |
-| `turborepo` | Yes | Yes; config target is usually `api` |
+Integrated `--deploy` support currently applies to `hono`, `elysia`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
 
-The distinction matters for non-latest releases: a template can be scaffold-ready while deploy/config generation differs by version. Check generated `package.json`, `prisma.compute.ts`, and README instead of assuming from the template name alone.
+`nest` and `svelte` are scaffold-only for Compute. For non-latest releases, verify generated `package.json`, `prisma.compute.ts`, and README before assuming deploy/config support.
 
 ## Basic Commands
 

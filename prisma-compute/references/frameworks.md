@@ -326,31 +326,6 @@ bunx @prisma/cli@latest app deploy \
 
 Verify the actual output path before using this command.
 
-## create-prisma Template Notes
+## create-prisma Notes
 
-Use these notes only when the project was scaffolded with `create-prisma` or the user is creating a new app. They are not the general definition of Compute framework support.
-
-`create-prisma@latest` scaffolds these templates:
-
-| Template | Scaffolds | Integrated `--deploy` support | Generated deploy shape |
-|----------|-----------|----------------------------------------|------------------------|
-| `hono` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework hono --http-port 8080` script |
-| `elysia` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework bun --http-port 8080` script |
-| `next` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework nextjs` script |
-| `tanstack-start` | Yes | Yes | `prisma.compute.ts` or flag-backed `--framework tanstack-start` script |
-| `nest` | Yes | No | scaffold only |
-| `svelte` | Yes | No | scaffold only |
-| `astro` | Yes | Yes | `prisma.compute.ts` with `framework: "astro"` |
-| `nuxt` | Yes | Yes | `prisma.compute.ts` with `framework: "nuxt"` |
-| `turborepo` | Yes | Yes | `prisma.compute.ts` with `apps.api`; script may run `app deploy api` |
-
-The distinction matters for non-latest releases: generated deploy/config support can differ from template scaffolding. Inspect the generated `package.json`, `prisma.compute.ts`, and README before assuming support from the template name alone. Existing apps should still be evaluated against the current `@prisma/cli app deploy` surface.
-
-The generated templates import Prisma Client from local generated paths such as:
-
-```typescript
-import { PrismaClient } from "../generated/prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-```
-
-Preserve those imports unless you also update the Prisma generator output path and every consumer.
+Use [`create-prisma.md`](create-prisma.md) only when the user is creating a new app or working inside a generated project. Keep this reference focused on `@prisma/cli app deploy` framework readiness for existing apps.
