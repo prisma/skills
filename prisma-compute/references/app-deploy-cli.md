@@ -24,53 +24,7 @@ If a future Prisma ORM CLI exposes `prisma app deploy`, use the local project co
 
 ## Typed Compute Config
 
-`prisma.compute.ts` is optional for a normal single-app deploy. Use it when a project has reusable deploy defaults, generated Compute config, or multiple deploy targets. For one-off/simple apps, explicit flags are fine. Read [`compute-config.md`](compute-config.md) before creating or editing it.
-
-Minimal single-app config:
-
-```typescript
-import { defineComputeConfig } from "@prisma/compute-sdk/config";
-
-export default defineComputeConfig({
-  app: {
-    name: "api",
-    framework: "hono",
-    entry: "src/index.ts",
-    httpPort: 8080,
-    env: ".env",
-  },
-});
-```
-
-Monorepo config:
-
-```typescript
-import { defineComputeConfig } from "@prisma/compute-sdk/config";
-
-export default defineComputeConfig({
-  apps: {
-    web: { root: "apps/web", framework: "nextjs" },
-    api: {
-      root: "apps/api",
-      framework: "bun",
-      entry: "src/index.ts",
-      httpPort: 8080,
-      env: "apps/api/.env",
-    },
-  },
-});
-```
-
-Targeted deploys:
-
-```bash
-bunx @prisma/cli@latest app deploy web
-bunx @prisma/cli@latest app deploy api --branch feature/login --json
-```
-
-Config values are deploy defaults. Explicit flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values. `prisma.compute.ts` does not select Workspace, Project, Branch, database, or production scope; continue to use flags, project linking, env storage, and CI secrets for those.
-
-For monorepos, use `prisma.compute.ts` at the repo/workspace root to declare `apps` targets and their `root`, `framework`, `entry`, `httpPort`, and `env` values. Without it, the CLI cannot reliably know which package root to deploy.
+`prisma.compute.ts` is optional for normal single-app deploys and useful for reusable defaults or multi-app targets. Read [`compute-config.md`](compute-config.md) for config shapes, target selection, precedence, and monorepo rules. This reference only shows how deploy commands consume those settings.
 
 ## Auth and Project Binding
 
@@ -91,17 +45,7 @@ For a new linked project:
 bunx @prisma/cli@latest project create my-app --json
 ```
 
-For non-interactive or CI work, first verify the supported auth mechanism in current help/docs. If only browser login is available, tell the user that a human login step is required before scripted deploy.
-
-Current `@prisma/cli` source accepts a workspace service token through `PRISMA_SERVICE_TOKEN` before falling back to stored browser-login credentials:
-
-```bash
-test -n "${PRISMA_SERVICE_TOKEN:-}" && echo "PRISMA_SERVICE_TOKEN is set"
-bunx @prisma/cli@latest auth whoami
-bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .env
-```
-
-Do not print the token value.
+For non-interactive or CI work, current `@prisma/cli` accepts a workspace service token through `PRISMA_SERVICE_TOKEN` before falling back to stored browser-login credentials. Verify auth with `auth whoami` and never print the token value.
 
 ## Project, Branch, Database, and Env Scope
 
@@ -118,7 +62,7 @@ If `prisma.compute.ts` defines a `name` or an `apps` key, that config can provid
 bunx @prisma/cli@latest app deploy api --project proj_123 --branch feature/login --json
 ```
 
-Without an `[app]` argument, a command run from inside a configured target root can infer that target. In a multi-app config, a bare `app deploy` from the repo root can deploy all targets in declaration order when no single target is inferred. `app build` and `app run` still need one target because local build/run commands do not operate on every app at once.
+See [`compute-config.md`](compute-config.md) for no-argument target inference, deploy-all, and build/run target rules.
 
 Branch scope must line up across deploys, databases, and env vars:
 
@@ -194,16 +138,6 @@ bunx @prisma/cli@latest app run api --port 8080
 ```
 
 `app run --port` sets `PORT` for local development. It does not rewrite an app's explicit host binding, so a local run is not enough to prove the deployed server is reachable from ingress.
-
-## Runtime Host and Port
-
-For deploys, check both pieces:
-
-- Port: current `@prisma/cli app deploy` uses HTTP `3000` by default when `--http-port` is omitted.
-- Generated scripts/config: Hono/Elysia usually set HTTP port `8080` either through `prisma.compute.ts` or flag-backed `--http-port 8080` scripts; trust the actual generated file/script unless you are intentionally changing the app port.
-- Host: deployed servers must bind all interfaces. Do not hard-code `localhost` or `127.0.0.1`; use `0.0.0.0` or the framework equivalent.
-
-If a fixed-port Bun app listens on `8080`, deploy it with `--http-port 8080`. If a framework server reads `process.env.PORT`, keep the code path intact and avoid deploy env that overrides the host to loopback.
 
 ## Deploy
 

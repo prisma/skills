@@ -325,7 +325,3 @@ bunx @prisma/cli@latest app deploy \
 ```
 
 Verify the actual output path before using this command.
-
-## create-prisma Notes
-
-Use [`create-prisma.md`](create-prisma.md) only when the user is creating a new app or working inside a generated project. Keep this reference focused on `@prisma/cli app deploy` framework readiness for existing apps.

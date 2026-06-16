@@ -93,46 +93,11 @@ When the deploy flow is selected, `create-prisma` can add:
 
 Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code using generated flags and/or `prisma.compute.ts`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
 
-Current and near-term `create-prisma` behavior can differ by release. Some Compute-ready templates generate `prisma.compute.ts` with framework, port, target, and env-file defaults; some generated projects may only have a `compute:deploy` script with explicit flags. Treat missing `prisma.compute.ts` as normal for a simple app, not as a deploy blocker.
+Current and near-term `create-prisma` behavior can differ by release. Inspect the generated `package.json`, `prisma.compute.ts`, and README before editing deploy behavior.
 
-Example config for a generated Hono app:
+## Generated Files to Preserve
 
-```typescript
-import { defineComputeConfig } from "@prisma/compute-sdk/config";
-
-export default defineComputeConfig({
-  app: {
-    name: "my-api",
-    framework: "hono",
-    httpPort: 8080,
-    env: ".env",
-  },
-});
-```
-
-## Template Defaults to Preserve
-
-Hono and Elysia:
-
-- include `main: "src/index.ts"` for entrypoint detection
-- default to port `8080`
-- read `PORT` from the environment
-- do not bind the deployed server to `localhost` or `127.0.0.1`; use the framework default if it binds all interfaces, or set `0.0.0.0`
-
-Next.js:
-
-- uses `output: "standalone"` in `next.config.ts`
-- must not deploy with `HOSTNAME=localhost` or another loopback-only host override
-
-TanStack Start:
-
-- uses `vite build`
-- expects Nitro output at `.output/server/index.mjs`
-- includes `nitro` as a dependency
-- imports `nitro` from `nitro/vite`
-- uses `plugins: [tanstackStart(), nitro(), viteReact()]` in `vite.config.ts`
-- uses `start: "node .output/server/index.mjs"`
-- should keep Nitro on an all-interface runtime host for deployed Compute apps
+Preserve generated framework runtime files and `prisma.compute.ts` unless you are intentionally changing the deploy target. For framework-specific deploy/runtime details, read [`frameworks.md`](frameworks.md).
 
 All Prisma 7 scaffolds:
 

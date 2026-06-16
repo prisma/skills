@@ -219,12 +219,9 @@ Symptoms:
 
 Fix:
 
-- pass either `--db` or `--no-db`, not both
-- pass `--db --yes` for non-interactive database creation; `--yes` alone does not create a database
-- remove `DATABASE_URL` or `DIRECT_URL` from `--env` inputs when using `--db`
-- use `--db` only for Prisma Postgres; known non-PostgreSQL schemas are rejected
-- run migrations, seed, or schema push yourself after database setup
-- for multi-app deploy-all, expect one branch database shared by all targets; create and assign separate databases explicitly when apps need isolation
+- read [`app-deploy-cli.md`](app-deploy-cli.md) `Database and Env` for the `--db` guardrails
+- run migrations, seed, or schema push yourself after database setup; Compute never applies schema changes for you
+- for multi-app deploy-all with app-specific database isolation, create and assign those database env vars explicitly before deploy
 
 ## Next.js Standalone Missing
 

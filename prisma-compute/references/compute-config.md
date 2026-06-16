@@ -176,14 +176,7 @@ bunx @prisma/cli@latest app deploy api \
 
 ## Database Scope
 
-The config does not declare databases in the current beta. Database setup remains explicit:
-
-```bash
-bunx @prisma/cli@latest app deploy api --db
-bunx @prisma/cli@latest app deploy web --no-db
-```
-
-In multi-app deploy-all runs, `--db` creates and wires one branch database and reuses it for the remaining targets. If apps need separate databases, create and assign those env vars explicitly instead of expecting `--db` to infer app-to-database ownership.
+The config does not declare databases in the current beta. Keep database intent in deploy flags, `database create`, or project env commands. Read [`app-deploy-cli.md`](app-deploy-cli.md) for `--db`, `--no-db`, deploy-all, migration, and env-var guardrails.
 
 ## Relationship to `prisma.config.ts`
 
