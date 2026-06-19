@@ -37,6 +37,22 @@ const checks = [
     ],
   },
   {
+    label: "@prisma/cli@latest auth workspace",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "workspace", "--help"],
+    probes: [
+      ["has workspace list", /\blist\b/],
+      ["has workspace use", /\buse\b/],
+      ["has workspace logout", /\blogout\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest auth logout",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "logout", "--help"],
+    probes: [["has --workspace", /--workspace\b/]],
+  },
+  {
     label: "@prisma/cli@latest app deploy",
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
@@ -157,7 +173,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--prod|app deploy|project env|database create|version|create-prisma|hono|elysia|next|tanstack|bun)/i.test(line))
+    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--prod|--workspace|app deploy|auth workspace|auth logout|workspace|project env|database create|version|create-prisma|hono|elysia|next|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 

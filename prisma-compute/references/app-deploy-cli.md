@@ -29,11 +29,44 @@ Useful commands:
 ```bash
 bunx @prisma/cli@latest auth login
 bunx @prisma/cli@latest auth whoami
+bunx @prisma/cli@latest auth workspace list --json
+bunx @prisma/cli@latest auth workspace use <workspace-id-or-name>
+bunx @prisma/cli@latest auth workspace logout <workspace-id-or-name>
+bunx @prisma/cli@latest auth logout --workspace <workspace-id-or-name>
 bunx @prisma/cli@latest project list --json
 bunx @prisma/cli@latest project show
 bunx @prisma/cli@latest project link <project-id-or-name>
 bunx @prisma/cli@latest project create my-app
 ```
+
+Current `@prisma/cli` can keep multiple local browser-login workspace sessions. Running `auth login` again for a different workspace should add/update that workspace session and make it active; it should not delete the existing workspace session. The active workspace pointer decides which stored OAuth workspace normal commands use.
+
+For agents, prefer this flow before project/app mutations:
+
+```bash
+bunx @prisma/cli@latest auth whoami --json
+bunx @prisma/cli@latest auth workspace list --json
+bunx @prisma/cli@latest auth workspace use <workspace-id>
+```
+
+Use workspace ids from `auth workspace list --json` when possible. Names are friendlier for humans but can be ambiguous. For a human TTY, `auth workspace use` with no argument opens an interactive picker. For headless scripts, always pass an id or exact name.
+
+If the active workspace is logged out or its refresh fails, the CLI intentionally does not auto-select another cached workspace. Choose the next workspace explicitly:
+
+```bash
+bunx @prisma/cli@latest auth workspace list --json
+bunx @prisma/cli@latest auth workspace use <workspace-id>
+```
+
+To clean up one local OAuth workspace without clearing every stored workspace session:
+
+```bash
+bunx @prisma/cli@latest auth workspace logout <workspace-id-or-name>
+# equivalent:
+bunx @prisma/cli@latest auth logout --workspace <workspace-id-or-name>
+```
+
+Plain `auth logout` clears all local OAuth workspace sessions. It does not unset `PRISMA_SERVICE_TOKEN`.
 
 For a new linked project:
 
@@ -41,9 +74,7 @@ For a new linked project:
 bunx @prisma/cli@latest project create my-app --json
 ```
 
-For non-interactive or CI work, first verify the supported auth mechanism in current help/docs. If only browser login is available, tell the user that a human login step is required before scripted deploy.
-
-Current `@prisma/cli` source accepts a workspace service token through `PRISMA_SERVICE_TOKEN` before falling back to stored browser-login credentials:
+For non-interactive or CI work, first verify the supported auth mechanism in current help/docs. Current `@prisma/cli` accepts a workspace service token through `PRISMA_SERVICE_TOKEN`. A non-empty service token takes precedence over stored browser-login credentials, so local OAuth workspace switching does not affect command execution while the env var is set. `auth workspace list --json` may still show local OAuth sessions, but they are not switchable until the service-token env var is unset.
 
 ```bash
 test -n "${PRISMA_SERVICE_TOKEN:-}" && echo "PRISMA_SERVICE_TOKEN is set"
@@ -51,7 +82,17 @@ bunx @prisma/cli@latest auth whoami
 bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .env
 ```
 
+If `PRISMA_SERVICE_TOKEN` is set but empty, unset it or provide a real token. The CLI should fail instead of silently falling back to local OAuth credentials.
+
 Do not print the token value. Historical standalone Compute CLI examples and low-level SDK snippets may use `PRISMA_API_TOKEN`; do not assume that name works for `@prisma/cli app deploy` unless the current CLI source/help confirms it.
+
+Local auth storage is useful for debugging but should not be printed verbatim:
+
+- `PRISMA_COMPUTE_AUTH_FILE` can override the auth file path.
+- On macOS, the default OAuth credentials file is `~/Library/Application Support/prisma/auth.json`.
+- Workspace metadata and the active workspace pointer live beside it as `auth.context.json`.
+- Project pins live in `.prisma/local.json`.
+- Local CLI state such as selected app and known live deployment lives in `.prisma/cli/state.json`, rooted near `prisma.compute.ts` when a config is discovered.
 
 ## Project, Branch, Database, and Env Scope
 
