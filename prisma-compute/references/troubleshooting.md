@@ -78,7 +78,7 @@ Fix:
 - remove unknown top-level keys
 - pass a target for multi-app build/run commands, such as `app build web`
 - pass an existing `apps` key for multi-app deploys, such as `app deploy api`
-- remove custom `build` blocks from `nuxt` and `astro` targets
+- remove custom `build` blocks from `nuxt`, `astro`, and `nestjs` targets
 
 Minimal recovery config:
 

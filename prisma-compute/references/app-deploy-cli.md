@@ -111,9 +111,9 @@ Branch scope must line up across deploys, databases, and env vars:
 
 - `app deploy --branch <git-name>` creates a deployment for that branch.
 - `database create <name> --branch <git-name>` creates a Prisma Postgres database for that branch scope.
-- `project env add/list/remove --branch <git-name>` manages branch-specific env overrides.
-- `project env add/list/remove --role production` manages production env.
-- `project env add/list/remove --role preview` manages preview-template env.
+- `project env add/update/list/remove --branch <git-name>` manages branch-specific env overrides.
+- `project env add/update/list/remove --role production` manages production env.
+- `project env add/update/list/remove --role preview` manages preview-template env.
 
 Do not assume a local Git branch was used by the CLI unless the generated script or command output says so. If a user asks for `feature/login`, pass `--branch feature/login` consistently to app, database, and env commands.
 
@@ -138,6 +138,8 @@ bunx @prisma/cli@latest project env list
 bunx @prisma/cli@latest project env add --file .env --role production
 bunx @prisma/cli@latest project env add --file .env.preview --role preview
 bunx @prisma/cli@latest project env add DATABASE_URL=postgresql://... --branch feature/foo
+bunx @prisma/cli@latest project env update --file .env --role production
+bunx @prisma/cli@latest project env update DATABASE_URL=postgresql://... --branch feature/foo
 bunx @prisma/cli@latest project env list --branch feature/foo
 bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 ```
@@ -157,6 +159,26 @@ Database setup guardrails:
 - Database env values supplied through `--env DATABASE_URL=...`, `--env DIRECT_URL=...`, or an env file suppress automatic database prompting; combining those values with `--db` is rejected.
 - Known non-PostgreSQL Prisma schema sources do not trigger database prompting; explicit `--db` is rejected because it creates Prisma Postgres.
 
+## Project Git, Branch, and Database Operations
+
+These commands are part of the same Platform CLI surface and often matter while preparing Compute deploys:
+
+```bash
+bunx @prisma/cli@latest branch list --json
+bunx @prisma/cli@latest git connect git@github.com:org/repo.git --project proj_123
+bunx @prisma/cli@latest git disconnect --project proj_123
+bunx @prisma/cli@latest database list --branch feature/foo --json
+bunx @prisma/cli@latest database show db_123 --json
+bunx @prisma/cli@latest database remove db_123 --confirm db_123
+bunx @prisma/cli@latest database connection list db_123 --json
+bunx @prisma/cli@latest database connection create db_123 --name readonly
+bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
+```
+
+Git integration connects a Project to a GitHub repository. Do not assume it replaces CLI deploys or returns preview deployment comments in GitHub unless current product behavior proves that flow exists.
+
+Database and database-connection commands never print stored secret values in list/show output. `database create` and `database connection create` return a one-time connection URL; treat it as a secret, store it immediately in env if needed, and do not echo it back in summaries. Removal requires exact `--confirm <id>`; `--yes` is not enough.
+
 ## Build and Run Locally
 
 Before deploy, verify that the app can produce a Compute artifact:
@@ -173,6 +195,13 @@ bunx @prisma/cli@latest app build --build-type bun --entry src/index.ts
 bunx @prisma/cli@latest app run --build-type bun --entry src/index.ts --port 8080
 ```
 
+For NestJS, use `app build` to validate the Compute artifact and run the framework's own dev command locally:
+
+```bash
+bunx @prisma/cli@latest app build --build-type nestjs
+bun run dev
+```
+
 With a compute config, pass the target name instead of repeating framework/entry/port flags:
 
 ```bash
@@ -181,6 +210,8 @@ bunx @prisma/cli@latest app run api --port 8080
 ```
 
 `app run --port` sets `PORT` for local development. It does not rewrite an app's explicit host binding, so a local run is not enough to prove the deployed server is reachable from ingress.
+
+`app run --build-type nestjs` is not supported in the current CLI. If a config-backed NestJS target is selected, run the Nest dev server directly instead.
 
 ## Deploy
 

@@ -13,6 +13,7 @@ nextjs
 nuxt
 astro
 hono
+nestjs
 tanstack-start
 bun
 ```
@@ -23,6 +24,7 @@ Current auto-detection:
 - Nuxt: `nuxt.config.*` or `nuxt` dependency
 - Astro: `astro.config.*` or `astro` dependency
 - Hono: `hono` dependency
+- NestJS: `@nestjs/core` dependency
 - TanStack Start: `@tanstack/react-start` or `@tanstack/solid-start`
 - Bun: explicit `--entry <path>` or `--framework bun`
 
@@ -36,18 +38,18 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 | Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | CLI owns framework build output; do not add a config `build` block |
 | Astro | `--framework astro` | Yes | standalone Node server artifact | CLI owns framework build output; do not add a config `build` block |
 | Hono | `--framework hono` | Yes | Bun entry from `main`, `module`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
+| NestJS | `--framework nestjs` | Yes | NestJS server artifact | Omit host or bind to `0.0.0.0`; do not add a config `build` block |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
-| Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia, Nest, custom HTTP servers |
+| Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia and custom HTTP servers |
 | Elysia | `--framework bun --entry src/index.ts` | No dedicated deploy key | Bun entrypoint | Preserve port/host handling |
-| Nest | `--framework bun --entry src/main.ts` or built JS entry | No dedicated deploy key | server entrypoint | Ensure `app.listen(..., "0.0.0.0")` |
 | SvelteKit | Not a current deploy framework key | No | Node adapter/prebuilt artifact | Do not deploy `vite preview` |
 | Turborepo | Deploy concrete app targets | No | app-specific entry/output | Prefer `prisma.compute.ts` with `apps` |
 
-`app build --build-type` uses the framework build type. Current build types include `auto`, `bun`, `nextjs`, `nuxt`, `astro`, and `tanstack-start`. Verify installed help before assuming the published package has caught up to source.
+`app build --build-type` uses the framework build type. Current build types include `auto`, `bun`, `nextjs`, `nuxt`, `astro`, `nestjs`, and `tanstack-start`. Verify installed help before assuming the published package has caught up to source.
 
 `app run --build-type` is local-dev oriented and currently supports `auto`, `bun`, and `nextjs`. It streams the local dev server and is not proof that the deployed app is reachable through public ingress.
 
-`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, and build settings. Custom `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, and `bun`. Current CLI source rejects `build` blocks for `nuxt` and `astro` because their framework CLI build paths are owned by the framework strategy.
+`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, and build settings. Custom `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, and `bun`. Current CLI source rejects `build` blocks for `nuxt`, `astro`, and `nestjs` because their framework build paths are owned by the framework strategy.
 
 Config snippets below assume:
 
@@ -129,6 +131,41 @@ const rawPort = (process.env.PORT ?? "").trim()
 const parsedPort = rawPort.length > 0 ? Number(rawPort) : Number.NaN
 const port = Number.isInteger(parsedPort) ? parsedPort : 8080
 serve({ fetch: app.fetch, port })
+```
+
+## NestJS
+
+Deploy shape:
+
+```bash
+bunx @prisma/cli@latest app deploy --framework nestjs --env .env
+```
+
+Config shape:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "nestjs",
+    env: ".env",
+  },
+});
+```
+
+Project expectations:
+
+- dependency detection uses `@nestjs/core`; pass `--framework nestjs` when the dependency graph is unusual
+- `src/main.ts` or the compiled runtime must start an HTTP server
+- read `process.env.PORT` and default to the same port used by `--http-port`
+- omit the host argument in `app.listen(port)` or pass `"0.0.0.0"`; do not pass `"localhost"` or `"127.0.0.1"`
+- do not add a `build` block for NestJS in `prisma.compute.ts`; the Compute framework strategy owns the build/output path
+- use `app build --build-type nestjs` for a Compute artifact check; `app run --build-type nestjs` is not supported, so use the Nest dev server locally
+
+Example runtime shape:
+
+```typescript
+const port = Number(process.env.PORT ?? "3000")
+await app.listen(port)
 ```
 
 ## TanStack Start
@@ -231,7 +268,7 @@ export default defineConfig({
 
 Do not add a `build` block for Astro in `prisma.compute.ts`; the Compute framework strategy owns the build command and output.
 
-## Bun, Elysia, Nest, and Custom Servers
+## Bun, Elysia, and Custom Servers
 
 Use the Bun deploy key for app shapes without a dedicated `--framework` value:
 
@@ -257,13 +294,6 @@ Elysia example:
 ```typescript
 const port = Number(process.env.PORT ?? "8080")
 app.listen({ port, hostname: "0.0.0.0" })
-```
-
-Nest example:
-
-```typescript
-const port = Number(process.env.PORT ?? "3000")
-await app.listen(port, "0.0.0.0")
 ```
 
 ## SvelteKit and Other Frameworks

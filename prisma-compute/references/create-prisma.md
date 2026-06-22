@@ -19,9 +19,11 @@ Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy
 
 `create-prisma@latest` scaffolds `hono`, `elysia`, `nest`, `next`, `svelte`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`.
 
-Integrated `--deploy` support currently applies to `hono`, `elysia`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
+Integrated `--deploy` support currently applies to `hono`, `elysia`, `nest`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
 
-`nest` and `svelte` are scaffold-only for Compute. For non-latest releases, verify generated `package.json`, `prisma.compute.ts`, and README before assuming deploy/config support.
+The scaffold template name is `nest`, but the Compute deploy framework/config key is `nestjs`.
+
+`svelte` is scaffold-only for Compute today because current `@prisma/cli app deploy --framework` does not expose a `svelte` key. For non-latest releases, verify generated `package.json`, `prisma.compute.ts`, and README before assuming deploy/config support.
 
 ## Basic Commands
 
@@ -103,7 +105,7 @@ All Prisma 7 scaffolds:
 
 - use `prisma.config.ts`
 - load `dotenv/config` where the runtime supports it
-- generate Prisma Client into a template-local `generated/prisma/client` path
+- generate Prisma Client into a template-local path such as `src/generated/prisma`
 - use `@prisma/adapter-pg` with a `DATABASE_URL` connection string for PostgreSQL
 
 ## Addon Notes
