@@ -1,6 +1,6 @@
 ---
 name: prisma-compute
-description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, Compute apps/deployments/logs/domains, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, or Turborepo.
+description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/logs/domains, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, or Turborepo.
 license: MIT
 metadata:
   author: prisma
@@ -52,7 +52,8 @@ Use this skill for:
 - Deciding whether a framework is Compute-ready
 - Debugging `create-prisma --deploy`, `compute:deploy`, or `app deploy`
 - Managing Compute app logs, deployments, environment variables, branches, and domains
-- Running non-interactive deploys with browser auth or Prisma service tokens
+- Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
+- Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
 - Programmatic deployments with `@prisma/compute-sdk` or Management API integrations
 
 ## Decision Tree
@@ -80,12 +81,13 @@ Use this skill for:
 | Priority | Category | Impact | Prefix |
 |----------|----------|--------|--------|
 | 1 | Command verification | CRITICAL | `verify-` |
-| 2 | Framework readiness | CRITICAL | `framework-` |
-| 3 | Runtime host and port binding | CRITICAL | `runtime-` |
-| 4 | Typed Compute config | HIGH | `config-` |
-| 5 | Branch, environment, and database wiring | HIGH | `env-` |
-| 6 | Deploy operations | HIGH | `deploy-` |
-| 7 | SDK and API automation | MEDIUM | `sdk-` |
+| 2 | Auth and workspace selection | CRITICAL | `auth-` |
+| 3 | Framework readiness | CRITICAL | `framework-` |
+| 4 | Runtime host and port binding | CRITICAL | `runtime-` |
+| 5 | Typed Compute config | HIGH | `config-` |
+| 6 | Branch, environment, and database wiring | HIGH | `env-` |
+| 7 | Deploy operations | HIGH | `deploy-` |
+| 8 | SDK and API automation | MEDIUM | `sdk-` |
 
 ## Quick Rules
 
@@ -97,21 +99,33 @@ Use this skill for:
 - `verify-generated-scripts` - Prefer the generated `compute:deploy` script when a project already has one.
 - `verify-public-url` - After a real deploy, smoke-test the public deployment URL instead of trusting local or readiness-only checks.
 - `verify-config-support` - For `prisma.compute.ts`, verify current CLI help/source because published package help may lag the repo.
+- `verify-auth-workspace-support` - Check `@prisma/cli auth workspace --help` before using workspace list/use/logout commands against an installed package.
 
-### 2. Framework Readiness
+### 2. Auth and Workspace Selection
+
+- `auth-source-precedence` - A non-empty `PRISMA_SERVICE_TOKEN` is the active auth source for commands and local OAuth workspaces are ignored for execution. If it is set but empty, the CLI should fail instead of falling back to stored OAuth.
+- `auth-multi-workspace` - `auth login` can store OAuth sessions for multiple workspaces on the same machine. The active workspace pointer selects which stored OAuth grant normal commands use.
+- `auth-list-before-switch` - Use `auth workspace list --json` to inspect local sessions. Agents should prefer workspace ids from JSON over names because names can be ambiguous.
+- `auth-switch-explicitly` - Use `auth workspace use <id-or-name>` for non-interactive switching. Use `auth workspace use` with no argument only for an interactive picker or when exactly one local OAuth workspace exists.
+- `auth-no-fallthrough` - If the active OAuth workspace is logged out or fails refresh, the CLI should not silently fall through to another cached workspace. Run `auth workspace use <id>` to choose the next workspace.
+- `auth-single-workspace-logout` - Use `auth workspace logout <id-or-name>` or `auth logout --workspace <id-or-name>` to remove one local OAuth workspace session. Plain `auth logout` clears all local OAuth workspace sessions.
+- `auth-service-token-switching` - While `PRISMA_SERVICE_TOKEN` is set, `auth workspace use` is unavailable because the service token is the active auth source; unset the env var to switch local OAuth workspaces. Workspace logout still only cleans local OAuth state.
+- `auth-storage-awareness` - Local OAuth credentials live in the platform auth file, with workspace metadata in a sidecar context file. Project pins live in `.prisma/local.json`, and CLI app/project state lives in `.prisma/cli/state.json` near `prisma.compute.ts` when present.
+
+### 3. Framework Readiness
 
 - `framework-cli-first` - Evaluate deploy readiness against current `@prisma/cli app deploy`, not against what `create-prisma` can scaffold.
 - `framework-supported-cli-deploy` - Current CLI source supports `nextjs`, `nuxt`, `astro`, `hono`, `tanstack-start`, and `bun`; verify installed help/source before relying on a key.
 - `framework-create-prisma-defaults-only` - `create-prisma` can provide generated defaults and `compute:deploy`, but it is not the general deploy surface for existing apps.
 - `framework-build-output` - Compute needs a server entrypoint or framework artifact, not only static output.
 
-### 3. Runtime Host and Port Binding
+### 4. Runtime Host and Port Binding
 
 - `runtime-bind-all-interfaces` - Deployed servers must bind on all interfaces (`0.0.0.0` or the framework equivalent), not hard-coded `localhost` or `127.0.0.1`.
 - `runtime-match-http-port` - The app must listen on the deployed HTTP port: read `process.env.PORT` when possible, or pass the matching `--http-port`.
 - `runtime-readiness-port-only` - Compute readiness watches listening ports; a loopback-only listener can look ready while public ingress cannot reach it.
 
-### 4. Typed Compute Config
+### 5. Typed Compute Config
 
 - `config-optional-simple-app` - `prisma.compute.ts` is not required to deploy a normal single app; use flags when there is no durable config.
 - `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts`.
@@ -121,7 +135,7 @@ Use this skill for:
 - `config-no-project-branch-secrets` - Do not commit Workspace, Project, Branch, production intent, service tokens, or secret values in `prisma.compute.ts`; keep those in flags, `.prisma/local.json`, env storage, or CI secrets.
 - `config-flags-win` - Explicit deploy flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values.
 
-### 5. Branch, Environment, and Database
+### 6. Branch, Environment, and Database
 
 - `env-do-not-leak-secrets` - Never print full `DATABASE_URL`, service tokens, or secret values.
 - `env-deploy-loads-dotenv` - Generated deploy scripts may load env via `prisma.compute.ts` or `--env .env`; inspect the actual script/config before redeploy.
@@ -131,15 +145,15 @@ Use this skill for:
 - `env-production-vs-preview` - Use `--role production` for production env, `--role preview` for preview template env, and `--branch <git-name>` for branch-specific overrides.
 - `env-db-explicit` - `--db` creates and wires one Prisma Postgres database for the branch; it never runs migrations, never creates one database per app, and conflicts with database URLs supplied through `--env`.
 
-### 6. Deploy Operations
+### 7. Deploy Operations
 
 - `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
-- `deploy-noninteractive-auth` - Non-interactive deploys need either stored CLI login or a supported service token env var; never print the token.
+- `deploy-noninteractive-auth` - Non-interactive deploys need either the correct active stored OAuth workspace or a supported service token env var; never print the token.
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
 - `deploy-ops-targets` - App show/open/logs/list-deploys/promote/rollback/remove and domain commands can also accept `[app]` targets from `prisma.compute.ts`.
 
-### 7. SDK and API
+### 8. SDK and API
 
 - `sdk-use-cli-first` - Prefer `@prisma/cli app deploy` for app workflows; use `create-prisma` only to scaffold a new app unless the user is building lower-level automation.
 - `sdk-result-handling` - `@prisma/compute-sdk` returns `Result` values; check `isOk()`/`isErr()` instead of relying on exceptions.
@@ -148,13 +162,14 @@ Use this skill for:
 
 1. Inspect the project: package manager, template/framework, `package.json` scripts, Prisma version, Prisma client location, `prisma.compute.ts`, and existing `compute:deploy`.
 2. Verify CLI help output for the package actually being used, or run `scripts/verify-compute-surface.mjs` for the standard Compute surface check.
-3. Choose the path:
+3. Verify auth context before project/app mutations: `auth whoami --json`, and when multiple local sessions may exist, `auth workspace list --json`.
+4. Choose the path:
    - existing app deploy: config-backed target when present, generated `compute:deploy`, or `@prisma/cli app build/run/deploy` flags
    - new app scaffold: `create-prisma`, then generated `compute:deploy` or `@prisma/cli app deploy`
    - low-level automation: `@prisma/compute-sdk` or Management API
-4. Check framework readiness plus host/port/env/runtime requirements, including project and branch scope.
-5. Run a local build or `app build` before deploying when feasible.
-6. Deploy with JSON output when automating, then smoke-test the public URL and summarize app URL, app id, deployment id, project id, and follow-up steps.
+5. Check framework readiness plus host/port/env/runtime requirements, including project and branch scope.
+6. Run a local build or `app build` before deploying when feasible.
+7. Deploy with JSON output when automating, then smoke-test the public URL and summarize app URL, app id, deployment id, project id, workspace id, and follow-up steps.
 
 ## Avoid
 
@@ -165,3 +180,5 @@ Use this skill for:
 - Do not deploy with placeholder `DATABASE_URL` values.
 - Do not assume `next start` is the Compute runtime path; Next.js deploys need standalone output.
 - Do not expose secret values from `.env`, CLI output, Management API responses, or logs.
+- Do not assume a stored OAuth login means the desired workspace is active; inspect or switch it explicitly.
+- Do not auto-switch to another cached workspace after logout or auth refresh failure.

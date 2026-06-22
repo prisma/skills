@@ -44,6 +44,23 @@ const checks = [
     ],
   },
   {
+    label: "@prisma/cli@latest auth workspace",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "workspace", "--help"],
+    probes: [
+      ["has workspace list", /\blist\b/],
+      ["has workspace use", /\buse\b/],
+      ["workspace use accepts optional id-or-name", /\buse \[id-or-name\]/],
+      ["has workspace logout", /\blogout\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest auth logout",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "logout", "--help"],
+    probes: [["has --workspace", /--workspace\b/]],
+  },
+  {
     label: "@prisma/cli@latest app deploy",
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
@@ -196,7 +213,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|database create|prisma\.compute\.ts|App target|\[app\]|version|create-prisma|hono|elysia|next|nuxt|astro|tanstack|bun)/i.test(line))
+    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|database create|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|create-prisma|hono|elysia|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 
