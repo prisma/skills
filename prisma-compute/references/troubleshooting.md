@@ -10,6 +10,7 @@ Run:
 bunx @prisma/cli@latest --help
 bunx @prisma/cli@latest app deploy --help
 bunx @prisma/cli@latest auth whoami
+bunx @prisma/cli@latest auth workspace list --json
 ```
 
 Then inspect:
@@ -77,7 +78,7 @@ Fix:
 - remove unknown top-level keys
 - pass a target for multi-app build/run commands, such as `app build web`
 - pass an existing `apps` key for multi-app deploys, such as `app deploy api`
-- remove custom `build` blocks from `nuxt` and `astro` targets
+- remove custom `build` blocks from `nuxt`, `astro`, and `nestjs` targets
 
 Minimal recovery config:
 
@@ -120,6 +121,8 @@ Symptoms:
 - `project list` fails
 - `auth whoami` fails
 - browser login was not completed
+- commands use the wrong workspace after a second login
+- another workspace is stored locally but commands behave signed out
 - `PRISMA_SERVICE_TOKEN` is missing, empty, expired, or lacks workspace/project permissions
 
 Fix:
@@ -127,7 +130,30 @@ Fix:
 ```bash
 bunx @prisma/cli@latest auth login
 bunx @prisma/cli@latest auth whoami
+bunx @prisma/cli@latest auth workspace list --json
 ```
+
+If multiple local OAuth workspaces exist, switch explicitly. Prefer ids from JSON:
+
+```bash
+bunx @prisma/cli@latest auth workspace use <workspace-id>
+bunx @prisma/cli@latest auth whoami --json
+bunx @prisma/cli@latest project list --json
+```
+
+For a human terminal, `auth workspace use` with no argument opens an interactive picker or selects the only local OAuth workspace without prompting. In non-interactive or `--json` mode, use `auth workspace use <id-or-name>` instead.
+
+If the active workspace was logged out or its token refresh failed, the CLI intentionally stays signed out for OAuth commands rather than falling through to another cached workspace. Recover by running `auth workspace list --json` and then `auth workspace use <workspace-id>`.
+
+To remove only one local OAuth workspace session:
+
+```bash
+bunx @prisma/cli@latest auth workspace logout <workspace-id-or-name>
+# or:
+bunx @prisma/cli@latest auth logout --workspace <workspace-id-or-name>
+```
+
+Use plain `auth logout` only when you want to clear all local OAuth workspace sessions.
 
 For CI, current `@prisma/cli` can authenticate with `PRISMA_SERVICE_TOKEN`:
 
@@ -137,7 +163,19 @@ bunx @prisma/cli@latest auth whoami
 bunx @prisma/cli@latest app deploy --json --no-interactive --prod --yes --env .env
 ```
 
+If `PRISMA_SERVICE_TOKEN` is set and non-empty, it is the active auth source and local OAuth workspace switching is unavailable for command execution. Unset `PRISMA_SERVICE_TOKEN` before using `auth workspace use` to change local OAuth workspace context.
+
 If `PRISMA_SERVICE_TOKEN` is set but empty, the CLI errors before trying browser-login credentials. Unset it or provide a valid workspace service token. Never echo, log, or paste the token value; only check whether it is present.
+
+Local storage hints for debugging:
+
+- Override auth storage with `PRISMA_COMPUTE_AUTH_FILE` when isolating tests.
+- Default macOS OAuth credential file: `~/Library/Application Support/prisma/auth.json`.
+- Active workspace metadata sidecar: `~/Library/Application Support/prisma/auth.context.json`.
+- Project binding: `.prisma/local.json`.
+- Local app/project state: `.prisma/cli/state.json`, usually next to the discovered `prisma.compute.ts`.
+
+Do not print credential files or token values into logs.
 
 ## Project Setup Fails
 

@@ -15,7 +15,9 @@ const checks = [
       ["has --deploy", /--deploy\b/],
       ["has hono template", /\bhono\b/i],
       ["has elysia template", /\belysia\b/i],
+      ["has nest template", /\bnest\b/i],
       ["has next template", /\bnext\b/i],
+      ["has svelte template", /\bsvelte\b/i],
       ["has astro template", /\bastro\b/i],
       ["has nuxt template", /\bnuxt\b/i],
       ["has tanstack-start template", /\btanstack-start\b/i],
@@ -44,11 +46,27 @@ const checks = [
     ],
   },
   {
+    label: "@prisma/cli@latest auth workspace",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "workspace", "--help"],
+    probes: [
+      ["has workspace list", /\blist\b/],
+      ["has workspace use", /\buse\b/],
+      ["workspace use accepts optional id-or-name", /\buse \[id-or-name\]/],
+      ["has workspace logout", /\blogout\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest auth logout",
+    packageName: "@prisma/cli@latest",
+    args: ["auth", "logout", "--help"],
+    probes: [["has --workspace", /--workspace\b/]],
+  },
+  {
     label: "@prisma/cli@latest app deploy",
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
     probes: [
-      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --framework", /--framework\b/],
       ["has --entry", /--entry\b/],
       ["has --http-port", /--http-port\b/],
@@ -58,6 +76,16 @@ const checks = [
       ["has --no-db", /--no-db\b/],
       ["has --prod", /--prod\b/],
       ["has --create-project", /--create-project\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app deploy framework choices",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "deploy", "--framework", "__invalid__", "--no-interactive"],
+    expectedExitCode: 2,
+    probes: [
+      ["allows nestjs framework", /Allowed choices are .*nestjs|nextjs, nuxt, astro, hono, nestjs, tanstack-start, bun/i],
+      ["does not allow svelte framework", /Allowed choices are (?:(?!svelte).)*$/is],
     ],
   },
   {
@@ -83,9 +111,17 @@ const checks = [
     packageName: "@prisma/cli@latest",
     args: ["app", "build", "--help"],
     probes: [
-      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --build-type", /--build-type\b/],
       ["has --entry", /--entry\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app build type choices",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "build", "--build-type", "__invalid__", "--no-interactive"],
+    expectedExitCode: 2,
+    probes: [
+      ["allows nestjs build type", /Allowed choices are .*nestjs|auto, bun, nextjs, nuxt, astro, nestjs, tanstack-start/i],
     ],
   },
   {
@@ -93,10 +129,19 @@ const checks = [
     packageName: "@prisma/cli@latest",
     args: ["app", "run", "--help"],
     probes: [
-      ["mentions prisma.compute.ts target", /prisma\.compute\.ts|App target/i],
       ["has --build-type", /--build-type\b/],
       ["has --entry", /--entry\b/],
       ["has --port", /--port\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest app run type choices",
+    packageName: "@prisma/cli@latest",
+    args: ["app", "run", "--build-type", "nestjs", "--no-interactive"],
+    expectedExitCode: 2,
+    probes: [
+      ["run stays local-dev only", /Allowed choices are auto, nextjs, bun/i],
+      ["does not allow nestjs run type", /argument 'nestjs' is invalid/i],
     ],
   },
   {
@@ -111,6 +156,32 @@ const checks = [
     ],
   },
   {
+    label: "@prisma/cli@latest project env update",
+    packageName: "@prisma/cli@latest",
+    args: ["project", "env", "update", "--help"],
+    probes: [
+      ["has --file", /--file\b/],
+      ["has --role", /--role\b/],
+      ["has --branch", /--branch\b/],
+      ["has --project", /--project\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest branch",
+    packageName: "@prisma/cli@latest",
+    args: ["branch", "--help"],
+    probes: [["has branch list", /\blist\b/]],
+  },
+  {
+    label: "@prisma/cli@latest git",
+    packageName: "@prisma/cli@latest",
+    args: ["git", "--help"],
+    probes: [
+      ["has git connect", /\bconnect\b/],
+      ["has git disconnect", /\bdisconnect\b/],
+    ],
+  },
+  {
     label: "@prisma/cli@latest database create",
     packageName: "@prisma/cli@latest",
     args: ["database", "create", "--help"],
@@ -118,6 +189,17 @@ const checks = [
       ["has --region", /--region\b/],
       ["has --project", /--project\b/],
       ["has --branch", /--branch\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest database connection",
+    packageName: "@prisma/cli@latest",
+    args: ["database", "connection", "--help"],
+    probes: [
+      ["has connection list", /\blist\b/],
+      ["has connection create", /\bcreate\b/],
+      ["has connection remove", /\bremove\b/],
+      ["mentions --confirm", /--confirm\b/],
     ],
   },
 ];
@@ -176,9 +258,10 @@ function runCheck(check) {
 
     child.on("close", (exitCode) => {
       clearTimeout(timeout);
+      const expectedExitCode = check.expectedExitCode ?? 0;
       resolve({
         check,
-        ok: exitCode === 0,
+        ok: exitCode === expectedExitCode,
         exitCode,
         output: stripAnsi(`${stdout}\n${stderr}`).trim(),
         error: null,
@@ -196,7 +279,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|database create|prisma\.compute\.ts|App target|\[app\]|version|create-prisma|hono|elysia|next|nuxt|astro|tanstack|bun)/i.test(line))
+    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 
@@ -205,6 +288,9 @@ function printResult(result) {
   console.log(`\n## ${check.label}`);
   console.log(`command: ${runnerCommand().command} ${runnerCommand().argsForPackage(check.packageName, check.args).join(" ")}`);
   console.log(`status: ${result.ok ? "ok" : `failed (${result.exitCode ?? "spawn error"})`}`);
+  if (check.expectedExitCode !== undefined) {
+    console.log(`expected exit: ${check.expectedExitCode}`);
+  }
 
   if (result.error) {
     console.log(`error: ${result.error}`);
