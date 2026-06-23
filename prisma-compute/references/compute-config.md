@@ -57,7 +57,7 @@ Each app target accepts:
 |-------|---------|
 | `name` | Deployed app name. Defaults to the `apps` key, then CLI inference. |
 | `root` | App directory relative to the config file. Defaults to the config directory. |
-| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `tanstack-start`, or `bun` in current CLI source. |
+| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, or `bun` in current CLI source. |
 | `entry` | Entrypoint path for Bun/Hono-style deploys, relative to the app root. |
 | `httpPort` | Deployed HTTP port. Use this for fixed-port apps. |
 | `env` | Dotenv file path string, or `{ file, vars }`. Paths resolve from the config directory. |
@@ -97,7 +97,7 @@ export default defineComputeConfig({
 
 Use `command: null` to skip the build step only when the app root already contains the deployable artifact.
 
-`build` applies to frameworks whose build settings are configurable by Compute, such as `nextjs`, `hono`, `tanstack-start`, and `bun`. In current CLI source, Nuxt and Astro use their framework CLI output and reject a custom `build` block.
+`build` applies to frameworks whose build settings are configurable by Compute, such as `nextjs`, `hono`, `tanstack-start`, and `bun`. In current CLI source, Nuxt, Astro, and NestJS use their framework strategy output and reject a custom `build` block.
 
 ## Monorepos and Multi-App Repos
 
