@@ -70,7 +70,7 @@ Compute needs a server process:
 - It must bind on all interfaces. Do not hard-code `localhost` or `127.0.0.1` for a deployed server; use `0.0.0.0`, `server.host: true`, or the framework equivalent.
 - It must have a deployable entrypoint or recognized framework output.
 - It must not rely on a preview-only command such as `vite preview`.
-- It must receive env vars through `--env`, project env, branch env, or the deploy `--db` flow.
+- It must receive env vars through `--env`, project env, branch env, or external automation.
 
 Check host and port together. A listener on the right port but bound to loopback can appear ready while public ingress cannot reach it.
 

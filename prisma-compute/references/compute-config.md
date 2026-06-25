@@ -205,7 +205,7 @@ bunx @prisma/cli@latest app deploy api \
 
 ## Database Scope
 
-The config does not declare databases in the current beta. Keep database intent in deploy flags, `database create`, or project env commands. Read [`app-deploy-cli.md`](app-deploy-cli.md) for `--db`, `--no-db`, deploy-all, migration, and env-var guardrails.
+The config does not declare databases in the current beta. Keep database intent in `database create`, project env commands, or external automation. Read [`app-deploy-cli.md`](app-deploy-cli.md) for deploy-all, migration, and env-var guardrails.
 
 ## Relationship to `prisma.config.ts`
 

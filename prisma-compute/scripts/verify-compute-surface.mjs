@@ -78,8 +78,6 @@ const checks = [
       ["has --http-port", /--http-port\b/],
       ["has --env", /--env\b/],
       ["has --branch", /--branch\b/],
-      ["has --db", /--db\b/],
-      ["has --no-db", /--no-db\b/],
       ["has --prod", /--prod\b/],
       ["has --create-project", /--create-project\b/],
     ],
@@ -283,7 +281,6 @@ const sourceChecks = [
       {
         path: "services/build-runner/build-jobs/runBuild.ts",
         probes: [
-          ["mirrors app deploy db flow", /Mirrors `prisma app deploy --db`/],
           ["wires preview branch database", /preview branch has a Prisma schema and no DATABASE_URL/i],
         ],
       },
@@ -366,7 +363,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|deployment|region|custom|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
+    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|deployment|region|custom|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 

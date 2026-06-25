@@ -138,18 +138,14 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 
 `app deploy --env .env` loads environment variables from a file for the deployment. A config-backed deploy can instead load env through `prisma.compute.ts` `env`. Neither path is a migration command or seed command.
 
-If the deploy should create and wire a Prisma Postgres database for the deploy target, current `app deploy` exposes `--db`; use `--no-db` to skip database setup. Treat any generated connection URL as a one-time secret.
+Database setup is not part of `prisma.compute.ts` in the current beta. Keep database intent explicit with `database create` and project env commands. Treat any generated connection URL as a one-time secret.
 
-Database setup is not part of `prisma.compute.ts` in the current beta. Keep database intent explicit with `--db`, `--no-db`, `database create`, and project env commands.
+Database and env guardrails:
 
-Database setup guardrails:
-
-- `--db` and `--no-db` are mutually exclusive.
-- `--yes` alone never creates a database; CI must pass `--db --yes`.
-- `--db` creates and wires one branch database. In deploy-all, every target on that branch shares it.
-- `--db` does not run migrations, seed data, or schema push. Run the app's own Prisma database command after deploy setup when needed.
-- Database env values supplied through `--env DATABASE_URL=...`, `--env DIRECT_URL=...`, or an env file suppress automatic database prompting; combining those values with `--db` is rejected.
-- Known non-PostgreSQL Prisma schema sources do not trigger database prompting; explicit `--db` is rejected because it creates Prisma Postgres.
+- Deploys do not run migrations, seed data, or schema push. Run the app's own Prisma database command after deploy setup when needed.
+- In deploy-all, every target on the same branch shares branch-scoped project env unless you assign app-specific env values yourself.
+- Existing database env values supplied through `--env DATABASE_URL=...`, `--env DIRECT_URL=...`, an env file, or project env should be treated as the source of truth.
+- Known non-PostgreSQL Prisma schema sources should not be wired to Prisma Postgres automatically.
 
 ## Project Git, Branch, and Database Operations
 
@@ -169,7 +165,7 @@ bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
 
 Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
 
-For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can mirror `app deploy --db`: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
+For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
 
 Database and database-connection commands never print stored secret values in list/show output. `database create` and `database connection create` return a one-time connection URL; treat it as a secret, store it immediately in env if needed, and do not echo it back in summaries. Removal requires exact `--confirm <id>`; `--yes` is not enough.
 
