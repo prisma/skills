@@ -145,7 +145,7 @@ Use this skill for:
 - `env-cli-token-name` - Current `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth.
 - `env-branch-scope` - Branch deploys, branch env vars, and branch databases must use the same branch name; pass `--branch <git-name>` explicitly when targeting a preview branch.
 - `env-production-vs-preview` - Use `--role production` for production env, `--role preview` for preview template env, and `--branch <git-name>` for branch-specific overrides.
-- `env-db-explicit` - Keep database and env wiring explicit; deploys do not run migrations, seed data, or create one database per app automatically.
+- `env-db-explicit` - Keep database and env wiring explicit through database and project env commands; deploy examples should not add database setup or skip flags, and deploys do not run migrations, seed data, or create one database per app automatically.
 
 ### 7. Deploy Operations
 
