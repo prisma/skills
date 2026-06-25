@@ -56,12 +56,13 @@ Each app target accepts:
 | Field | Meaning |
 |-------|---------|
 | `name` | Deployed app name. Defaults to the `apps` key, then CLI inference. |
+| `region` | Compute region id used only when deploy creates a new app. Existing apps keep their current region. |
 | `root` | App directory relative to the config file. Defaults to the config directory. |
-| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, or `bun` in current CLI source. |
+| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, `custom`, or `bun` in current CLI source. |
 | `entry` | Entrypoint path for Bun/Hono-style deploys, relative to the app root. |
 | `httpPort` | Deployed HTTP port. Use this for fixed-port apps. |
 | `env` | Dotenv file path string, or `{ file, vars }`. Paths resolve from the config directory. |
-| `build` | `{ command, outputDirectory }`. Present means the config owns build settings for that target. |
+| `build` | `{ command, outputDirectory, entrypoint }`. Present means the config owns build settings for that target. |
 
 `env` examples:
 
@@ -97,7 +98,24 @@ export default defineComputeConfig({
 
 Use `command: null` to skip the build step only when the app root already contains the deployable artifact.
 
-`build` applies to frameworks whose build settings are configurable by Compute, such as `nextjs`, `hono`, `tanstack-start`, and `bun`. In current CLI source, Nuxt, Astro, and NestJS use their framework strategy output and reject a custom `build` block.
+For a custom or prebuilt artifact, make the deploy target explicit:
+
+```typescript
+export default defineComputeConfig({
+  app: {
+    framework: "custom",
+    build: {
+      command: "npm run build",
+      outputDirectory: "build",
+      entrypoint: "handler.js",
+    },
+  },
+});
+```
+
+`build.entrypoint` is relative to `build.outputDirectory` when an output directory is set. For Bun/Hono configs without an output directory, an entrypoint-backed build can supply the source entrypoint. Do not set both `entry` and `build.entrypoint` unless they describe the same file.
+
+`build` applies to frameworks whose build settings are configurable by Compute, such as `nextjs`, `hono`, `tanstack-start`, `custom`, and `bun`. In current CLI source, Nuxt, Astro, and NestJS use their framework strategy output and reject a config `build` block.
 
 ## Monorepos and Multi-App Repos
 
@@ -123,6 +141,15 @@ export default defineComputeConfig({
         vars: {
           LOG_LEVEL: "info",
         },
+      },
+    },
+    frontend: {
+      root: "apps/frontend",
+      framework: "custom",
+      build: {
+        command: "pnpm --filter frontend build",
+        outputDirectory: "dist/server",
+        entrypoint: "index.mjs",
       },
     },
   },
@@ -163,6 +190,8 @@ Explicit flags win over config values:
 - `--http-port` overrides `httpPort`
 - any `--env` flag replaces all config env inputs
 - `--app` and `PRISMA_APP_ID` rank above config app names
+
+`region` is not an app selector and there is no general deploy flag equivalent in current help output. It is only used when deploy creates a new app. If the selected app already exists, deploy keeps that app's existing region.
 
 `prisma.compute.ts` never selects Workspace, Project, Branch, or production intent. Keep those in CLI flags, environment variables, `.prisma/local.json`, or CI configuration:
 

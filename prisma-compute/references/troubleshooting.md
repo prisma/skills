@@ -78,7 +78,9 @@ Fix:
 - remove unknown top-level keys
 - pass a target for multi-app build/run commands, such as `app build web`
 - pass an existing `apps` key for multi-app deploys, such as `app deploy api`
-- remove custom `build` blocks from `nuxt`, `astro`, and `nestjs` targets
+- remove config `build` blocks from `nuxt`, `astro`, and `nestjs` targets
+- for `framework: "custom"`, set both `build.outputDirectory` and `build.entrypoint`
+- when `build.outputDirectory` is set for a configurable framework, also set `build.entrypoint` if the framework needs a configured runtime entrypoint
 
 Minimal recovery config:
 

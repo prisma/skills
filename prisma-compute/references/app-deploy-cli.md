@@ -167,7 +167,9 @@ bunx @prisma/cli@latest database connection create db_123 --name readonly
 bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
 ```
 
-Git integration connects a Project to a GitHub repository. Do not assume it replaces CLI deploys or returns preview deployment comments in GitHub unless current product behavior proves that flow exists.
+Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
+
+For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can mirror `app deploy --db`: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
 
 Database and database-connection commands never print stored secret values in list/show output. `database create` and `database connection create` return a one-time connection URL; treat it as a secret, store it immediately in env if needed, and do not echo it back in summaries. Removal requires exact `--confirm <id>`; `--yes` is not enough.
 

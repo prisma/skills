@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 
+import fs from "node:fs";
+import path from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_TIMEOUT_MS = 45_000;
 const CREATE_PRISMA_PACKAGE =
   process.env.PRISMA_CREATE_PRISMA_PACKAGE || "create-prisma@latest";
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const SKILLS_REPO_ROOT = path.resolve(SCRIPT_DIR, "..", "..");
+const DEFAULT_WORK_ROOT = path.resolve(SKILLS_REPO_ROOT, "..");
 
 const checks = [
   {
@@ -85,6 +91,7 @@ const checks = [
     expectedExitCode: 2,
     probes: [
       ["allows nestjs framework", /Allowed choices are .*nestjs|nextjs, nuxt, astro, hono, nestjs, tanstack-start, bun/i],
+      ["published package does not allow custom framework yet", /Allowed choices are (?:(?!custom).)*$/is],
       ["does not allow svelte framework", /Allowed choices are (?:(?!svelte).)*$/is],
     ],
   },
@@ -122,6 +129,7 @@ const checks = [
     expectedExitCode: 2,
     probes: [
       ["allows nestjs build type", /Allowed choices are .*nestjs|auto, bun, nextjs, nuxt, astro, nestjs, tanstack-start/i],
+      ["published package does not allow custom build type yet", /Allowed choices are (?:(?!custom).)*$/is],
     ],
   },
   {
@@ -204,6 +212,85 @@ const checks = [
   },
 ];
 
+const sourceChecks = [
+  {
+    label: "prisma-cli source",
+    envName: "PRISMA_CLI_REPO",
+    defaultRoot: path.join(DEFAULT_WORK_ROOT, "prisma-cli"),
+    files: [
+      {
+        path: "docs/product/command-spec.md",
+        probes: [
+          ["documents custom deploy framework", /--framework <[^>]*custom[^>]*>/],
+          ["documents config region", /config `region` applies only when the resolved app does not exist yet/i],
+          ["documents build.entrypoint", /`build\.entrypoint` is the built artifact entrypoint/i],
+        ],
+      },
+      {
+        path: "packages/cli/src/lib/app/compute-config.ts",
+        probes: [
+          ["merges config region", /readComputeTargetRegion/],
+          ["returns region deploy input", /\bregion,\n/],
+        ],
+      },
+    ],
+  },
+  {
+    label: "project-compute source",
+    envName: "PROJECT_COMPUTE_REPO",
+    defaultRoot: path.join(DEFAULT_WORK_ROOT, "project-compute"),
+    files: [
+      {
+        path: "sdk/src/config/types.ts",
+        probes: [
+          ["config framework includes custom", /"custom"/],
+          ["config app supports region", /region\?: string/],
+          ["build config supports entrypoint", /entrypoint\?: string/],
+        ],
+      },
+      {
+        path: "sdk/src/compute-client.ts",
+        probes: [
+          ["deploy options use appName", /appName\?: string/],
+          ["deploy result uses deploymentEndpointDomain", /deploymentEndpointDomain: string/],
+        ],
+      },
+      {
+        path: "sdk/src/index.ts",
+        probes: [["exports CustomBuild", /\bCustomBuild\b/]],
+      },
+    ],
+  },
+  {
+    label: "pdp-control-plane source",
+    envName: "PDP_CONTROL_PLANE_REPO",
+    defaultRoot: path.join(DEFAULT_WORK_ROOT, "pdp-control-plane"),
+    files: [
+      {
+        path: "services/management-api/routes/v1/deployments.ts",
+        probes: [
+          ["has public deployments route", /basePath\(`\/deployments`\)/],
+          ["has deployment log stream route", /:deploymentId\/logs/],
+        ],
+      },
+      {
+        path: "services/console/app/components/GitHubRepoConnect.tsx",
+        probes: [
+          ["mentions Deploy from GitHub", /Deploy from GitHub/],
+          ["mentions push to deploy", /push to deploy/i],
+        ],
+      },
+      {
+        path: "services/build-runner/build-jobs/runBuild.ts",
+        probes: [
+          ["mirrors app deploy db flow", /Mirrors `prisma app deploy --db`/],
+          ["wires preview branch database", /preview branch has a Prisma schema and no DATABASE_URL/i],
+        ],
+      },
+    ],
+  },
+];
+
 function runnerCommand() {
   if (process.env.PRISMA_COMPUTE_RUNNER) {
     return {
@@ -279,7 +366,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
+    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--db|--no-db|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|deployment|region|custom|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 
@@ -310,15 +397,140 @@ function printResult(result) {
   }
 }
 
+function resolveSourceRoot(check) {
+  const explicitRoot = process.env[check.envName];
+  if (explicitRoot) {
+    return {
+      root: path.resolve(explicitRoot),
+      explicit: true,
+    };
+  }
+
+  if (fs.existsSync(check.defaultRoot)) {
+    return {
+      root: check.defaultRoot,
+      explicit: false,
+    };
+  }
+
+  return null;
+}
+
+function runSourceCheck(check) {
+  const resolved = resolveSourceRoot(check);
+  if (!resolved) {
+    return {
+      check,
+      skipped: true,
+      ok: true,
+      root: null,
+      files: [],
+      error: null,
+    };
+  }
+
+  if (!fs.existsSync(resolved.root)) {
+    return {
+      check,
+      skipped: false,
+      ok: false,
+      root: resolved.root,
+      files: [],
+      error: `${resolved.root} does not exist`,
+    };
+  }
+
+  const files = [];
+  let ok = true;
+
+  for (const file of check.files) {
+    const fullPath = path.join(resolved.root, file.path);
+    if (!fs.existsSync(fullPath)) {
+      ok = false;
+      files.push({
+        path: file.path,
+        ok: false,
+        error: "missing file",
+        probes: [],
+      });
+      continue;
+    }
+
+    const content = fs.readFileSync(fullPath, "utf8");
+    const probes = file.probes.map(([label, pattern]) => {
+      const passed = pattern.test(content);
+      if (!passed) {
+        ok = false;
+      }
+      return { label, passed };
+    });
+
+    files.push({
+      path: file.path,
+      ok: probes.every((probe) => probe.passed),
+      error: null,
+      probes,
+    });
+  }
+
+  return {
+    check,
+    skipped: false,
+    ok,
+    root: resolved.root,
+    files,
+    error: null,
+  };
+}
+
+function printSourceResult(result) {
+  const { check } = result;
+  console.log(`\n## ${check.label}`);
+  if (result.skipped) {
+    console.log(
+      `status: skipped (set ${check.envName} or place repo at ${check.defaultRoot})`,
+    );
+    return;
+  }
+
+  console.log(`source: ${result.root}`);
+  console.log(`status: ${result.ok ? "ok" : "failed"}`);
+
+  if (result.error) {
+    console.log(`error: ${result.error}`);
+    return;
+  }
+
+  for (const file of result.files) {
+    console.log(`file ${file.path}: ${file.ok ? "ok" : "failed"}`);
+    if (file.error) {
+      console.log(`- ${file.error}`);
+      continue;
+    }
+    for (const probe of file.probes) {
+      console.log(`- ${probe.label}: ${probe.passed ? "yes" : "no"}`);
+    }
+  }
+}
+
 console.log("# Prisma Compute CLI Surface");
 console.log(`runner: ${runnerCommand().command}`);
 console.log("Set PRISMA_COMPUTE_RUNNER=bunx to use bunx instead of npx.");
 console.log("Set PRISMA_CREATE_PRISMA_PACKAGE to test another create-prisma tag or local package.");
+console.log("Set PRISMA_CLI_REPO, PROJECT_COMPUTE_REPO, or PDP_CONTROL_PLANE_REPO to audit local source repos.");
 
 let hasFailure = false;
 for (const check of checks) {
   const result = await runCheck(check);
   printResult(result);
+  if (!result.ok) {
+    hasFailure = true;
+  }
+}
+
+for (const check of sourceChecks) {
+  const result = runSourceCheck(check);
+  printSourceResult(result);
   if (!result.ok) {
     hasFailure = true;
   }

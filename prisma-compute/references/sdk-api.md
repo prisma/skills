@@ -53,20 +53,20 @@ const result = await compute.deploy({
     entrypoint: "index.js",
   }),
   projectId: "proj_abc",
-  serviceName: "my-app",
+  appName: "my-app",
   region: "us-east-1",
   envVars: { DATABASE_URL: databaseUrl },
   portMapping: { http: 3000 },
 })
 
 if (result.isOk()) {
-  console.log(result.value.versionEndpointDomain)
+  console.log(result.value.deploymentEndpointDomain)
 } else {
   console.error(result.error.message)
 }
 ```
 
-SDK methods return `Result<T, E>`. Check `isOk()` or `isErr()` instead of assuming errors throw.
+SDK methods return `Result<T, E>`. Check `isOk()` or `isErr()` instead of assuming errors throw. Deploy results expose app/deployment vocabulary: `appId`, `appName`, `deploymentId`, `deploymentEndpointDomain`, `appEndpointDomain`, `promoted`, and `resolvedConfig`.
 
 ## SDK Build Strategies
 
@@ -78,6 +78,7 @@ Current project-compute SDK strategies:
 - `AstroBuild`: expects `dist/server/entry.mjs`
 - `NestjsBuild`: builds a NestJS HTTP server artifact
 - `TanstackStartBuild`: runs `vite build` and expects a Nitro node server at `.output/server/index.mjs`; keep `tanstackStart()` and `nitro()` in Vite config
+- `CustomBuild`: runs optional configured build settings and stages a configured artifact entrypoint
 - `BunBuild`: runs `bun build` and needs an explicit entrypoint or `package.json` `main`
 - `PreBuilt`: uses an existing artifact directory and relative entrypoint
 
@@ -104,19 +105,22 @@ Compute resources map roughly to:
 
 - Project: parent container
 - Branch: production or preview scope for env resolution and database/env attachment
-- Compute service/app: stable app endpoint and branch attachment
-- Compute version/deployment: build artifact plus runtime status and preview URL
+- App: stable app endpoint and branch attachment
+- Deployment: build artifact plus runtime status and preview URL
 
-Low-level service/version routes include:
+Low-level public routes use App/Deployment names:
 
-- list/create compute services under a project
-- get/update/delete compute service
-- create/list/get/start/stop/delete compute versions
-- promote a version to the service endpoint
-- stream logs for a version
+- list/create apps under a project with `/v1/apps`
+- get/update/delete an app
+- create/list deployments for an app
+- get/start/stop/delete deployments with `/v1/deployments/:deploymentId`
+- promote or roll back an app using `deploymentId`
+- stream logs with `/v1/deployments/:deploymentId/logs`
 - manage custom domains
 
-Environment variables are not embedded directly in the low-level version create payload. They resolve from the service's attached Branch. Use project/environment-variable APIs or CLI env commands to write env vars first, and keep the branch name consistent across app/service creation, database creation, and env writes.
+Internal compatibility aliases may still appear in code. Prefer App/Deployment names in new docs, skills, and automation.
+
+Environment variables are not embedded directly in the low-level deployment create payload. They resolve from the app's attached Branch. Use project/environment-variable APIs or CLI env commands to write env vars first, and keep the branch name consistent across app creation, database creation, and env writes.
 
 When using the CLI alongside SDK automation:
 
@@ -130,7 +134,7 @@ Production promotion is not just "the same branch with another label"; current `
 
 ## Secrets and Redaction
 
-Management API version inspection exposes env var names with redacted values. Treat any value like `[redacted]` as a marker, not as the deployed value.
+Management API deployment inspection exposes env var names with redacted values. Treat any value like `[redacted]` as a marker, not as the deployed value.
 
 Do not log:
 
