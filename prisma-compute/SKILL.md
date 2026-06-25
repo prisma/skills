@@ -150,6 +150,7 @@ Use this skill for:
 ### 7. Deploy Operations
 
 - `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
+- `deploy-github-default-branch` - When a Compute app is connected to GitHub push-to-deploy, a merge to the default branch is the production deploy path; do not tell users to redeploy the old preview branch or run a default-branch preview deploy unless GitHub deploy records show that path is unavailable.
 - `deploy-noninteractive-auth` - Non-interactive deploys need either the correct active stored OAuth workspace or a supported service token env var; never print the token.
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.

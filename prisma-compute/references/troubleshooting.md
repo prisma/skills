@@ -220,6 +220,30 @@ test -f prisma/schema.prisma && sed -n '1,220p' prisma/schema.prisma
 
 Never deploy `postgresql://USER:PASSWORD@HOST:PORT/DATABASE` placeholder values.
 
+## Merged to Main But Production Looks Old
+
+Symptoms:
+
+- the PR branch was merged into `main` or the configured default branch
+- the user is still looking at a feature-branch preview URL
+- an agent suggests redeploying the old branch instead of checking production
+- the feature branch was deleted after merge
+
+Check:
+
+```bash
+bunx @prisma/cli@latest app show --json
+bunx @prisma/cli@latest app list-deploys --json
+bunx @prisma/cli@latest app logs --deployment <deployment-id> --json
+```
+
+Fix:
+
+- if the app uses GitHub push-to-deploy, say that the merge to the default branch should appear in production after the production deployment completes
+- point the user at the production app endpoint or latest production deployment, not the old preview URL
+- inspect Console/build-runner deployment records if the production deployment did not start or failed
+- only use a manual CLI production deploy when GitHub push-to-deploy is not configured, is disabled, or the user explicitly wants a manual deploy
+
 ## Wrong Branch, Env, or Database
 
 Symptoms:

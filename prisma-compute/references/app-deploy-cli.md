@@ -111,6 +111,14 @@ Do not assume a local Git branch was used by the CLI unless the generated script
 
 Promotion is a separate production action: `app promote <deployment-id>` rebuilds a deployment with production env vars. Do not treat a preview branch deploy as production promotion.
 
+## Deployment Story: GitHub vs CLI
+
+When a Compute app is connected to GitHub push-to-deploy, the default branch is the production deploy path. If a PR has been merged into `main` or another configured default branch, the natural answer is that the changes should appear in production after the production deployment completes. Do not tell the user to keep using a deleted feature-branch preview URL, redeploy the old preview branch, or run a default-branch preview deploy unless deployment records show the GitHub production deploy is missing.
+
+Feature and PR branches are preview scope. A preview deployment can be useful before merge, but after the branch is merged or deleted it should not be treated as the live app. If the user is looking at a preview URL after merge, point them to the app's production endpoint or the latest production deployment record.
+
+Use CLI deploys for explicit manual deploys, local-source deploys, or repositories that are not using GitHub push-to-deploy. For manual production deploys, confirm production intent with `--prod --yes`; use `--branch <git-name>` for preview or branch-specific deploy scope.
+
 The current `app show`, `app list-deploys`, and `app logs` help exposes `--app`, `--project`, and for logs `--deployment`, not `--branch`. For branch debugging, capture the deployment id from deploy JSON and inspect that deployment or its logs.
 
 `app deploy --create-project <name>` creates and links a new Project before deploying. Use it only when the user wants a new Project. It conflicts with `--project` and `PRISMA_PROJECT_ID`, and `--yes` alone does not choose Project scope.
@@ -163,7 +171,7 @@ bunx @prisma/cli@latest database connection create db_123 --name readonly
 bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
 ```
 
-Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
+Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch production deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
 
 For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
 
