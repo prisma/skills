@@ -113,11 +113,7 @@ Promotion is a separate production action: `app promote <deployment-id>` rebuild
 
 ## Deployment Story: GitHub vs CLI
 
-When a Compute app is connected to GitHub push-to-deploy, the default branch is the production deploy path. If a PR has been merged into `main` or another configured default branch, the natural answer is that the changes should appear in production after the production deployment completes. Do not tell the user to keep using a deleted feature-branch preview URL, redeploy the old preview branch, or run a default-branch preview deploy unless deployment records show the GitHub production deploy is missing.
-
-Feature and PR branches are preview scope. A preview deployment can be useful before merge, but after the branch is merged or deleted it should not be treated as the live app. If the user is looking at a preview URL after merge, point them to the app's production endpoint or the latest production deployment record.
-
-Use CLI deploys for explicit manual deploys, local-source deploys, or repositories that are not using GitHub push-to-deploy. For manual production deploys, confirm production intent with `--prod --yes`; use `--branch <git-name>` for preview or branch-specific deploy scope.
+When a Compute app is connected to GitHub push-to-deploy, the default branch is the production deploy path. If a PR has been merged into `main` or another configured default branch, the natural answer is that the changes should appear in production after the production deployment completes; use CLI deploys for explicit manual deploys, local-source deploys, or repositories that are not using GitHub push-to-deploy.
 
 The current `app show`, `app list-deploys`, and `app logs` help exposes `--app`, `--project`, and for logs `--deployment`, not `--branch`. For branch debugging, capture the deployment id from deploy JSON and inspect that deployment or its logs.
 
