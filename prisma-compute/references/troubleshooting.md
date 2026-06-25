@@ -78,7 +78,9 @@ Fix:
 - remove unknown top-level keys
 - pass a target for multi-app build/run commands, such as `app build web`
 - pass an existing `apps` key for multi-app deploys, such as `app deploy api`
-- remove custom `build` blocks from `nuxt`, `astro`, and `nestjs` targets
+- remove config `build` blocks from `nuxt`, `astro`, and `nestjs` targets
+- for `framework: "custom"`, set both `build.outputDirectory` and `build.entrypoint`
+- when `build.outputDirectory` is set for a configurable framework, also set `build.entrypoint` if the framework needs a configured runtime entrypoint
 
 Minimal recovery config:
 
@@ -247,17 +249,18 @@ Fix:
 - treat `app promote <deployment-id>` as a production action because it rebuilds with production env vars
 - do not expect `prisma.compute.ts` to select Project, Branch, production, or database scope; it only supplies app deploy defaults
 
-## `--db` Rejected or Did Not Apply Schema
+## Database Wiring or Schema Did Not Apply
 
 Symptoms:
 
-- `app deploy --db` is rejected
-- `--db` created env vars but the database is empty
-- a deploy-all run created one database while multiple apps deployed
+- deploy runs but the app cannot find `DATABASE_URL`
+- database env vars exist but the database is empty
+- a deploy-all run points multiple apps at the same branch database
 
 Fix:
 
-- read [`app-deploy-cli.md`](app-deploy-cli.md) `Database and Env` for the `--db` guardrails
+- read [`app-deploy-cli.md`](app-deploy-cli.md) `Database and Env` for the database/env guardrails
+- create and assign database env vars explicitly for the intended branch/app scope
 - run migrations, seed, or schema push yourself after database setup; Compute never applies schema changes for you
 - for multi-app deploy-all with app-specific database isolation, create and assign those database env vars explicitly before deploy
 

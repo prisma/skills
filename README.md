@@ -135,7 +135,7 @@ Prisma Compute deployment and hosting workflows centered on the Prisma Platform 
 **Use when:**
 - Creating a new Prisma app with optional Compute deploy
 - Deploying or redeploying an existing app to Prisma Compute
-- Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, or Turborepo
+- Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts
 - Managing Compute app logs, deployments, environment variables, branches, and domains
 - Building programmatic Compute integrations with SDK/API tooling
 
@@ -144,7 +144,7 @@ Prisma Compute deployment and hosting workflows centered on the Prisma Platform 
 - Generated `compute:deploy` scripts
 - `create-prisma --deploy` for new project scaffolds
 - Framework-specific build output requirements
-- `@prisma/compute-sdk` and Management API service/version concepts
+- `@prisma/compute-sdk` and Management API App/Deployment concepts
 - Troubleshooting auth, env, build, deploy, log, and port issues
 
 ## Installation
