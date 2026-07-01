@@ -2,28 +2,28 @@
 
 Use this reference when creating a new app with Prisma and optionally deploying it to Prisma Compute.
 
-Do not use `create-prisma` as the deploy path for an existing app. For existing projects, use the generated `compute:deploy` script when present, or call `bunx @prisma/cli@latest app deploy` directly after verifying current help output.
+Do not use `create-prisma` as the deploy path for an existing app. For existing projects, use the generated `compute:deploy` script when present, or call `bunx @prisma/cli@latest app deploy` directly.
 
-## Current Reference
+## Reference
 
-Verify current scaffold behavior:
+Useful scaffold checks:
 
 ```bash
 bunx create-prisma@latest --help
 bunx create-prisma@latest --version
 ```
 
-Use `create-prisma@latest` for new-project scaffolding after verifying `--deploy` appears in `create-prisma@latest --help`.
+Use `create-prisma@latest` for new-project scaffolding.
 
 ## Supported Templates
 
 `create-prisma@latest` scaffolds `hono`, `elysia`, `nest`, `next`, `svelte`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`.
 
-Integrated `--deploy` support currently applies to `hono`, `elysia`, `nest`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
+Integrated `--deploy` support applies to `hono`, `elysia`, `nest`, `next`, `astro`, `nuxt`, `tanstack-start`, and `turborepo`. For `turborepo`, the generated config target is usually `api`.
 
 The scaffold template name is `nest`, but the Compute deploy framework/config key is `nestjs`.
 
-`svelte` is scaffold-only for Compute today because current `@prisma/cli app deploy --framework` does not expose a `svelte` key. For non-latest releases, verify generated `package.json`, `prisma.compute.ts`, and README before assuming deploy/config support.
+`svelte` is scaffold-only for Compute because `@prisma/cli app deploy --framework` has no `svelte` key.
 
 ## Basic Commands
 
@@ -93,9 +93,9 @@ When the deploy flow is selected, `create-prisma` can add:
 }
 ```
 
-Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code using generated flags and/or `prisma.compute.ts`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly after verifying current help output.
+Use the actual generated script from `package.json`; do not reconstruct it from memory. The script redeploys app code using generated flags and/or `prisma.compute.ts`. It does not create a new project, create a new database, run migrations, or seed data. If a scaffolded project does not have `compute:deploy`, use `@prisma/cli app deploy` directly.
 
-Current and near-term `create-prisma` behavior can differ by release. Inspect the generated `package.json`, `prisma.compute.ts`, and README before editing deploy behavior.
+Inspect the generated `package.json`, `prisma.compute.ts`, and README before editing deploy behavior.
 
 ## Generated Files to Preserve
 
@@ -114,4 +114,4 @@ All Prisma 7 scaffolds:
 
 ## Failure Handling
 
-If `--deploy` is explicit and setup cannot authenticate, cannot run the Platform CLI, or the template is not deployable, report that deploy failed and keep the scaffolded project. Do not delete the user's files.
+If `--deploy` is explicit and setup cannot authenticate, cannot run the Platform CLI, or cannot complete the integrated deploy, report that deploy failed and keep the scaffolded project. Do not delete the user's files.

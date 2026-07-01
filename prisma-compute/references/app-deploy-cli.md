@@ -4,12 +4,13 @@ Use this reference for existing projects and for generated `compute:deploy` scri
 
 ## Package and Command
 
-Current Compute app workflows are exposed through the Prisma Platform CLI package:
+Compute app workflows are exposed through the Prisma Platform CLI package:
 
 ```bash
 bunx @prisma/cli@latest --help
 bunx @prisma/cli@latest app --help
 bunx @prisma/cli@latest app deploy --help
+bunx @prisma/cli@latest build logs --help
 ```
 
 The examples in help output may call the binary `prisma-cli`. When using package runners, prefer:
@@ -20,7 +21,18 @@ npx @prisma/cli@latest app deploy
 pnpm dlx @prisma/cli@latest app deploy
 ```
 
-If a future Prisma ORM CLI exposes `prisma app deploy`, use the local project command after verifying `prisma app deploy --help`.
+## Agent Skill Installation
+
+`@prisma/cli` can install and refresh Prisma skills for local AI coding agents:
+
+```bash
+bunx @prisma/cli@latest agent install
+bunx @prisma/cli@latest agent install --skill prisma-compute
+bunx @prisma/cli@latest agent update
+bunx @prisma/cli@latest agent status --json
+```
+
+`agent install` and `agent update` shell out to `skills@latest add prisma/skills` through the detected package runner. Use them when the user wants Prisma's agent context installed or refreshed; they are not a deployment command.
 
 ## Typed Compute Config
 
@@ -38,7 +50,7 @@ bunx @prisma/cli@latest project show
 bunx @prisma/cli@latest project link <project-id-or-name>
 ```
 
-Current `@prisma/cli` can keep multiple local browser-login workspace sessions. Running `auth login` again for a different workspace should add/update that workspace session and make it active; it should not delete the existing workspace session. The active workspace pointer decides which stored OAuth workspace normal commands use.
+`@prisma/cli` can keep multiple local browser-login workspace sessions. Running `auth login` again for a different workspace should add/update that workspace session and make it active; it should not delete the existing workspace session. The active workspace pointer decides which stored OAuth workspace normal commands use.
 
 For agents, prefer this flow before project/app mutations:
 
@@ -70,7 +82,7 @@ For a new linked project:
 bunx @prisma/cli@latest project create my-app --json
 ```
 
-For non-interactive or CI work, current `@prisma/cli` accepts a workspace service token through `PRISMA_SERVICE_TOKEN`. A non-empty service token takes precedence over stored browser-login credentials, so local OAuth workspace switching does not affect command execution while the env var is set. `auth workspace list --json` may still show local OAuth sessions, but they are not switchable until the service-token env var is unset. Verify auth with `auth whoami` and never print the token value.
+For non-interactive or CI work, `@prisma/cli` accepts a workspace service token through `PRISMA_SERVICE_TOKEN`. A non-empty service token takes precedence over stored browser-login credentials, so local OAuth workspace switching does not affect command execution while the env var is set. `auth workspace list --json` may still show local OAuth sessions, but they are not switchable until the service-token env var is unset. Verify auth with `auth whoami` and never print the token value.
 
 If `PRISMA_SERVICE_TOKEN` is set but empty, unset it or provide a real token. The CLI should fail instead of silently falling back to local OAuth credentials.
 
@@ -91,7 +103,7 @@ bunx @prisma/cli@latest project show --json
 bunx @prisma/cli@latest app deploy --project proj_123 --app my-api --branch feature/login --json
 ```
 
-If `prisma.compute.ts` defines a `name` or an `apps` key, that config can provide the app name. `--app` and `PRISMA_APP_ID` rank above the config value. `[app]` selects a target from `apps` when the installed CLI supports typed compute config:
+If `prisma.compute.ts` defines a `name` or an `apps` key, that config can provide the app name. `--app` and `PRISMA_APP_ID` rank above the config value. `[app]` selects a target from `apps`:
 
 ```bash
 bunx @prisma/cli@latest app deploy api --project proj_123 --branch feature/login --json
@@ -115,9 +127,11 @@ Promotion is a separate production action: `app promote <deployment-id>` rebuild
 
 When a Compute app is connected to GitHub push-to-deploy, the default branch is the production deploy path. If a PR has been merged into `main` or another configured default branch, the natural answer is that the changes should appear in production after the production deployment completes; use CLI deploys for explicit manual deploys, local-source deploys, or repositories that are not using GitHub push-to-deploy.
 
-The current `app show`, `app list-deploys`, and `app logs` help exposes `--app`, `--project`, and for logs `--deployment`, not `--branch`. For branch debugging, capture the deployment id from deploy JSON and inspect that deployment or its logs.
+`app show`, `app list-deploys`, and `app logs` expose `--app`, `--project`, and for logs `--deployment`, not `--branch`. For branch debugging, capture the deployment id from deploy JSON and inspect that deployment or its logs.
 
 `app deploy --create-project <name>` creates and links a new Project before deploying. Use it only when the user wants a new Project. It conflicts with `--project` and `PRISMA_PROJECT_ID`, and `--yes` alone does not choose Project scope.
+
+`app deploy --region <region>` only applies when deploy creates a new app. Existing apps keep their current region. Use `prisma.compute.ts` `region` for a durable default, and use the flag only for one-off new-app placement.
 
 ## Database and Env
 
@@ -142,7 +156,7 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 
 `app deploy --env .env` loads environment variables from a file for the deployment. A config-backed deploy can instead load env through `prisma.compute.ts` `env`. Neither path is a migration command or seed command.
 
-Database setup is not part of `prisma.compute.ts` in the current beta. Keep database intent explicit with `database create` and project env commands. Do not add database setup or skip flags to deploy examples. Treat any generated connection URL as a one-time secret.
+Database setup is not part of `prisma.compute.ts`. Keep database intent explicit with `database create` and project env commands. Do not add database setup to deploy examples. Treat any generated connection URL as a one-time secret.
 
 Database and env guardrails:
 
@@ -169,7 +183,7 @@ bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
 
 Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch production deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
 
-For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
+For GitHub-driven deploys, inspect the Console/build-runner state, deployment records, build logs, or the `Prisma Compute Deploy` GitHub check run instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. GitHub check runs are the guided feedback path; do not promise Vercel-style PR comments.
 
 Database and database-connection commands never print stored secret values in list/show output. `database create` and `database connection create` return a one-time connection URL; treat it as a secret, store it immediately in env if needed, and do not echo it back in summaries. Removal requires exact `--confirm <id>`; `--yes` is not enough.
 
@@ -205,7 +219,7 @@ bunx @prisma/cli@latest app run api --port 8080
 
 `app run --port` sets `PORT` for local development. It does not rewrite an app's explicit host binding, so a local run is not enough to prove the deployed server is reachable from ingress.
 
-`app run --build-type nestjs` is not supported in the current CLI. If a config-backed NestJS target is selected, run the Nest dev server directly instead.
+`app run --build-type nestjs` is not supported. If a config-backed NestJS target is selected, run the Nest dev server directly instead.
 
 ## Deploy
 
@@ -239,10 +253,10 @@ bunx @prisma/cli@latest app deploy \
 After a real deploy, verify the public deployment URL. Do not stop at "deploy succeeded" or a local `app run` check:
 
 ```bash
-node prisma-compute/scripts/smoke-deployed-app.mjs https://<deployment-url>
+curl -i https://<deployment-url>
 ```
 
-If the deploy command returns JSON, parse the URL from the result and smoke-test that exact URL. Use `--expect <text>` when the app has a stable health response or page marker. The smoke script rejects `localhost` and `127.0.0.1` by default so agents do not accidentally test a local server instead of public ingress.
+If the deploy command returns JSON, parse the URL from the result and request that exact public URL. Do not accidentally test `localhost` or `127.0.0.1` instead of public ingress.
 
 Create/link a project during deploy:
 
@@ -264,6 +278,19 @@ bunx @prisma/cli@latest app deploy \
   --yes \
   --env .env
 ```
+
+Deploy a newly created app in a specific region:
+
+```bash
+bunx @prisma/cli@latest app deploy \
+  --app my-api \
+  --region us-west-1 \
+  --prod \
+  --yes \
+  --env .env
+```
+
+`--region` is a new-app placement hint. It does not move an existing app.
 
 Deploy a preview branch with framework and port:
 
@@ -289,7 +316,7 @@ bunx @prisma/cli@latest app deploy \
   --env .env
 ```
 
-`--entry <path>` without `--framework` is treated as a Bun app deploy by the current CLI.
+`--entry <path>` without `--framework` is treated as a Bun app deploy.
 
 Config-backed Bun-style app:
 
@@ -297,7 +324,7 @@ Config-backed Bun-style app:
 bunx @prisma/cli@latest app deploy api --prod --yes --env .env
 ```
 
-Use config for stable app defaults, and flags for one-off project, branch, env, database, and production choices.
+Use config for stable app defaults, and flags for one-off project, branch, region, env, and production choices. Keep database setup in explicit database and project-env commands.
 
 ## Operations
 
@@ -326,6 +353,16 @@ bunx @prisma/cli@latest app logs --deployment <deployment-id>
 bunx @prisma/cli@latest app logs --json
 ```
 
+Build logs for GitHub/Console builds:
+
+```bash
+bunx @prisma/cli@latest build logs <build-id>
+bunx @prisma/cli@latest build logs <build-id> --follow
+bunx @prisma/cli@latest build logs <build-id> --json
+```
+
+`build logs` streams build output keyed by a Build id from a GitHub/Console build or check run. It is separate from runtime `app logs`, which are keyed by the current app deployment or a deployment id.
+
 Domains:
 
 ```bash
@@ -336,7 +373,7 @@ bunx @prisma/cli@latest app domain retry shop.example.com
 bunx @prisma/cli@latest app domain remove shop.example.com
 ```
 
-Custom domain commands target production branch runtime during the current beta. Do not use a preview branch for production domain setup.
+Custom domain commands target production branch runtime. Do not use a preview branch for production domain setup.
 
 ## Output Handling
 
@@ -346,6 +383,7 @@ When `--json` is available, parse the JSON and summarize:
 - branch name
 - app id/name
 - deployment id/status
+- build id when present
 - deployment URL
 - database id/name if one was created
 

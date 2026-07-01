@@ -6,7 +6,7 @@ Use this reference when deciding whether and how an app can deploy to Prisma Com
 
 Treat `@prisma/cli app deploy` as the deployment surface. Treat `create-prisma` as a new-project scaffold that can generate useful defaults and, for some templates, a `compute:deploy` script.
 
-Current `@prisma/cli` source supports these deploy framework keys:
+Compute deploy supports these framework keys:
 
 ```text
 nextjs
@@ -19,9 +19,7 @@ custom
 bun
 ```
 
-Published package help can lag source. Treat the list above as source-aware guidance, then verify the installed package before passing a `--framework` value in a real command.
-
-Current auto-detection:
+Auto-detection:
 
 - Next.js: `next.config.*` or `next` dependency
 - Nuxt: `nuxt.config.*` or `nuxt` dependency
@@ -32,9 +30,9 @@ Current auto-detection:
 - Custom artifact: explicit `framework: "custom"` plus `build.outputDirectory` and `build.entrypoint` in `prisma.compute.ts`
 - Bun: explicit `--entry <path>` or `--framework bun`
 
-If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supported `--framework` value. If the app is a source-level plain server, use `framework: "bun"` plus `entry`, or pass `--framework bun --entry <path>`, after verifying the server entrypoint. If the app already produces a runnable Node artifact, use `framework: "custom"` with `build.outputDirectory` and `build.entrypoint` after verifying source/help supports it.
+If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supported `--framework` value. If the app is a source-level plain server, use `framework: "bun"` plus `entry`, or pass `--framework bun --entry <path>`, after verifying the server entrypoint. If the app already produces a runnable Node artifact, use `framework: "custom"` with `build.outputDirectory` and `build.entrypoint`.
 
-## Current CLI Matrix
+## CLI Matrix
 
 | App shape | Deploy command shape | Auto-detected | Required output/entry | Notes |
 |-----------|----------------------|---------------|-----------------------|-------|
@@ -44,17 +42,17 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 | Hono | `--framework hono` | Yes | Bun entry from `main`, `module`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
 | NestJS | `--framework nestjs` | Yes | NestJS server artifact | Omit host or bind to `0.0.0.0`; do not add a config `build` block |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
-| Custom artifact | config-backed `framework: "custom"` | No | configured `build.outputDirectory` and `build.entrypoint` | Use for prebuilt/custom-built Node artifacts when source/help supports it |
+| Custom artifact | config-backed `framework: "custom"` | No | configured `build.outputDirectory` and `build.entrypoint` | Use for prebuilt/custom-built Node artifacts |
 | Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia and custom HTTP servers |
 | Elysia | `--framework bun --entry src/index.ts` | No dedicated deploy key | Bun entrypoint | Preserve port/host handling |
-| SvelteKit | Not a current deploy framework key | No | Node adapter/prebuilt artifact | Do not deploy `vite preview` |
+| SvelteKit | No deploy framework key | No | Node adapter/prebuilt artifact | Do not deploy `vite preview` |
 | Turborepo | Deploy concrete app targets | No | app-specific entry/output | Prefer `prisma.compute.ts` with `apps` |
 
-`app build --build-type` uses the framework build type. Current source build types include `auto`, `bun`, `nextjs`, `nuxt`, `astro`, `nestjs`, `tanstack-start`, and `custom`. Verify installed help before assuming the published package has caught up to source.
+`app build --build-type` uses the framework build type. Build types include `auto`, `nextjs`, `nuxt`, `astro`, `nestjs`, `tanstack-start`, `custom`, and `bun`.
 
-`app run --build-type` is local-dev oriented and currently supports `auto`, `bun`, and `nextjs`. It streams the local dev server and is not proof that the deployed app is reachable through public ingress.
+`app run --build-type` is local-dev oriented and supports `auto`, `bun`, and `nextjs`. It streams the local dev server and is not proof that the deployed app is reachable through public ingress.
 
-`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, region, and build settings. Config `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, `custom`, and `bun`. Current CLI source rejects `build` blocks for `nuxt`, `astro`, and `nestjs` because their framework build paths are owned by the framework strategy.
+`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, region, and build settings. Config `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, `custom`, and `bun`. The CLI rejects `build` blocks for `nuxt`, `astro`, and `nestjs` because their framework build paths are owned by the framework strategy.
 
 Config snippets below assume:
 
@@ -66,7 +64,7 @@ import { defineComputeConfig } from "@prisma/compute-sdk/config";
 
 Compute needs a server process:
 
-- It must listen on the deployed HTTP port. Current `@prisma/cli app deploy` defaults to HTTP `3000` unless `--http-port` is passed.
+- It must listen on the deployed HTTP port. `@prisma/cli app deploy` defaults to HTTP `3000` unless `--http-port` is passed.
 - It must bind on all interfaces. Do not hard-code `localhost` or `127.0.0.1` for a deployed server; use `0.0.0.0`, `server.host: true`, or the framework equivalent.
 - It must have a deployable entrypoint or recognized framework output.
 - It must not rely on a preview-only command such as `vite preview`.
@@ -285,7 +283,7 @@ bunx @prisma/cli@latest app deploy \
   --env .env
 ```
 
-Current `app deploy` also treats `--entry <path>` without `--framework` as a Bun app deploy.
+`app deploy` also treats `--entry <path>` without `--framework` as a Bun app deploy.
 
 Requirements:
 
@@ -322,7 +320,6 @@ export default defineComputeConfig({
 
 Requirements:
 
-- verify the installed CLI/source supports `custom` before using it
 - set both `build.outputDirectory` and `build.entrypoint`
 - make `build.entrypoint` relative to `build.outputDirectory`
 - ensure the artifact starts an HTTP server and binds on all interfaces
@@ -330,12 +327,11 @@ Requirements:
 
 ## SvelteKit and Other Frameworks
 
-Current `@prisma/cli app deploy --framework` does not expose a `svelte` framework key. Do not claim SvelteKit is directly deployable with that name unless current help/source has changed.
+`@prisma/cli app deploy --framework` has no `svelte` framework key. Do not claim SvelteKit is directly deployable with that name.
 
-For unsupported frameworks, use one of these paths:
+For frameworks without a dedicated deploy key, use one of these paths:
 
-- wait for current CLI deploy support and verify the exact `--framework` value
-- produce a Node server artifact and deploy with config-backed `framework: "custom"` when current source/help supports it, or through a supported prebuilt/SDK flow
+- produce a Node server artifact and deploy with config-backed `framework: "custom"`, or through a supported prebuilt/SDK flow
 - if the app has a plain Node/Bun server entrypoint, deploy that entrypoint through `--framework bun --entry <path>`
 
 SvelteKit should use a Node adapter or another production server artifact. Do not use `vite preview` as the deployed runtime.
@@ -375,7 +371,7 @@ Deploy one target:
 bunx @prisma/cli@latest app deploy api --branch feature/foo --json
 ```
 
-Flag-only shape after verifying output paths:
+Flag-only shape after confirming output paths:
 
 ```bash
 bun run build
