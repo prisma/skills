@@ -36,7 +36,7 @@ const apiClient = createManagementApiClient({
 })
 ```
 
-Token naming differs by surface. Current `@prisma/cli app ...` uses `PRISMA_SERVICE_TOKEN` for non-interactive service-token auth. The SDK examples here use `PRISMA_API_TOKEN` as an application convention for passing a token into `createManagementApiClient`; the SDK itself only receives the `token` string.
+Token naming differs by surface. `@prisma/cli app ...` uses `PRISMA_SERVICE_TOKEN` for non-interactive service-token auth. The SDK examples here use `PRISMA_API_TOKEN` as an application convention for passing a token into `createManagementApiClient`; the SDK itself only receives the `token` string.
 
 Deploy a prebuilt artifact:
 
@@ -70,7 +70,7 @@ SDK methods return `Result<T, E>`. Check `isOk()` or `isErr()` instead of assumi
 
 ## SDK Build Strategies
 
-Current project-compute SDK strategies:
+Project Compute SDK strategies:
 
 - `AutoBuild`: tries supported framework strategies such as Next.js, Nuxt, Astro, NestJS, TanStack Start, then Bun
 - `NextjsBuild`: requires standalone output and returns `server.js`
@@ -81,8 +81,6 @@ Current project-compute SDK strategies:
 - `CustomBuild`: runs optional configured build settings and stages a configured artifact entrypoint
 - `BunBuild`: runs `bun build` and needs an explicit entrypoint or `package.json` `main`
 - `PreBuilt`: uses an existing artifact directory and relative entrypoint
-
-The launch Platform CLI may support a different or newer framework list. Verify help output before applying SDK-era assumptions to user-facing CLI commands.
 
 ## Regions
 
@@ -97,7 +95,7 @@ ap-northeast-1
 ap-southeast-1
 ```
 
-The `create-prisma` deploy flow does not select a region because `app deploy` does not expose a region flag. Do not ask for a region in that flow unless current help output supports it.
+Use `--region` in `@prisma/cli app deploy` or `region` in SDK deploy input only when creating a new Compute app. Existing apps keep their current region.
 
 ## Management API Concepts
 
@@ -130,7 +128,7 @@ bunx @prisma/cli@latest database create preview-db --branch feature/foo --json
 bunx @prisma/cli@latest app deploy --branch feature/foo --json --no-interactive
 ```
 
-Production promotion is not just "the same branch with another label"; current `app promote <deployment-id>` rebuilds with production env vars.
+Production promotion is not just "the same branch with another label"; `app promote <deployment-id>` rebuilds with production env vars.
 
 ## Secrets and Redaction
 
