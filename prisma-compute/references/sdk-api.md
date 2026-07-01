@@ -97,7 +97,7 @@ ap-northeast-1
 ap-southeast-1
 ```
 
-The `create-prisma` deploy flow does not select a region because `app deploy` does not expose a region flag. Do not ask for a region in that flow unless current help output supports it.
+Current `@prisma/cli app deploy` exposes `--region` for new-app placement, and SDK deploy accepts `region`. Existing apps keep their current region. `create-prisma` scaffolding may still avoid asking for a region, so verify current help/output before promising a scaffold-time region prompt.
 
 ## Management API Concepts
 

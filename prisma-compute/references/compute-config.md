@@ -58,7 +58,7 @@ Each app target accepts:
 | `name` | Deployed app name. Defaults to the `apps` key, then CLI inference. |
 | `region` | Compute region id used only when deploy creates a new app. Existing apps keep their current region. |
 | `root` | App directory relative to the config file. Defaults to the config directory. |
-| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, `custom`, or `bun` in current CLI source. |
+| `framework` | Deploy framework: `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, `custom`, or `bun` in current CLI help/source. |
 | `entry` | Entrypoint path for Bun/Hono-style deploys, relative to the app root. |
 | `httpPort` | Deployed HTTP port. Use this for fixed-port apps. |
 | `env` | Dotenv file path string, or `{ file, vars }`. Paths resolve from the config directory. |
@@ -171,7 +171,7 @@ If no `[app]` argument is passed, commands can infer the target from the invocat
 bunx @prisma/cli@latest app deploy --branch feature/foo --json --no-interactive
 ```
 
-Deploy-all rejects per-app overrides such as `--app`, `--framework`, `--entry`, `--http-port`, `--env`, and `PRISMA_APP_ID`. Project, branch, database, production, and confirmation flags still apply to the whole run.
+Deploy-all rejects per-app overrides such as `--app`, `--framework`, `--entry`, `--http-port`, `--region`, `--env`, and `PRISMA_APP_ID`. Project, branch, database, production, and confirmation flags still apply to the whole run.
 
 `app build` and `app run` still need one target in multi-app configs because a local build/run command cannot operate N apps at once.
 
@@ -188,10 +188,11 @@ Explicit flags win over config values:
 - `--framework` overrides `framework`
 - `--entry` overrides `entry`
 - `--http-port` overrides `httpPort`
+- `--region` overrides `region`
 - any `--env` flag replaces all config env inputs
 - `--app` and `PRISMA_APP_ID` rank above config app names
 
-`region` is not an app selector and there is no general deploy flag equivalent in current help output. It is only used when deploy creates a new app. If the selected app already exists, deploy keeps that app's existing region.
+`region` is not an app selector. Config `region` and `--region` are only used when deploy creates a new app. If the selected app already exists, deploy keeps that app's existing region.
 
 `prisma.compute.ts` never selects Workspace, Project, Branch, or production intent. Keep those in CLI flags, environment variables, `.prisma/local.json`, or CI configuration:
 

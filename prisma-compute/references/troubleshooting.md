@@ -60,7 +60,7 @@ Fix:
 - use `[app]` targets from the `apps` keys, such as `bunx @prisma/cli@latest app deploy api`
 - remember that config-relative paths such as `root` and `env.file` resolve from the config file directory
 
-If the installed `@prisma/cli@latest` help does not mention `prisma.compute.ts` or `[app]`, the published package may lag the CLI source. Either test with the intended CLI version or fall back to explicit flags until the new package is available.
+If a pinned `@prisma/cli` version does not mention `prisma.compute.ts` or `[app]`, test with the intended CLI version or fall back to explicit flags until the project can upgrade.
 
 ## Compute Config Invalid
 
@@ -406,7 +406,7 @@ If using branch-specific env, confirm the branch name and role.
 
 ## Need Logs
 
-Current app:
+Runtime logs for the current app:
 
 ```bash
 bunx @prisma/cli@latest app logs
@@ -423,5 +423,15 @@ Machine-readable:
 ```bash
 bunx @prisma/cli@latest app logs --json
 ```
+
+Build logs for GitHub/Console builds:
+
+```bash
+bunx @prisma/cli@latest build logs <build-id>
+bunx @prisma/cli@latest build logs <build-id> --follow
+bunx @prisma/cli@latest build logs <build-id> --json
+```
+
+Use `build logs` for build output keyed by a Build id from a GitHub check run, Console build page, or Management API build record. Use `app logs` for runtime logs keyed by the current app deployment or a deployment id.
 
 Summarize relevant errors. Do not paste secrets.

@@ -19,6 +19,7 @@ const checks = [
     args: ["--help"],
     probes: [
       ["has --deploy", /--deploy\b/],
+      ["has --skills", /--skills\b/],
       ["has hono template", /\bhono\b/i],
       ["has elysia template", /\belysia\b/i],
       ["has nest template", /\bnest\b/i],
@@ -69,6 +70,35 @@ const checks = [
     probes: [["has --workspace", /--workspace\b/]],
   },
   {
+    label: "@prisma/cli@latest agent",
+    packageName: "@prisma/cli@latest",
+    args: ["agent", "--help"],
+    probes: [
+      ["has agent install", /\binstall\b/],
+      ["has agent update", /\bupdate\b/],
+      ["has agent status", /\bstatus\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest agent install",
+    packageName: "@prisma/cli@latest",
+    args: ["agent", "install", "--help"],
+    probes: [
+      ["has --agent", /--agent\b/],
+      ["has --all-agents", /--all-agents\b/],
+      ["has --skill", /--skill\b/],
+      ["has --global", /--global\b/],
+      ["has --copy", /--copy\b/],
+      ["has --dry-run", /--dry-run\b/],
+    ],
+  },
+  {
+    label: "@prisma/cli@latest agent status",
+    packageName: "@prisma/cli@latest",
+    args: ["agent", "status", "--help"],
+    probes: [["has --global", /--global\b/]],
+  },
+  {
     label: "@prisma/cli@latest app deploy",
     packageName: "@prisma/cli@latest",
     args: ["app", "deploy", "--help"],
@@ -78,6 +108,7 @@ const checks = [
       ["has --http-port", /--http-port\b/],
       ["has --env", /--env\b/],
       ["has --branch", /--branch\b/],
+      ["has --region", /--region\b/],
       ["has --prod", /--prod\b/],
       ["has --create-project", /--create-project\b/],
     ],
@@ -89,7 +120,7 @@ const checks = [
     expectedExitCode: 2,
     probes: [
       ["allows nestjs framework", /Allowed choices are .*nestjs|nextjs, nuxt, astro, hono, nestjs, tanstack-start, bun/i],
-      ["published package does not allow custom framework yet", /Allowed choices are (?:(?!custom).)*$/is],
+      ["allows custom framework", /Allowed choices are .*custom/i],
       ["does not allow svelte framework", /Allowed choices are (?:(?!svelte).)*$/is],
     ],
   },
@@ -127,7 +158,7 @@ const checks = [
     expectedExitCode: 2,
     probes: [
       ["allows nestjs build type", /Allowed choices are .*nestjs|auto, bun, nextjs, nuxt, astro, nestjs, tanstack-start/i],
-      ["published package does not allow custom build type yet", /Allowed choices are (?:(?!custom).)*$/is],
+      ["allows custom build type", /Allowed choices are .*custom/i],
     ],
   },
   {
@@ -208,6 +239,16 @@ const checks = [
       ["mentions --confirm", /--confirm\b/],
     ],
   },
+  {
+    label: "@prisma/cli@latest build logs",
+    packageName: "@prisma/cli@latest",
+    args: ["build", "logs", "--help"],
+    probes: [
+      ["has build id argument", /logs <buildId>|logs <build_id>/i],
+      ["has --follow", /--follow\b/],
+      ["has --cursor", /--cursor\b/],
+    ],
+  },
 ];
 
 const sourceChecks = [
@@ -220,15 +261,24 @@ const sourceChecks = [
         path: "docs/product/command-spec.md",
         probes: [
           ["documents custom deploy framework", /--framework <[^>]*custom[^>]*>/],
-          ["documents config region", /config `region` applies only when the resolved app does not exist yet/i],
+          ["documents deploy region", /--region <region>/],
           ["documents build.entrypoint", /`build\.entrypoint` is the built artifact entrypoint/i],
+          ["documents agent install", /agent install --agent <agent>/],
+          ["documents build logs", /build logs <build[-_]?id>/i],
         ],
       },
       {
         path: "packages/cli/src/lib/app/compute-config.ts",
         probes: [
-          ["merges config region", /readComputeTargetRegion/],
+          ["merges config region", /set by --region/],
           ["returns region deploy input", /\bregion,\n/],
+        ],
+      },
+      {
+        path: "packages/cli/src/controllers/build.ts",
+        probes: [
+          ["streams build logs", /runBuildLogs/],
+          ["build logs use Build id", /keyed[\s\S]*`Build\.id`/],
         ],
       },
     ],
@@ -242,7 +292,8 @@ const sourceChecks = [
         path: "sdk/src/config/types.ts",
         probes: [
           ["config framework includes custom", /"custom"/],
-          ["config app supports region", /region\?: string/],
+          ["config app supports region", /region\?: ComputeRegion/],
+          ["config defaults support region", /ComputeConfigDefaults[\s\S]*region\?: ComputeRegion/],
           ["build config supports entrypoint", /entrypoint\?: string/],
         ],
       },
@@ -272,10 +323,24 @@ const sourceChecks = [
         ],
       },
       {
+        path: "services/management-api/routes/v1/builds.ts",
+        probes: [
+          ["has build logs route", /basePath\(`\/builds`\)/],
+          ["streams build logs", /Stream build logs/],
+        ],
+      },
+      {
         path: "services/console/app/components/GitHubRepoConnect.tsx",
         probes: [
           ["mentions Deploy from GitHub", /Deploy from GitHub/],
           ["mentions push to deploy", /push to deploy/i],
+        ],
+      },
+      {
+        path: "services/build-runner/lib/postDeploymentCheckRun.ts",
+        probes: [
+          ["posts Prisma Compute Deploy check run", /Prisma Compute Deploy/],
+          ["includes build logs command", /build logs \${buildId}/],
         ],
       },
       {
@@ -363,7 +428,7 @@ function firstUsefulLines(output) {
     .split("\n")
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /(auth workspace|--workspace|--deploy|--framework|--entry|--http-port|--env|--branch|--role|--project|--create-project|--prod|--build-type|--port|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|version|deployment|region|custom|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
+    .filter((line) => /(agent install|agent update|agent status|build logs|auth workspace|--workspace|--agent|--all-agents|--skill|--global|--copy|--dry-run|--deploy|--framework|--entry|--http-port|--region|--env|--branch|--role|--project|--create-project|--prod|--build-type|--port|--follow|--cursor|--confirm|Allowed choices|app deploy|app build|app run|app domain|app show-deploy|app remove|project env|env update|branch list|git connect|database create|database connection|prisma\.compute\.ts|App target|\[app\]|\[id-or-name\]|<buildId>|<build_id>|version|deployment|region|custom|create-prisma|hono|elysia|nest|svelte|next|nuxt|astro|tanstack|bun)/i.test(line))
     .slice(0, 12);
 }
 

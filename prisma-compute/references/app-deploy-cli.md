@@ -10,6 +10,7 @@ Current Compute app workflows are exposed through the Prisma Platform CLI packag
 bunx @prisma/cli@latest --help
 bunx @prisma/cli@latest app --help
 bunx @prisma/cli@latest app deploy --help
+bunx @prisma/cli@latest build logs --help
 ```
 
 The examples in help output may call the binary `prisma-cli`. When using package runners, prefer:
@@ -21,6 +22,19 @@ pnpm dlx @prisma/cli@latest app deploy
 ```
 
 If a future Prisma ORM CLI exposes `prisma app deploy`, use the local project command after verifying `prisma app deploy --help`.
+
+## Agent Skill Installation
+
+Current `@prisma/cli` can install and refresh Prisma skills for local AI coding agents:
+
+```bash
+bunx @prisma/cli@latest agent install
+bunx @prisma/cli@latest agent install --skill prisma-compute
+bunx @prisma/cli@latest agent update
+bunx @prisma/cli@latest agent status --json
+```
+
+`agent install` and `agent update` shell out to `skills@latest add prisma/skills` through the detected package runner. Use them when the user wants Prisma's agent context installed or refreshed; they are not a deployment command.
 
 ## Typed Compute Config
 
@@ -119,6 +133,8 @@ The current `app show`, `app list-deploys`, and `app logs` help exposes `--app`,
 
 `app deploy --create-project <name>` creates and links a new Project before deploying. Use it only when the user wants a new Project. It conflicts with `--project` and `PRISMA_PROJECT_ID`, and `--yes` alone does not choose Project scope.
 
+`app deploy --region <region>` only applies when deploy creates a new app. Existing apps keep their current region. Use `prisma.compute.ts` `region` for a durable default, and use the flag only for one-off new-app placement.
+
 ## Database and Env
 
 Create a Prisma Postgres database for the linked project:
@@ -169,7 +185,7 @@ bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
 
 Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch production deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
 
-For GitHub-driven deploys, inspect the Console/build-runner state or deployment records instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise GitHub PR comments or Vercel-style preview feedback unless the current product behavior proves that integration exists.
+For GitHub-driven deploys, inspect the Console/build-runner state, deployment records, build logs, or the `Prisma Compute Deploy` GitHub check run instead of assuming local CLI output exists. The build runner can perform branch-aware database/env wiring: a preview branch with a Prisma schema and no `DATABASE_URL` can get a branch-scoped preview database, while production can wire a missing `DATABASE_URL` template from an existing ready database. Do not promise Vercel-style PR comments unless the current product behavior proves that integration exists.
 
 Database and database-connection commands never print stored secret values in list/show output. `database create` and `database connection create` return a one-time connection URL; treat it as a secret, store it immediately in env if needed, and do not echo it back in summaries. Removal requires exact `--confirm <id>`; `--yes` is not enough.
 
@@ -265,6 +281,19 @@ bunx @prisma/cli@latest app deploy \
   --env .env
 ```
 
+Deploy a newly created app in a specific region:
+
+```bash
+bunx @prisma/cli@latest app deploy \
+  --app my-api \
+  --region us-west-1 \
+  --prod \
+  --yes \
+  --env .env
+```
+
+`--region` is a new-app placement hint. It does not move an existing app.
+
 Deploy a preview branch with framework and port:
 
 ```bash
@@ -297,7 +326,7 @@ Config-backed Bun-style app:
 bunx @prisma/cli@latest app deploy api --prod --yes --env .env
 ```
 
-Use config for stable app defaults, and flags for one-off project, branch, env, database, and production choices.
+Use config for stable app defaults, and flags for one-off project, branch, region, env, database, and production choices.
 
 ## Operations
 
@@ -326,6 +355,16 @@ bunx @prisma/cli@latest app logs --deployment <deployment-id>
 bunx @prisma/cli@latest app logs --json
 ```
 
+Build logs for GitHub/Console builds:
+
+```bash
+bunx @prisma/cli@latest build logs <build-id>
+bunx @prisma/cli@latest build logs <build-id> --follow
+bunx @prisma/cli@latest build logs <build-id> --json
+```
+
+`build logs` streams build output keyed by a Build id from a GitHub/Console build or check run. It is separate from runtime `app logs`, which are keyed by the current app deployment or a deployment id.
+
 Domains:
 
 ```bash
@@ -346,6 +385,7 @@ When `--json` is available, parse the JSON and summarize:
 - branch name
 - app id/name
 - deployment id/status
+- build id when present
 - deployment URL
 - database id/name if one was created
 

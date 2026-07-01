@@ -1,10 +1,10 @@
 ---
 name: prisma-compute
-description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/logs/domains, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
+description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/build logs/domains, `@prisma/cli agent install`, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
 license: MIT
 metadata:
   author: prisma
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Prisma Compute
@@ -18,6 +18,7 @@ Prisma Compute is actively moving into the Prisma Platform CLI. Before giving co
 ```bash
 bunx @prisma/cli@latest app deploy --help
 bunx @prisma/cli@latest app --help
+bunx @prisma/cli@latest build logs --help
 bunx create-prisma@latest --help
 ```
 
@@ -52,8 +53,10 @@ Use this skill for:
 - Deciding whether a framework is Compute-ready
 - Debugging `create-prisma --deploy`, `compute:deploy`, or `app deploy`
 - Managing Compute app logs, deployments, environment variables, branches, and domains
+- Inspecting GitHub/Console build logs and GitHub push-to-deploy status
 - Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
 - Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
+- Installing or updating Prisma skills with `@prisma/cli agent install|update|status`
 - Programmatic deployments with `@prisma/compute-sdk` or Management API integrations
 
 ## Decision Tree
@@ -115,7 +118,7 @@ Use this skill for:
 ### 3. Framework Readiness
 
 - `framework-cli-first` - Evaluate deploy readiness against current `@prisma/cli app deploy`, not against what `create-prisma` can scaffold.
-- `framework-supported-cli-deploy` - Current CLI source supports `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, `custom`, and `bun`; verify installed help/source before relying on a key.
+- `framework-supported-cli-deploy` - Current CLI help/source supports `nextjs`, `nuxt`, `astro`, `hono`, `nestjs`, `tanstack-start`, `custom`, and `bun`; verify installed help/source before relying on a key.
 - `framework-create-prisma-defaults-only` - `create-prisma` can provide generated defaults and `compute:deploy`, but it is not the general deploy surface for existing apps.
 - `framework-build-output` - Compute needs a server entrypoint or framework artifact, not only static output.
 
@@ -133,9 +136,9 @@ Use this skill for:
 - `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
 - `config-targets` - In multi-app configs, `@prisma/cli app deploy web` selects the `apps.web` target. Without `[app]`, commands can infer the target from the current directory; otherwise deploy can run all targets while build/run require one.
 - `config-region-new-app-only` - A config `region` is only a default for newly created apps; deploys to existing apps keep the app's current region.
-- `config-custom-artifact` - Use `framework: "custom"` with `build.outputDirectory` and `build.entrypoint` for prebuilt or custom-built artifacts when source/help supports it.
+- `config-custom-artifact` - Use `framework: "custom"` with `build.outputDirectory` and `build.entrypoint` for prebuilt or custom-built artifacts.
 - `config-no-project-branch-secrets` - Do not commit Workspace, Project, Branch, production intent, service tokens, or secret values in `prisma.compute.ts`; keep those in flags, `.prisma/local.json`, env storage, or CI secrets. App-level defaults such as `region`, `root`, `framework`, `entry`, `httpPort`, and non-secret env file paths belong in config.
-- `config-flags-win` - Explicit deploy flags such as `--framework`, `--entry`, `--http-port`, and `--env` override matching config values.
+- `config-flags-win` - Explicit deploy flags such as `--framework`, `--entry`, `--http-port`, `--region`, and `--env` override matching config values.
 
 ### 6. Branch, Environment, and Database
 
@@ -150,7 +153,8 @@ Use this skill for:
 ### 7. Deploy Operations
 
 - `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
-- `deploy-github-default-branch` - When a Compute app is connected to GitHub push-to-deploy, a merge to the default branch is the production deploy path; do not tell users to redeploy the old preview branch or run a default-branch preview deploy unless GitHub deploy records show that path is unavailable.
+- `deploy-github-default-branch` - When a Compute app is connected to GitHub push-to-deploy, a merge to the default branch is the production deploy path; check deployment records or GitHub check runs instead of telling users to redeploy the old preview branch or run a default-branch preview deploy.
+- `deploy-build-logs` - Use `@prisma/cli build logs <build-id>` for GitHub/Console build output. Use `app logs` for runtime deployment logs; the two ids are different.
 - `deploy-noninteractive-auth` - Non-interactive deploys need either the correct active stored OAuth workspace or a supported service token env var; never print the token.
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
@@ -173,6 +177,7 @@ Use this skill for:
 5. Check framework readiness plus host/port/env/runtime requirements, including project and branch scope.
 6. Run a local build or `app build` before deploying when feasible.
 7. Deploy with JSON output when automating, then smoke-test the public URL and summarize app URL, app id, deployment id, project id, workspace id, and follow-up steps.
+8. For GitHub/Console builds, inspect the `Prisma Compute Deploy` check run or `build logs <build-id>` before guessing why a build failed.
 
 ## Avoid
 
