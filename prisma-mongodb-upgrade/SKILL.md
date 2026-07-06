@@ -11,10 +11,10 @@ metadata:
 
 MongoDB projects are the one Prisma cohort with no road into Prisma 7: **v6 is the terminal
 classic-ORM major for MongoDB, and v7 never ships a MongoDB connector**. The successor path
-is [Prisma Next](https://github.com/prisma/prisma-next), which has a working MongoDB target
-in active development. This skill frames the real decision — stay on v6 deliberately, or
-migrate to Prisma Next now — and carries the migration mechanics for teams that choose to
-move.
+is [Prisma Next](https://github.com/prisma/prisma-next), where MongoDB support is in Early
+Access with GA planned after Postgres. This skill frames the real decision — migrate to
+Prisma Next (the encouraged path), or stay on v6 where a hard blocker applies — and carries
+the migration mechanics.
 
 **Never do either of these:**
 
@@ -27,46 +27,48 @@ move.
 
 | Version | MongoDB status |
 |---------|----------------|
-| Prisma ORM v6 | Fully supported (`mongodb` provider); latest 6.x is the current production path; maintenance line |
+| Prisma ORM v6 | Fully supported (`mongodb` provider); latest 6.x is the current stable path; maintenance line |
 | Prisma ORM v7 | **No MongoDB connector — not an option, ever** |
-| Prisma Next | MongoDB target exists and is well-built, but is roadmap-classified as a POC: pre-1.0, Early Access at best, excluded from the current EA/GA target sets |
+| Prisma Next | MongoDB support in **Early Access**, actively developed, GA planned after Postgres — the successor path for MongoDB projects |
 
 ## The decision, up front
 
-**Default: production MongoDB apps stay on Prisma v6 today — deliberately, not by neglect.**
-Prisma Next's own roadmap classifies its MongoDB target as a proof-of-concept and excludes it
-from the Early Access and GA target sets; its package line is pre-1.0 with breaking changes
-between minors; and its Mongo client façade does not yet expose transactions.
+**Migrating to Prisma Next is the encouraged path.** MongoDB support in Prisma Next is Early
+Access: functional and moving quickly, with GA planned after Postgres — and the Prisma team
+wants MongoDB users to migrate early and share feedback. The migration mechanics are
+detailed in the references.
 
-**The migrate-now branch is real** and mechanically detailed in the references — appropriate
-for greenfield projects, experiments, and teams that knowingly accept Early Access churn.
+**Staying on the latest v6 remains a legitimate choice where a hard blocker applies** —
+stated plainly: the Next Mongo façade does not wrap transactions yet (the underlying driver
+is available directly; this is expected to change soon), and pre-1.0 minors can carry
+breaking changes with published upgrade recipes.
 
 ### Decision table
 
 | Signal | Direction |
 |--------|-----------|
-| Production app, availability matters | Stay on v6 |
-| App uses multi-document transactions (`$transaction`) | **Stay on v6 — hard no-go for Next today** (the Next Mongo façade has no `db.transaction(...)`; only raw driver sessions) |
-| Team cannot absorb pre-1.0 breaking upgrades between minors | Stay on v6 |
-| Greenfield / prototype / internal tool | Migrating to Next now is reasonable |
-| Team wants to be early on the successor stack and can track releases | Migrate now, with the verification checklist |
-| Curious but risk-averse | Stay on v6; run a staged Next round-trip on a copy (see `verify-cutover-checklist`) and revisit each quarter |
+| No blockers below apply | Migrate to Next; run the `verify-cutover-checklist` and share feedback with the Prisma team |
+| Greenfield / prototype / internal tool | Migrate to Next |
+| Codebase uses multi-document transactions (`$transaction`) — check with grep, do not ask | Plan raw-driver session equivalents first (see `client-api-mapping`), or stay on v6 until the façade wrapper lands |
+| Team cannot absorb pre-1.0 breaking upgrades between minors | Stay on v6 until GA |
+| Risk-averse but interested | Run a staged Next round-trip on a copy (see `verify-cutover-checklist`), then migrate |
 
-### Stay-on-v6 hygiene (the default is active, not passive)
+Note: the transactions gap is expected to close soon — this section will be updated when
+façade transactions merge in Prisma Next.
+
+### If staying on v6: hygiene (a deliberate stay, not neglect)
 
 - Pin the Prisma packages to the latest 6.x line and keep taking 6.x patch releases.
 - Track Prisma release notes and security advisories for the 6.x line.
 - Keep the classic v6 MongoDB setup: `url = env("DATABASE_URL")` in the schema, `db push`
   workflow, no SQL driver adapters (see `prisma-database-setup` for the v6 MongoDB shape).
-- Put a revisit date on the decision (e.g. quarterly): the trigger to re-evaluate is Prisma
-  Next's MongoDB target entering the officially supported Early Access/GA set and façade
-  transactions landing.
+- Re-evaluate when Prisma Next's MongoDB is GA, or when blockers for trying EA are resolved.
 
 ## Reference files
 
 | Reference | What it covers |
 |-----------|----------------|
-| `references/decision-stay-or-migrate.md` | The full decision framing, no-go signals, and stay-hygiene detail |
+| `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail |
 | `references/schema-contract-mapping.md` | v6 schema (`mongodb` provider, `@db.ObjectId`, composite types) → Next contract concepts |
 | `references/client-api-mapping.md` | v6 client calls → Next equivalents, incl. raw escape hatches and transactions — names map, parity does not |
 | `references/migrations-mapping.md` | v6 `db push`-only story → Next's plan/migrate/verify/sign flow |
@@ -76,8 +78,8 @@ for greenfield projects, experiments, and teams that knowingly accept Early Acce
 
 Behavioral claims about Prisma Next in this skill were verified against
 [prisma/prisma-next](https://github.com/prisma/prisma-next) at commit
-`a2791c5dd59d579b4b3052942ae7f8fe5e2ee852` (pre-1.0, ~v0.14/0.15 line). Prisma Next is Early
-Access and its surface moves: **before acting on any Next-side claim, verify it against the
+`a2791c5dd59d579b4b3052942ae7f8fe5e2ee852` (pre-1.0, ~v0.14/0.15 line). Prisma Next moves
+quickly in Early Access: **before acting on any Next-side claim, verify it against the
 version actually installed** (check the project's `@prisma-next/*` versions and the
 prisma-next skills installed with it). Next's Mongo target requires MongoDB 8.0+ and expects
 `mongodb@^7` as a user-supplied peer dependency.

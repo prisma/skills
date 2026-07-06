@@ -1,6 +1,6 @@
 # decision-stay-or-migrate
 
-How to decide between staying on Prisma v6 and migrating a MongoDB project to Prisma Next.
+How to decide between migrating a MongoDB project to Prisma Next and staying on Prisma v6.
 
 ## Priority
 
@@ -9,26 +9,27 @@ CRITICAL
 ## Why It Matters
 
 MongoDB projects cannot follow the general "upgrade Prisma" advice: Prisma 7 has no MongoDB
-connector, so the only forward path is Prisma Next — which is Early Access. Advising a
-production team onto a pre-1.0 stack, or silently rewriting their app onto SQL, are both
-serious failure modes. The correct default today is a deliberate stay on v6.
+connector, so the forward path is Prisma Next. Advising an impossible v7 upgrade, or
+silently rewriting the app onto SQL, are both serious failure modes. The encouraged path is
+migrating to Prisma Next — its MongoDB support is Early Access and the Prisma team wants
+early adopters' feedback — with a deliberate stay on v6 where a hard blocker applies.
 
 ## The facts the decision rests on
 
-Prisma Next side (verified against prisma/prisma-next @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`):
+Prisma Next side (verified against prisma/prisma-next @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`;
+status confirmed by the Prisma team 2026-07):
 
-- The MongoDB target is one of two roadmap **POCs** ("validating that non-SQL targets work
-  within the framework"); the Early Access target set is Postgres plus one SQL database, and
-  GA is Postgres-only — MongoDB is in neither (`ROADMAP.md`, `README.md`).
-- The implementation itself is deep, not a stub: a full package family (ORM, typed
+- **MongoDB support is Early Access**, actively developed, with GA planned after Postgres.
+- The implementation is deep, not a stub: a full package family (ORM, typed
   aggregation-pipeline builder, raw lane, driver over the official `mongodb` package),
   first-class contract-driven migrations, and extensive tests against real in-memory MongoDB.
-- **The Mongo client façade has no `db.transaction(...)`** — multi-document atomicity
-  requires the MongoDB driver's session API directly (prisma-next
-  `skills/prisma-next-queries/SKILL.md`, `skills/prisma-next-runtime/SKILL.md`).
-- Pre-1.0 churn is real: the 0.11→0.12 release changed Mongo validator emission and made
-  `mongodb` a user-supplied peer dependency (`CHANGELOG.md`); floor is MongoDB 8.0 and
-  `mongodb@^7`.
+- **The Mongo client façade does not wrap `db.transaction(...)` yet** — multi-document
+  atomicity is done through the MongoDB driver's session API, which is directly available
+  (the `mongodb` package is a user-supplied peer dependency). A façade wrapper is expected;
+  this skill will be updated when it merges.
+- Early Access means pre-1.0 minors can carry breaking changes, with published upgrade
+  recipes (e.g. 0.11→0.12 changed Mongo validator emission and made `mongodb` a
+  user-supplied peer dependency). Floor: MongoDB 8.0 and `mongodb@^7`.
 
 Prisma v6 side:
 
@@ -38,16 +39,17 @@ Prisma v6 side:
 - v6 MongoDB has no Prisma Migrate; the workflow is `db push`
   ([no support for Prisma Migrate](https://www.prisma.io/docs/orm/overview/databases/mongodb#no-support-for-prisma-migrate)).
 
-## No-go signals for migrating now
+## Blocker checks before migrating
 
-Treat each of these as a hard stop for the migrate-now branch:
+Run these checks yourself — from the codebase, not by asking the user:
 
-- **The app relies on `$transaction` / multi-document atomicity.** Next's Mongo façade does
-  not wrap transactions yet; the only workaround is hand-written raw driver sessions.
-- **The team cannot absorb pre-1.0 breaking upgrades.** Next publishes versioned upgrade
-  recipes between minors; someone has to run them.
-- **The operator has not explicitly accepted Early Access status.** Do not migrate a
-  production app to a POC-classified target on your own initiative.
+- **Search the codebase for `$transaction` usage** (grep for `$transaction`). If present,
+  plan the raw-driver session equivalents before migrating (see `client-api-mapping.md`) —
+  or stay on v6 until the façade wrapper lands.
+- **Check the MongoDB server version** (must be 8.0+ for Next; v6 tolerated older).
+- **Confirm the team can absorb pre-1.0 upgrades.** Next publishes versioned upgrade recipes
+  between minors; someone has to run them. For a production app, confirm the user accepts
+  Early Access status before migrating.
 
 ## Bad
 
@@ -64,10 +66,9 @@ steps corrupt a working v6 setup.
 ```text
 User: "We're on Prisma 6 with MongoDB. Should we upgrade to Prisma 7?"
 Agent: "Prisma 7 does not support MongoDB, and never will — v6 is the last classic-ORM
-major for MongoDB. Your real options are: (a) stay on the latest 6.x deliberately (the
-right default for production today), or (b) migrate to Prisma Next, the successor, whose
-MongoDB target is functional but Early Access. Does your app use $transaction? That is
-currently a no-go for Next..."
+major for MongoDB. The path forward is Prisma Next, the successor: its MongoDB support is
+Early Access and migrating is encouraged. Let me check the codebase for blockers first —
+searching for $transaction usage and checking the MongoDB server version..."
 ```
 
 ## Stay-on-v6 hygiene
@@ -78,10 +79,9 @@ Staying is a decision, not a default-by-neglect:
 - Watch Prisma release notes and security advisories for the 6.x maintenance line.
 - Keep the classic setup (`url = env("DATABASE_URL")` in the schema; `db push`; no SQL
   driver adapters).
-- Schedule a revisit (quarterly is reasonable). Re-evaluate when Prisma Next's MongoDB
-  target joins the supported EA/GA set and façade transactions land.
+- Re-evaluate when Prisma Next's MongoDB is GA, or when blockers for trying EA are resolved.
 
 ## References
 
-- [Prisma Next repository (roadmap, README)](https://github.com/prisma/prisma-next)
+- [Prisma Next repository](https://github.com/prisma/prisma-next)
 - [Prisma v6 MongoDB documentation](https://www.prisma.io/docs/orm/overview/databases/mongodb)

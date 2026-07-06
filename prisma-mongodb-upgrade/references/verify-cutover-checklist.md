@@ -40,9 +40,9 @@ the cutover observable and reversible.
    before applying to production.
 6. **Storage-name addressing audited:** every ported call site uses collection storage
    names (`db.orm.users`), not model names (see `schema-contract-mapping.md`).
-7. **Transaction inventory is empty:** grep the v6 app for `$transaction`; each hit must be
-   redesigned (raw driver sessions) or the migration deferred — there is no façade
-   equivalent in Next today (see `client-api-mapping.md`).
+7. **Transaction inventory mapped:** grep the v6 app for `$transaction`; each hit gets a
+   driver-session equivalent (the `mongodb` driver is directly available; the façade wrapper
+   is expected soon — see `client-api-mapping.md`).
 8. **Raw call inventory mapped:** every `$runCommandRaw` / `findRaw` / `aggregateRaw` call
    has an explicit Next-side replacement (`mongoRaw(...)` lane or pipeline builder).
 9. **Staged read-only soak:** run the Next stack read-only against staging/production data

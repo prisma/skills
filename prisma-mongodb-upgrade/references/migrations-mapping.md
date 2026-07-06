@@ -36,8 +36,8 @@ Migration authoring in Next is first-class for Postgres **and Mongo** (prisma-ne
   know from SQL, repurposed for Mongo state.
 - **DDL is not transactional on Mongo:** the runner applies operations, verifies the live
   schema against the destination contract, and only advances the marker on a verify pass —
-  making interrupted runs resumable rather than atomic (prisma-next
-  `packages/3-mongo-target/1-mongo-target/src/core/mongo-runner.ts`).
+  making interrupted runs resumable rather than atomic (see Prisma Next's
+  `prisma-next-migrations` skill).
 - **Push-style alternative still exists:** `db update` diffs the live database against the
   contract and applies directly without writing a migration directory — the closest
   analogue to the v6 `db push` habit, at the cost of no history.
