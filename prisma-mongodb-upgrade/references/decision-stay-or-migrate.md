@@ -65,7 +65,7 @@ steps corrupt a working v6 setup.
 
 ```text
 User: "We're on Prisma 6 with MongoDB. Should we upgrade to Prisma 7?"
-Agent: "Prisma 7 does not support MongoDB, and never will — v6 is the last classic-ORM
+Agent: "Prisma 7 does not support MongoDB — v6 is the last classic-ORM
 major for MongoDB. The path forward is Prisma Next, the successor: its MongoDB support is
 Early Access and migrating is encouraged. Let me check the codebase for blockers first —
 searching for $transaction usage and checking the MongoDB server version..."
