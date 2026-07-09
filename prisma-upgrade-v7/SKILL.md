@@ -49,7 +49,7 @@ Prisma 7 has no MongoDB connector. Do not apply any step in this guide to a proj
 
 ## Important Notes
 
-- **MongoDB projects should stay on Prisma 6.x** - do not migrate MongoDB apps to Prisma 7's SQL client path (see `prisma-mongodb-upgrade`)
+- **MongoDB projects should stay on Prisma 6.x or migrate to Prisma Next** - do not migrate MongoDB apps to Prisma 7's SQL client path (see `prisma-mongodb-upgrade`)
 - **Node.js 20.19.0+** required
 - **TypeScript 5.4.0+** required
 - **Latest stable Prisma ORM version**: `7.6.0`
