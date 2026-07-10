@@ -170,7 +170,7 @@ generator client {
 }
 ```
 
-For MongoDB, stay on the latest Prisma 6.x line and keep the connection URL in `schema.prisma`. Do not move a MongoDB project to the Prisma 7 SQL adapter setup.
+For MongoDB, stay on the latest Prisma 6.x line and keep the connection URL in `schema.prisma`. Do not move a MongoDB project to the Prisma 7 SQL adapter setup. If a MongoDB project asks about upgrading Prisma versions, route to the `prisma-mongodb-upgrade` skill (stay-on-v6 vs Prisma Next is the real decision; Prisma 7 is not an option).
 
 ## Rule Files
 

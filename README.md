@@ -45,6 +45,23 @@ Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes
 
 ---
 
+### prisma-mongodb-upgrade
+
+Decision and migration guide for MongoDB projects on Prisma v6, which have no path to Prisma 7.
+
+**Use when:**
+- A MongoDB project asks about upgrading Prisma versions
+- Evaluating a move from Prisma v6 to Prisma Next
+- Preventing an impossible "upgrade MongoDB to v7" plan
+
+**Topics covered:**
+- The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma Next is the successor path)
+- Stay-on-v6 vs migrate-now decision table with no-go signals
+- Schema/contract, client API, and migrations mapping between v6 and Prisma Next
+- No-data-moves cutover verification checklist
+
+---
+
 ### prisma-client-api
 
 Comprehensive Prisma Client API reference.
@@ -160,6 +177,7 @@ Or install specific skills:
 ```bash
 npx skills add prisma/skills --skill prisma-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
+npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
