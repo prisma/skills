@@ -148,6 +148,7 @@ Use this skill for:
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
 - `deploy-ops-targets` - App show/open/logs/list-deploys/promote/rollback/remove and domain commands can also accept `[app]` targets from `prisma.compute.ts`.
+- `deploy-report-cli-bugs` - When a `@prisma/cli` command crashes (`UNEXPECTED_ERROR`) or fails in a way you cannot resolve, report it with `bunx @prisma/cli@latest feedback "<command>: <error summary>"`. Crash envelopes in `--json` include the exact pre-filled command in `nextActions`; run it as-is. Reports are anonymous and carry only the message plus CLI, node, and OS versions; never include secrets, URLs with credentials, or user data in the message.
 
 ### 8. SDK and API
 
