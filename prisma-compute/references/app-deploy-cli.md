@@ -156,7 +156,7 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 
 `app deploy --env .env` loads environment variables from a file for the deployment. A config-backed deploy can instead load env through `prisma.compute.ts` `env`. Neither path is a migration command or seed command.
 
-Database setup is not part of `prisma.compute.ts`. Deploy-time setup goes through explicit flags: `app deploy --db` creates one branch-scoped Prisma Postgres database (shared by all apps on the branch) and wires `DATABASE_URL`/`DIRECT_URL` through project env; `--yes` alone never creates a database, so CI passes `--db --yes`; `--no-db` skips setup. `--db` and `--no-db` are mutually exclusive, and deploys still never run migrations or seed data. Outside deploy, keep database intent explicit with `database create` and project env commands. Treat any generated connection URL as a one-time secret.
+Database setup is not part of `prisma.compute.ts`. Keep database intent explicit with `database create` and project env commands. Do not add database setup to deploy examples. Treat any generated connection URL as a one-time secret.
 
 Database and env guardrails:
 
