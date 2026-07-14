@@ -4,7 +4,7 @@ description: Prisma Compute deployment and hosting guide. Use whenever the user 
 license: MIT
 metadata:
   author: prisma
-  version: "1.3.1"
+  version: "1.4.0"
 ---
 
 # Prisma Compute
@@ -42,7 +42,7 @@ Use this skill for:
 - Creating or updating a typed `prisma.compute.ts` deploy config
 - Deciding whether a framework is Compute-ready
 - Debugging `create-prisma --deploy`, `compute:deploy`, or `app deploy`
-- Managing Compute app logs, deployments, environment variables, branches, and domains
+- Managing Compute app logs, deployments, environment variables, and domains, and listing platform branches (`branch list`; there are no branch create/remove commands)
 - Inspecting GitHub/Console build logs and GitHub push-to-deploy status
 - Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
 - Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
@@ -120,6 +120,7 @@ Use this skill for:
 ### 5. Typed Compute Config
 
 - `config-optional-simple-app` - `prisma.compute.ts` is not required to deploy a normal single app; use flags when there is no durable config.
+- `config-init-formalizer` - Generate a fresh config with `bunx @prisma/cli@latest init`: it detects the framework, pins name/framework/httpPort (plus entry for Bun/Hono), and offers the Project link. `--format json` writes a dependency-free `prisma.compute.json` instead. `init` refuses when any config already exists, never scaffolds code, and never deploys.
 - `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts`.
 - `config-app-vs-apps` - Use `app` for a single deploy target and `apps` for monorepos or multi-app repos; define exactly one.
 - `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
@@ -141,13 +142,15 @@ Use this skill for:
 
 ### 7. Deploy Operations
 
-- `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
+- `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy. The first production deploy of an App auto-promotes without `--prod`; the flag gates subsequent production-branch deploys.
+- `deploy-no-promote` - Use `app deploy --no-promote` for build-then-verify: it builds a candidate reachable at its own URL without touching the live deployment, promoted later with `app promote <deployment-id>`.
 - `deploy-github-default-branch` - When a Compute app is connected to GitHub push-to-deploy, a merge to the default branch is the production deploy path; check deployment records or GitHub check runs instead of telling users to redeploy the merged PR branch or run a default-branch preview deploy.
 - `deploy-build-logs` - Use `@prisma/cli build logs <build-id>` for GitHub/Console build output. Use `app logs` for runtime deployment logs; the two ids are different.
 - `deploy-noninteractive-auth` - Non-interactive deploys need either the correct active stored OAuth workspace or a supported service token env var; never print the token.
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
 - `deploy-ops-targets` - App show/open/logs/list-deploys/promote/rollback/remove and domain commands can also accept `[app]` targets from `prisma.compute.ts`.
+- `deploy-report-cli-bugs` - When a `@prisma/cli` command crashes (`UNEXPECTED_ERROR`) or fails in a way you cannot resolve, report it with `bunx @prisma/cli@latest feedback "<command>: <error summary>"`. Crash envelopes in `--json` include the exact pre-filled command in `nextActions`; run it as-is. Reports are anonymous and carry only the message plus CLI, node, and OS versions; never include secrets, URLs with credentials, or user data in the message.
 
 ### 8. SDK and API
 

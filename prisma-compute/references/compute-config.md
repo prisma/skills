@@ -6,6 +6,12 @@ Use this reference when creating or updating `prisma.compute.ts`, especially for
 
 For monorepos or multi-app repositories, use `prisma.compute.ts`: it is the practical way to tell Compute which app target lives at which `root` and which framework/entry/env defaults belong to each target.
 
+## Generating a Config with `init`
+
+Prefer `bunx @prisma/cli@latest init` over hand-writing a fresh single-app config. It detects the framework from the same registry deploy uses, pins `name`, `framework`, and `httpPort` (plus `entry` for Bun and Hono), previews every value with its source, offers the `@prisma/compute-sdk` devDependency for editor types, and offers the Project link. Useful flags: `--framework`, `--entry`, `--http-port`, `--name`, `--no-link`, `--json`.
+
+`--format json` writes a dependency-free static `prisma.compute.json` instead of the TypeScript config; a later explicit `init --format ts` converts it in place when the config needs to become programmatic. `init` fails with `INIT_CONFIG_EXISTS` when any compute config already exists, never scaffolds application code, and never deploys. Multi-app monorepo configs are still written by hand.
+
 ## File Names and Discovery
 
 The canonical file is `prisma.compute.ts`. The loader also accepts:
@@ -15,11 +21,14 @@ prisma.compute.mts
 prisma.compute.js
 prisma.compute.mjs
 prisma.compute.cjs
+prisma.compute.json
 ```
+
+`prisma.compute.json` is the static, dependency-free variant of the same config; it is discovered and loaded like the others.
 
 Keep exactly one compute config file in a directory. If multiple names exist together, the CLI reports `COMPUTE_CONFIG_INVALID`.
 
-The CLI searches from the invocation directory up to the repository or workspace boundary. Boundaries include `.git`, `pnpm-workspace.yaml`, `bun.lock`, or `package.json#workspaces`. Config-relative paths such as `root` and `env.file` resolve from the config file directory. `--env` flag paths still resolve from the invocation directory.
+The CLI searches from the invocation directory up to the repository or workspace boundary. Boundaries include `.git`, `pnpm-workspace.yaml`, `bun.lock`, `bun.lockb`, or `package.json#workspaces`. Config-relative paths such as `root` and `env.file` resolve from the config file directory. `--env` flag paths still resolve from the invocation directory.
 
 When a config is discovered, its directory becomes the Compute project directory for local state: `.prisma/local.json` and `.prisma/cli/state.json` live beside that config, not necessarily inside the app root.
 
@@ -47,7 +56,7 @@ Define exactly one of:
 - `app` for a single deploy target
 - `apps` for a monorepo or multi-app repository
 
-Do not define both, and do not add unrelated top-level keys.
+Do not define both. Besides `app`/`apps`, the only other allowed top-level key is `region`: a project-level default region applied when deploy creates new apps, overridable per app and by `--region`.
 
 ## App Fields
 
@@ -115,7 +124,7 @@ export default defineComputeConfig({
 
 `build.entrypoint` is relative to `build.outputDirectory` when an output directory is set. For Bun/Hono configs without an output directory, an entrypoint-backed build can supply the source entrypoint. Do not set both `entry` and `build.entrypoint` unless they describe the same file.
 
-`build` applies to frameworks whose build settings are configurable by Compute, such as `nextjs`, `hono`, `tanstack-start`, `custom`, and `bun`. Nuxt, Astro, and NestJS use their framework strategy output and reject a config `build` block.
+A config `build` block is accepted for every supported framework: the config-backed build types are `nextjs`, `nuxt`, `astro`, `nestjs`, `tanstack-start`, `custom`, and `bun` (`hono` builds through the `bun` strategy). Only `custom` requires one (`build.outputDirectory` and `build.entrypoint`); for the others it overrides inferred build settings.
 
 ## Monorepos and Multi-App Repos
 

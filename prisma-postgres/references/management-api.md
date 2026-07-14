@@ -42,12 +42,20 @@ Authorization: Bearer $TOKEN
 3. Exchange code at `https://auth.prisma.io/token`.
 4. Use returned access token in Management API requests.
 
+## Resource model
+
+Workspace -> Project -> Branch -> Database. Branches are a first-class resource: databases attach to a Branch, and branch-scoped env/databases are how preview isolation works.
+
 ## Common endpoints
 
 - `GET /workspaces`
 - `GET /projects`
 - `POST /projects`
-- Database management endpoints under project/database paths
+- `GET`/`POST /projects/:projectId/branches`
+- `GET`/`PATCH`/`DELETE /branches/:branchId`
+- Databases at both `/databases` (flat) and `/projects/:projectId/databases`
+- Connection responses return structured `endpoints.direct` and `endpoints.pooled` objects; the flat top-level `connectionString` is deprecated in favor of `endpoints.direct.connectionString`/`endpoints.pooled.connectionString`
+- Connection secrets are one-time view: revealed at creation, never re-readable from later GETs
 
 ## Notes
 

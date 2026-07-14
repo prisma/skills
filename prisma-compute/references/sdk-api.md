@@ -66,7 +66,7 @@ if (result.isOk()) {
 }
 ```
 
-SDK methods return `Result<T, E>`. Check `isOk()` or `isErr()` instead of assuming errors throw. Deploy results expose app/deployment vocabulary: `appId`, `appName`, `deploymentId`, `deploymentEndpointDomain`, `appEndpointDomain`, `promoted`, and `resolvedConfig`.
+SDK methods return `Result<T, E>`. Check `isOk()` or `isErr()` instead of assuming errors throw. Deploy results expose app/deployment vocabulary including `appId`, `appName`, `projectId`, `region`, `deploymentId`, `deploymentEndpointDomain`, `appEndpointDomain`, `promoted`, `previousDeploymentId`, `previousDeploymentAction`, and `resolvedConfig`.
 
 ## SDK Build Strategies
 
@@ -118,7 +118,7 @@ Low-level public routes use App/Deployment names:
 
 Internal compatibility aliases may still appear in code. Prefer App/Deployment names in new docs, skills, and automation.
 
-Environment variables are not embedded directly in the low-level deployment create payload. They resolve from the app's attached Branch. Use project/environment-variable APIs or CLI env commands to write env vars first, and keep the branch name consistent across app creation, database creation, and env writes.
+Environment variables are not embedded directly in the low-level deployment create payload. The attached branch's role selects their scope: a preview branch resolves branch-scoped vars, while a production branch (or no branch) resolves project-scoped production vars. Use project/environment-variable APIs or CLI env commands to write env vars first, and keep the branch name consistent across app creation, database creation, and env writes.
 
 When using the CLI alongside SDK automation:
 

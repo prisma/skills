@@ -4,7 +4,7 @@ description: Prisma Postgres setup and operations guidance across Console, creat
 license: MIT
 metadata:
   author: prisma
-  version: "7.6.0"
+  version: "7.7.0"
 ---
 
 # Prisma Postgres
@@ -66,6 +66,20 @@ npx create-postgres@latest
 For app integrations, you can also use the programmatic API (`create()` / `regions()`) from the `create-db` npm package.
 
 Temporary databases auto-delete after ~24 hours unless claimed.
+
+### 2b. Persistent databases with the Platform CLI
+
+For databases that belong to a Project (not throwaway `create-db` databases), use `@prisma/cli`:
+
+```bash
+npx -y @prisma/cli@latest database create main --branch main
+npx -y @prisma/cli@latest database list --json
+npx -y @prisma/cli@latest database connection create db_123
+npx -y @prisma/cli@latest database usage db_123
+npx -y @prisma/cli@latest database backup list db_123
+```
+
+`database create` and `database connection create` print a one-time connection URL; store it immediately. Destructive commands (`remove`, `restore`) require exact `--confirm <id>`.
 
 ### 3. Link an existing local project
 

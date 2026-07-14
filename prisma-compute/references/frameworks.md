@@ -25,7 +25,7 @@ Auto-detection:
 - Nuxt: `nuxt.config.*` or `nuxt` dependency
 - Astro: `astro.config.*` or `astro` dependency
 - Hono: `hono` dependency
-- NestJS: `@nestjs/core` dependency
+- NestJS: `nest-cli.json` or `@nestjs/core` dependency
 - TanStack Start: `@tanstack/react-start` or `@tanstack/solid-start`
 - Custom artifact: explicit `framework: "custom"` plus `build.outputDirectory` and `build.entrypoint` in `prisma.compute.ts`
 - Bun: explicit `--entry <path>` or `--framework bun`
@@ -37,10 +37,10 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 | App shape | Deploy command shape | Auto-detected | Required output/entry | Notes |
 |-----------|----------------------|---------------|-----------------------|-------|
 | Next.js | `--framework nextjs` | Yes | standalone `server.js` output | Requires `output: "standalone"` |
-| Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | CLI owns framework build output; do not add a config `build` block |
-| Astro | `--framework astro` | Yes | standalone Node server artifact | CLI owns framework build output; do not add a config `build` block |
+| Nuxt | `--framework nuxt` | Yes | `.output/server/index.mjs` | Framework strategy supplies build defaults; a config `build` block is optional |
+| Astro | `--framework astro` | Yes | standalone Node server artifact | Framework strategy supplies build defaults; a config `build` block is optional |
 | Hono | `--framework hono` | Yes | Bun entry from `main`, `module`, `--entry`, or `src/index.ts` | Usually fixed port `8080` in generated config/scripts |
-| NestJS | `--framework nestjs` | Yes | NestJS server artifact | Omit host or bind to `0.0.0.0`; do not add a config `build` block |
+| NestJS | `--framework nestjs` | Yes | NestJS server artifact | Omit host or bind to `0.0.0.0`; a config `build` block is optional |
 | TanStack Start | `--framework tanstack-start` | Yes | `.output/server/index.mjs` | Requires Nitro node output |
 | Custom artifact | config-backed `framework: "custom"` | No | configured `build.outputDirectory` and `build.entrypoint` | Use for prebuilt/custom-built Node artifacts |
 | Bun / plain server | `--framework bun --entry <path>` | With explicit entry | server entrypoint | Use for Elysia and custom HTTP servers |
@@ -52,7 +52,7 @@ If detection is ambiguous, set `framework` in `prisma.compute.ts` or pass a supp
 
 `app run --build-type` is local-dev oriented and supports `auto`, `bun`, and `nextjs`. It streams the local dev server and is not proof that the deployed app is reachable through public ingress.
 
-`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, region, and build settings. Config `build` blocks apply only where Compute consumes committed settings: `nextjs`, `hono`, `tanstack-start`, `custom`, and `bun`. The CLI rejects `build` blocks for `nuxt`, `astro`, and `nestjs` because their framework build paths are owned by the framework strategy.
+`prisma.compute.ts` can set framework, entrypoint, HTTP port, env inputs, app root, region, and build settings. A config `build` block is accepted for every supported framework; all build types are config-backed (`nextjs`, `nuxt`, `astro`, `nestjs`, `tanstack-start`, `custom`, `bun`; `hono` builds through the `bun` strategy). For Nuxt, Astro, and NestJS the framework strategy supplies the default build command and output, so a `build` block is optional and normally unnecessary, but it overrides those defaults when present. Only `custom` requires one.
 
 Config snippets below assume:
 
@@ -64,7 +64,7 @@ import { defineComputeConfig } from "@prisma/compute-sdk/config";
 
 Compute needs a server process:
 
-- It must listen on the deployed HTTP port. `@prisma/cli app deploy` defaults to HTTP `3000` unless `--http-port` is passed.
+- It must listen on the deployed HTTP port. `@prisma/cli app deploy` defaults to the framework's default HTTP port (3000 for most frameworks, 4321 for Astro) unless `--http-port` is passed.
 - It must bind on all interfaces. Do not hard-code `localhost` or `127.0.0.1` for a deployed server; use `0.0.0.0`, `server.host: true`, or the framework equivalent.
 - It must have a deployable entrypoint or recognized framework output.
 - It must not rely on a preview-only command such as `vite preview`.
@@ -157,11 +157,11 @@ export default defineComputeConfig({
 
 Project expectations:
 
-- dependency detection uses `@nestjs/core`; pass `--framework nestjs` when the dependency graph is unusual
+- detection uses `nest-cli.json` or the `@nestjs/core` dependency; pass `--framework nestjs` when neither signal is present
 - `src/main.ts` or the compiled runtime must start an HTTP server
 - read `process.env.PORT` and default to the same port used by `--http-port`
 - omit the host argument in `app.listen(port)` or pass `"0.0.0.0"`; do not pass `"localhost"` or `"127.0.0.1"`
-- do not add a `build` block for NestJS in `prisma.compute.ts`; the Compute framework strategy owns the build/output path
+- a `build` block is optional for NestJS; the framework strategy supplies the build/output defaults, and a committed `build` block overrides them
 - use `app build --build-type nestjs` for a Compute artifact check; `app run --build-type nestjs` is not supported, so use the Nest dev server locally
 
 Example runtime shape:
@@ -234,7 +234,7 @@ export default defineComputeConfig({
 });
 ```
 
-Nuxt uses Nitro output at `.output/server/index.mjs`. Keep the Nitro preset compatible with a Node server runtime. Do not add a `build` block for Nuxt in `prisma.compute.ts`; the Compute framework strategy owns the build command and output.
+Nuxt uses Nitro output at `.output/server/index.mjs`. Keep the Nitro preset compatible with a Node server runtime. A `build` block is optional for Nuxt: the framework strategy supplies the build command and output, and a committed `build` block overrides them.
 
 ## Astro
 
@@ -269,7 +269,7 @@ export default defineConfig({
 })
 ```
 
-Do not add a `build` block for Astro in `prisma.compute.ts`; the Compute framework strategy owns the build command and output.
+A `build` block is optional for Astro: the framework strategy supplies the build command and output, and a committed `build` block overrides them.
 
 ## Bun, Elysia, and Plain Source Servers
 

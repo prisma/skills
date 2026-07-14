@@ -55,6 +55,8 @@ Typical direct TCP format:
 DATABASE_URL="postgres://identifier:key@db.prisma.io:5432/postgres?sslmode=require"
 ```
 
+Management API connection responses expose both `endpoints.direct` (`db.prisma.io:5432`) and `endpoints.pooled` (`pooled.db.prisma.io:5432`); prefer those fields over the deprecated flat `connectionString`. Connection secrets are shown once at creation (one-time view); store them immediately.
+
 ## Adapter choices
 
 - Standard Node.js apps: prefer `@prisma/adapter-pg` with the direct TCP URL above.
