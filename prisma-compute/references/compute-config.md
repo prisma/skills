@@ -6,6 +6,12 @@ Use this reference when creating or updating `prisma.compute.ts`, especially for
 
 For monorepos or multi-app repositories, use `prisma.compute.ts`: it is the practical way to tell Compute which app target lives at which `root` and which framework/entry/env defaults belong to each target.
 
+## Generating a Config with `init`
+
+Prefer `bunx @prisma/cli@latest init` over hand-writing a fresh single-app config. It detects the framework from the same registry deploy uses, pins `name`, `framework`, and `httpPort` (plus `entry` for Bun and Hono), previews every value with its source, offers the `@prisma/compute-sdk` devDependency for editor types, and offers the Project link. Useful flags: `--framework`, `--entry`, `--http-port`, `--name`, `--no-link`, `--json`.
+
+`--format json` writes a dependency-free static `prisma.compute.json` instead of the TypeScript config; a later explicit `init --format ts` converts it in place when the config needs to become programmatic. `init` fails with `INIT_CONFIG_EXISTS` when any compute config already exists, never scaffolds application code, and never deploys. Multi-app monorepo configs are still written by hand.
+
 ## File Names and Discovery
 
 The canonical file is `prisma.compute.ts`. The loader also accepts:

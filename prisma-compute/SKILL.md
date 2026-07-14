@@ -4,7 +4,7 @@ description: Prisma Compute deployment and hosting guide. Use whenever the user 
 license: MIT
 metadata:
   author: prisma
-  version: "1.3.1"
+  version: "1.4.0"
 ---
 
 # Prisma Compute
@@ -120,6 +120,7 @@ Use this skill for:
 ### 5. Typed Compute Config
 
 - `config-optional-simple-app` - `prisma.compute.ts` is not required to deploy a normal single app; use flags when there is no durable config.
+- `config-init-formalizer` - Generate a fresh config with `bunx @prisma/cli@latest init`: it detects the framework, pins name/framework/httpPort (plus entry for Bun/Hono), and offers the Project link. `--format json` writes a dependency-free `prisma.compute.json` instead. `init` refuses when any config already exists, never scaffolds code, and never deploys.
 - `config-use-prisma-compute-ts` - Put reusable deploy defaults in `prisma.compute.ts` with `defineComputeConfig`, not in `prisma.config.ts`.
 - `config-app-vs-apps` - Use `app` for a single deploy target and `apps` for monorepos or multi-app repos; define exactly one.
 - `config-monorepo-roots` - For monorepos, use `prisma.compute.ts` to declare app targets, roots, framework defaults, entrypoints, ports, and env inputs.
