@@ -156,7 +156,7 @@ bunx @prisma/cli@latest project env remove STRIPE_KEY --role preview
 
 `app deploy --env .env` loads environment variables from a file for the deployment. A config-backed deploy can instead load env through `prisma.compute.ts` `env`. Neither path is a migration command or seed command.
 
-Database setup is not part of `prisma.compute.ts`. Keep database intent explicit with `database create` and project env commands. Do not add database setup to deploy examples. Treat any generated connection URL as a one-time secret.
+Database setup is not part of `prisma.compute.ts`. Deploy-time setup goes through explicit flags: `app deploy --db` creates one branch-scoped Prisma Postgres database (shared by all apps on the branch) and wires `DATABASE_URL`/`DIRECT_URL` through project env; `--yes` alone never creates a database, so CI passes `--db --yes`; `--no-db` skips setup. `--db` and `--no-db` are mutually exclusive, and deploys still never run migrations or seed data. Outside deploy, keep database intent explicit with `database create` and project env commands. Treat any generated connection URL as a one-time secret.
 
 Database and env guardrails:
 
@@ -179,7 +179,16 @@ bunx @prisma/cli@latest database remove db_123 --confirm db_123
 bunx @prisma/cli@latest database connection list db_123 --json
 bunx @prisma/cli@latest database connection create db_123 --name readonly
 bunx @prisma/cli@latest database connection remove conn_123 --confirm conn_123
+bunx @prisma/cli@latest database connection rotate conn_123 --confirm conn_123
+bunx @prisma/cli@latest database usage db_123 --json
+bunx @prisma/cli@latest database backup list db_123 --json
+bunx @prisma/cli@latest database restore db_123 --backup bkp_123 --confirm db_123
+bunx @prisma/cli@latest project rename new-name --project proj_123
+bunx @prisma/cli@latest project transfer proj_123 --to-workspace wksp_456 --confirm proj_123
+bunx @prisma/cli@latest project remove proj_123 --confirm proj_123
 ```
+
+Destructive and ownership-changing commands (`remove`, `restore`, `transfer`, `connection rotate`) require exact `--confirm <id>`; `--yes` is not enough.
 
 Git integration connects a Project to a GitHub repository. Console-side GitHub import can create a Compute app and trigger push-to-deploy for the connected repository, including default-branch production deploys. The CLI `git connect` command is setup, not a local deploy command; use `app deploy` for explicit CLI deploys.
 
@@ -229,15 +238,19 @@ Deploy with prompts:
 bunx @prisma/cli@latest app deploy
 ```
 
-Agent/script-friendly deploy:
+Agent/script-friendly deploy (do not assume production; add `--prod --yes` only when the user intends a production deploy, and note the first production deploy of an App auto-promotes without `--prod`):
 
 ```bash
 bunx @prisma/cli@latest app deploy \
   --json \
   --no-interactive \
-  --prod \
-  --yes \
   --env .env
+```
+
+Build-then-verify path for CI: `--no-promote` builds a candidate deployment without changing the live one; it is reachable at its own candidate URL and promoted later with `app promote <deployment-id>`:
+
+```bash
+bunx @prisma/cli@latest app deploy --no-promote --json --no-interactive
 ```
 
 For preview branches, omit `--prod` unless the user explicitly intends a production deploy:

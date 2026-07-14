@@ -42,7 +42,7 @@ Use this skill for:
 - Creating or updating a typed `prisma.compute.ts` deploy config
 - Deciding whether a framework is Compute-ready
 - Debugging `create-prisma --deploy`, `compute:deploy`, or `app deploy`
-- Managing Compute app logs, deployments, environment variables, branches, and domains
+- Managing Compute app logs, deployments, environment variables, and domains, and listing platform branches (`branch list`; there are no branch create/remove commands)
 - Inspecting GitHub/Console build logs and GitHub push-to-deploy status
 - Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
 - Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
@@ -138,11 +138,12 @@ Use this skill for:
 - `env-cli-token-name` - `@prisma/cli` uses `PRISMA_SERVICE_TOKEN` for service-token auth.
 - `env-branch-scope` - Branch deploys, branch env vars, and branch databases must use the same branch name; pass `--branch <git-name>` explicitly when targeting a preview branch.
 - `env-production-vs-preview` - Use `--role production` for production env, `--role preview` for preview template env, and `--branch <git-name>` for branch-specific overrides.
-- `env-db-explicit` - Keep database and env wiring explicit through database and project env commands; deploy examples should not add database setup, and deploys do not run migrations, seed data, or create one database per app automatically.
+- `env-db-explicit` - Keep database and env wiring explicit: `app deploy --db` creates one branch-scoped database shared by every app on the branch and wires `DATABASE_URL`/`DIRECT_URL` (`--db --yes` in CI; `--yes` alone never creates one; `--no-db` skips). Everything else goes through database and project env commands, and deploys never run migrations, seed data, or create one database per app automatically.
 
 ### 7. Deploy Operations
 
-- `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy.
+- `deploy-prod-intent` - Use `--prod --yes` only when the user intends a production deploy. The first production deploy of an App auto-promotes without `--prod`; the flag gates subsequent production-branch deploys.
+- `deploy-no-promote` - Use `app deploy --no-promote` for build-then-verify: it builds a candidate reachable at its own URL without touching the live deployment, promoted later with `app promote <deployment-id>`.
 - `deploy-github-default-branch` - When a Compute app is connected to GitHub push-to-deploy, a merge to the default branch is the production deploy path; check deployment records or GitHub check runs instead of telling users to redeploy the merged PR branch or run a default-branch preview deploy.
 - `deploy-build-logs` - Use `@prisma/cli build logs <build-id>` for GitHub/Console build output. Use `app logs` for runtime deployment logs; the two ids are different.
 - `deploy-noninteractive-auth` - Non-interactive deploys need either the correct active stored OAuth workspace or a supported service token env var; never print the token.
