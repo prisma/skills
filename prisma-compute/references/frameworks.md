@@ -161,7 +161,6 @@ Project expectations:
 - `src/main.ts` or the compiled runtime must start an HTTP server
 - read `process.env.PORT` and default to the same port used by `--http-port`
 - omit the host argument in `app.listen(port)` or pass `"0.0.0.0"`; do not pass `"localhost"` or `"127.0.0.1"`
-- a `build` block is optional for NestJS; the framework strategy supplies the build/output defaults, and a committed `build` block overrides them
 - use `app build --build-type nestjs` for a Compute artifact check; `app run --build-type nestjs` is not supported, so use the Nest dev server locally
 
 Example runtime shape:
@@ -234,7 +233,7 @@ export default defineComputeConfig({
 });
 ```
 
-Nuxt uses Nitro output at `.output/server/index.mjs`. Keep the Nitro preset compatible with a Node server runtime. A `build` block is optional for Nuxt: the framework strategy supplies the build command and output, and a committed `build` block overrides them.
+Nuxt uses Nitro output at `.output/server/index.mjs`. Keep the Nitro preset compatible with a Node server runtime.
 
 ## Astro
 
@@ -268,8 +267,6 @@ export default defineConfig({
   server: { host: true },
 })
 ```
-
-A `build` block is optional for Astro: the framework strategy supplies the build command and output, and a committed `build` block overrides them.
 
 ## Bun, Elysia, and Plain Source Servers
 

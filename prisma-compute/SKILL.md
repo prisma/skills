@@ -1,10 +1,10 @@
 ---
 name: prisma-compute
-description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/build logs/domains, `@prisma/cli agent install`, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
+description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/build logs/domains, `@prisma/cli agent install`, `@prisma/cli feedback`, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
 license: MIT
 metadata:
   author: prisma
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Prisma Compute
@@ -23,6 +23,17 @@ bunx create-prisma@latest --help
 ```
 
 Use `@prisma/cli@latest` for Compute app deployment. Use `create-prisma@latest` for new-project scaffolding.
+
+## Send Feedback and Report CLI Issues
+
+The CLI has a built-in feedback channel. Use it whenever a command crashes (`UNEXPECTED_ERROR`), a failure survives troubleshooting, or the user asks to send feedback to the Prisma team:
+
+```bash
+bunx @prisma/cli@latest feedback "app deploy crashed: <first error line>"
+bunx @prisma/cli@latest feedback "love the deploy flow" --email you@example.com
+```
+
+Crash output points here on its own: `--json` crash envelopes carry the exact pre-filled command as a `recover` entry in `nextActions` (run it verbatim), and human crash output ends with a `Tell us what happened:` hint. Feedback is anonymous unless `--email` is passed and attaches only the CLI version, node version, and OS platform/arch. Never include secrets, connection URLs, or user data in the message.
 
 ## Source-of-Truth Order
 
@@ -47,6 +58,7 @@ Use this skill for:
 - Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
 - Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
 - Installing or updating Prisma skills with `@prisma/cli agent install|update|status`
+- Sending feedback or reporting unresolvable CLI failures with `@prisma/cli feedback`
 - Programmatic deployments with `@prisma/compute-sdk` or Management API integrations
 
 ## Decision Tree
@@ -150,7 +162,7 @@ Use this skill for:
 - `deploy-json-for-agents` - Use `--json --no-interactive` for scripts and agent-readable output.
 - `deploy-create-project` - Use `--create-project <name>` only when the user wants deploy to create and link a new project; it conflicts with `--project` and `PRISMA_PROJECT_ID`.
 - `deploy-ops-targets` - App show/open/logs/list-deploys/promote/rollback/remove and domain commands can also accept `[app]` targets from `prisma.compute.ts`.
-- `deploy-report-cli-bugs` - When a `@prisma/cli` command crashes (`UNEXPECTED_ERROR`) or fails in a way you cannot resolve, report it with `bunx @prisma/cli@latest feedback "<command>: <error summary>"`. Crash envelopes in `--json` include the exact pre-filled command in `nextActions`; run it as-is. Reports are anonymous and carry only the message plus CLI, node, and OS versions; never include secrets, URLs with credentials, or user data in the message.
+- `deploy-report-cli-bugs` - On `UNEXPECTED_ERROR` or an unresolvable failure, report it with the feedback command; see "Send Feedback and Report CLI Issues" above.
 
 ### 8. SDK and API
 
@@ -176,9 +188,5 @@ Use this skill for:
 - Do not bury Compute deployment guidance in the generic `prisma-cli` skill.
 - Do not run `create-prisma` inside an existing app just to deploy it; use the generated `compute:deploy` script or `@prisma/cli app deploy`.
 - Do not tell users that every `create-prisma` template can auto-deploy.
-- Do not put Compute deploy defaults in `prisma.config.ts`; use `prisma.compute.ts`.
 - Do not deploy with placeholder `DATABASE_URL` values.
 - Do not assume `next start` is the Compute runtime path; Next.js deploys need standalone output.
-- Do not expose secret values from `.env`, CLI output, Management API responses, or logs.
-- Do not assume a stored OAuth login means the desired workspace is active; inspect or switch it explicitly.
-- Do not auto-switch to another cached workspace after logout or auth refresh failure.
