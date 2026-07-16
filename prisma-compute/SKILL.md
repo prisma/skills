@@ -1,6 +1,6 @@
 ---
 name: prisma-compute
-description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/build logs/domains, `@prisma/cli agent install`, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
+description: Prisma Compute deployment and hosting guide. Use whenever the user mentions Prisma Compute, `prisma.compute.ts`, `defineComputeConfig`, deploying or hosting a Prisma app, `@prisma/cli app deploy`, `compute:deploy`, `create-prisma --deploy`, `PRISMA_SERVICE_TOKEN`, `auth workspace`, Compute apps/deployments/build logs/domains, `@prisma/cli agent install`, `@prisma/cli feedback`, localhost vs `0.0.0.0`, deploy port binding, or framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts.
 license: MIT
 metadata:
   author: prisma
@@ -23,6 +23,17 @@ bunx create-prisma@latest --help
 ```
 
 Use `@prisma/cli@latest` for Compute app deployment. Use `create-prisma@latest` for new-project scaffolding.
+
+## Send Feedback and Report CLI Issues
+
+The CLI has a built-in feedback channel. Use it whenever a command crashes (`UNEXPECTED_ERROR`), a failure survives troubleshooting, or the user asks to send feedback to the Prisma team:
+
+```bash
+bunx @prisma/cli@latest feedback "app deploy crashed: <first error line>"
+bunx @prisma/cli@latest feedback "love the deploy flow" --email you@example.com
+```
+
+Crash output points here on its own: `--json` crash envelopes carry the exact pre-filled command as a `recover` entry in `nextActions` (run it verbatim), and human crash output ends with a `Tell us what happened:` hint. Feedback is anonymous unless `--email` is passed and attaches only the CLI version, node version, and OS platform/arch. Never include secrets, connection URLs, or user data in the message.
 
 ## Source-of-Truth Order
 
@@ -47,6 +58,7 @@ Use this skill for:
 - Running non-interactive deploys with browser auth, multiple stored workspaces, or Prisma service tokens
 - Switching, selecting, listing, or logging out local Prisma Platform workspaces for `@prisma/cli`
 - Installing or updating Prisma skills with `@prisma/cli agent install|update|status`
+- Sending feedback or reporting unresolvable CLI failures with `@prisma/cli feedback`
 - Programmatic deployments with `@prisma/compute-sdk` or Management API integrations
 
 ## Decision Tree
