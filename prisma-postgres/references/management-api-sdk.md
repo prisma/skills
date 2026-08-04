@@ -2,7 +2,7 @@
 
 Use `@prisma/management-api-sdk` for typed API integration with optional OAuth and token refresh.
 
-This reference was checked against SDK `1.56.0`. Because the Platform API evolves independently from Prisma ORM, inspect the installed package's generated `api.d.ts` for the exact paths and request/response shapes.
+The Platform API evolves independently from Prisma ORM. Inspect the installed package's generated `api.d.ts` for exact paths and request/response shapes.
 
 ## Priority
 
@@ -31,7 +31,7 @@ Check the generated client result before using `data`; typed clients surface HTT
 
 ## Workspace service tokens
 
-SDK 1.56 adds typed routes to list, create, and revoke workspace service tokens:
+The typed client exposes routes to list, create, and revoke workspace service tokens:
 
 - `GET /v1/workspaces/{workspaceId}/service-tokens`
 - `POST /v1/workspaces/{workspaceId}/service-tokens`

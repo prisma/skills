@@ -187,7 +187,7 @@ prisma complete zsh
 
 ## AI Safety Checkpoint
 
-Prisma ORM 7.9 blocks destructive commands when it detects an AI agent until the agent has obtained explicit user consent. This covers `migrate reset`, `db push --force-reset`, and `db push --accept-data-loss`.
+Prisma blocks destructive commands when it detects an AI agent until the agent has obtained explicit user consent. This covers `migrate reset`, `db push --force-reset`, and `db push --accept-data-loss`.
 
 - Explain the exact data-loss impact and ask for consent immediately before running the command.
 - Do not infer consent from earlier or unrelated messages.

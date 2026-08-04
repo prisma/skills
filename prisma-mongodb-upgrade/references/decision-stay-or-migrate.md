@@ -16,7 +16,7 @@ early adopters' feedback — with a deliberate stay on v6 where a hard blocker a
 
 ## The facts the decision rests on
 
-Prisma Next side (verified against `prisma/prisma` main at `446acc`, package line 0.16.0):
+Prisma Next side:
 
 - **MongoDB support is Early Access**, actively developed, with GA planned after Postgres.
 - The implementation is deep, not a stub: a full package family (ORM, typed

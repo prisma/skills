@@ -241,11 +241,7 @@ Each skill contains:
 
 ## Prisma Version
 
-The stable ORM-focused skills target **Prisma ORM 7.9.1** (the latest stable release verified on 2026-08-04). Prisma ORM 7 is developed on the [`v7` branch](https://github.com/prisma/prisma/tree/v7); the repository's default branch now contains Prisma Next.
-
-The `prisma-platform-cli` skill tracks published `@prisma/cli@3.0.0-beta.29` plus source head `363d3d2` (including source-only plan-limit recovery), the `prisma-compute` SDK reference tracks `@prisma/compute-sdk@0.38.0`, and the Management API SDK reference tracks `@prisma/management-api-sdk@1.56.0`. These beta/independently versioned surfaces must still be verified from installed `--help` output, structured errors, and types before mutations.
-
-The `prisma-mongodb-upgrade` bridge tracks Prisma Next 0.16.0 and tells migrated projects to use Prisma Next's project-local, version-matched skills as the source of truth.
+The ORM-focused skills target **Prisma ORM 7.9.1**. Platform CLI, Compute, Management API, and Prisma Next surfaces evolve independently, so verify installed help, structured errors, and types before mutations. Prisma Next projects should use their project-local, version-matched skills as the source of truth.
 
 The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 

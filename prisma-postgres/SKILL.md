@@ -127,7 +127,7 @@ npm install @prisma/management-api-sdk
 
 Use `createManagementApiClient` for existing tokens, or `createManagementApiSdk` for OAuth + token refresh.
 
-The current SDK line verified for this skill is `@prisma/management-api-sdk@1.56.0`. Always let the installed SDK types/OpenAPI document settle exact beta endpoint shapes. Version 1.56 adds typed workspace service-token list/create/revoke routes; a newly created token value is returned exactly once.
+The SDK exposes typed workspace service-token list, create, and revoke routes. A newly created token value is returned exactly once. Let the installed SDK types or OpenAPI document settle exact beta endpoint shapes.
 
 ## Rule Files
 

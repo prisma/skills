@@ -26,8 +26,6 @@ import { defineComputeConfig } from "@prisma/compute-sdk/config";
 
 Use this import in `prisma.compute.ts` for type checking. The helper is an identity function; the CLI loader aliases the import when it evaluates config files, so a user project does not need the SDK solely to load a Compute config.
 
-The latest published SDK verified for this reference is `@prisma/compute-sdk@0.38.0`.
-
 Create an authenticated Management API client:
 
 ```typescript

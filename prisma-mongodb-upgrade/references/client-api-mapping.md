@@ -58,4 +58,4 @@ await session.withTransaction(async () => {
 
 - [v6 MongoDB raw queries](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries#raw-queries-with-mongodb)
 - [v6 replica set requirement for transactions](https://www.prisma.io/docs/orm/overview/databases/mongodb#replica-set-configuration)
-- Prisma Next queries + runtime skills (`skills/prisma-next-queries`, including `mongo.md`; `skills/prisma-next-runtime`) in `prisma/prisma` — authoritative for the installed version; verified on the 0.16 line at `446acc`
+- Prisma Next queries + runtime skills (`skills/prisma-next-queries`, including `mongo.md`; `skills/prisma-next-runtime`) in `prisma/prisma` — authoritative for the installed version

@@ -36,7 +36,7 @@ bunx --bun prisma init
 | `--with-model` | Add example model to created schema file | - |
 | `--no-skills` | Skip the best-effort installation of Prisma agent skills | - |
 
-Since Prisma ORM 7.9, `prisma init` attempts to install `prisma/skills` for detected agents. This is best-effort and does not make project initialization fail. Use `--no-skills` in minimal or controlled environments.
+`prisma init` attempts to install `prisma/skills` for detected agents. This is best-effort and does not make project initialization fail. Use `--no-skills` in minimal or controlled environments.
 
 ## Examples
 

@@ -254,7 +254,7 @@ Fix:
 
 ## Workspace plan limit reached
 
-Current Prisma CLI source maps the exact Management API discriminator `planLimitReached` to `PLAN_LIMIT_REACHED` for database operations. This landed after published `@prisma/cli@3.0.0-beta.29`, so first confirm the installed CLI actually emits it.
+When the installed CLI returns `PLAN_LIMIT_REACHED`, treat it as a workspace plan restriction rather than a Compute or database outage.
 
 For agent/CI handling, run the relevant database command with `--json` and branch on `error.code === "PLAN_LIMIT_REACHED"`. Read `error.meta.upgradeUrl`, `planName`, `workspaceId`, and `usageBlocked`; optional values may be `null`. This is a workspace plan restriction rather than a Compute/database outage. Use the canonical upgrade URL when returned or direct the user to Prisma Console. Do not retry as an outage or infer a plan limit from status codes or message text.
 

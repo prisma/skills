@@ -62,4 +62,4 @@ mirroring how `db push` was used on v6.
 ## References
 
 - [v6: no Prisma Migrate for MongoDB](https://www.prisma.io/docs/orm/overview/databases/mongodb#no-support-for-prisma-migrate)
-- Prisma Next migrations skill (`skills/prisma-next-migrations`) — authoritative for the Next side; verified on the 0.16 line at `446acc`
+- Prisma Next migrations skill (`skills/prisma-next-migrations`) — authoritative for the installed Next version

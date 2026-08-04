@@ -1,6 +1,6 @@
 # AI safety checkpoint for destructive commands
 
-Prisma ORM 7.9 detects common AI-agent environments and blocks these commands until the user gives explicit consent:
+Prisma detects common AI-agent environments and blocks these commands until the user gives explicit consent:
 
 - `prisma migrate reset`
 - `prisma db push --force-reset`

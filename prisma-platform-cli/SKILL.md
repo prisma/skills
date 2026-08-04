@@ -9,7 +9,7 @@ metadata:
 
 # Prisma Platform CLI
 
-Reference for the public-beta `@prisma/cli` package. The latest published package verified here is `3.0.0-beta.29`; its installed binary is `prisma-cli`. This skill also tracks source head `363d3d2`, which is ahead of that publication. Verify installed help and structured errors before relying on a source-head-only behavior. This is a different package from the stable Prisma ORM CLI (`prisma`).
+Reference for the public-beta `@prisma/cli` package, whose installed binary is `prisma-cli`. It is separate from the stable Prisma ORM CLI (`prisma`). Verify installed help and structured errors before relying on a beta behavior.
 
 ## Boundaries
 
@@ -19,6 +19,8 @@ Reference for the public-beta `@prisma/cli` package. The latest published packag
 | Platform auth, projects, databases, buckets, Git, agent tools | this skill / `@prisma/cli` |
 | Compute apps, builds, deploys, logs, domains | `prisma-compute` / `@prisma/cli` |
 | Low-level Prisma Postgres Management API | `prisma-postgres` |
+
+After routing to another skill, use that skill for command details; do not duplicate or guess them here.
 
 The Platform CLI is beta and requires Node.js 22.12 or newer. Verify current help before mutating resources:
 
@@ -54,6 +56,7 @@ npx -y @prisma/cli@latest <group> --help
 
 ## Global Agent Rules
 
+- Read only the reference needed for the requested command group and keep the answer task-scoped.
 - Prefer `--json --no-interactive` for automation and parse ids from JSON rather than display text.
 - Use `--yes` only after the intended mutation is clear; it is not permission for destructive or production actions.
 - Never print service tokens, connection strings, bucket secret keys, or environment-variable values.
@@ -75,13 +78,7 @@ A non-empty `PRISMA_SERVICE_TOKEN` takes precedence over cached OAuth workspaces
 
 ## Database and Bucket Safety
 
-Read [`references/database-bucket.md`](references/database-bucket.md) before provisioning or deleting resources. Key points:
-
-- Keep database, branch, region, source, and environment scope explicit.
-- Use connection create/rotate/remove rather than assuming a database's original secret URL remains readable.
-- Backup records are incremental; do not infer storage behavior or size units from old API examples.
-- Bucket key roles are `read` and `read_write`.
-- Deletion examples must use the id printed by a prior JSON lookup, not a user-supplied name guessed to be an id.
+Read [`references/database-bucket.md`](references/database-bucket.md) before provisioning or deleting resources. It covers explicit scope, one-time secrets, backups, bucket roles, and exact-id confirmation.
 
 ## Agent Tools and Feedback
 
@@ -93,10 +90,3 @@ npx -y @prisma/cli@latest feedback "<concise problem or feedback>"
 ```
 
 Read [`references/agent-feedback.md`](references/agent-feedback.md) before changing installed skills or reporting a CLI failure.
-
-## References
-
-- [`references/auth-project.md`](references/auth-project.md) — auth, workspaces, project context, env, Git, and branches
-- [`references/database-bucket.md`](references/database-bucket.md) — databases, connections, backups, restores, buckets, and keys
-- [`references/agent-feedback.md`](references/agent-feedback.md) — agent installation/update/status and safe feedback
-- [Prisma CLI repository](https://github.com/prisma/prisma-cli)

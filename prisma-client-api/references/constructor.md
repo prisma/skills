@@ -129,7 +129,7 @@ const prisma = new PrismaClient({
 
 ### queryPlanCacheMaxSize
 
-Prisma ORM 7.8 added a constructor-level limit for the in-memory query-plan cache:
+Use `queryPlanCacheMaxSize` to limit the in-memory query-plan cache:
 
 ```typescript
 const prisma = new PrismaClient({

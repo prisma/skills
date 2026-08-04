@@ -35,7 +35,7 @@ Before deletion, list/show the exact database id, confirm it belongs to the inte
 
 ### Plan-limit recovery
 
-At Prisma CLI source head `363d3d2`, a database API failure whose structured discriminator is exactly `error.code === "planLimitReached"` becomes the stable CLI error `PLAN_LIMIT_REACHED`. This source behavior landed after published `@prisma/cli@3.0.0-beta.29`, so branch on it only when the installed CLI actually returns that code.
+When the installed CLI returns `PLAN_LIMIT_REACHED`, treat it as a workspace plan restriction rather than a database outage.
 
 In `--json` mode, inspect `error.code` and `error.meta` rather than human prose. The metadata includes `workspaceId`, `blockedFeature`, `planName`, `usageBlocked`, and `upgradeUrl`; unavailable values are `null`. Treat it as a workspace plan restriction, not a Prisma outage. Use the canonical `upgradeUrl` when present, otherwise direct the user to Prisma Console. Do not infer this diagnosis from an HTTP status, message substring, retry count, or `usageBlocked` alone.
 

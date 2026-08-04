@@ -237,7 +237,7 @@ function throwAdapterError(error: unknown): never {
 }
 ```
 
-Prisma ORM 7.9 uses preserved original details when an unmapped driver error becomes `P2039`. Do not replace every unknown exception with a fabricated `GenericJs` id; rethrow genuinely unexpected non-driver errors so programming bugs remain visible.
+Prisma uses preserved original details when an unmapped driver error becomes `P2039`. Do not replace every unknown exception with a fabricated `GenericJs` id; rethrow genuinely unexpected non-driver errors so programming bugs remain visible.
 
 ## Factory, ownership, and shadow database
 

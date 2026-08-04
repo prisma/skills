@@ -27,7 +27,7 @@ the migration mechanics.
 
 | Version | MongoDB status |
 |---------|----------------|
-| Prisma ORM v6 | Fully supported (`mongodb` provider); `6.19.3` is the current maintained classic path verified for this guide |
+| Prisma ORM v6 | Supported (`mongodb` provider); use the maintained v6 line |
 | Prisma ORM v7 | **No MongoDB connector — not an option, ever** |
 | Prisma Next | MongoDB support in **Early Access**, actively developed, GA planned after Postgres — the successor path for MongoDB projects |
 
@@ -71,14 +71,9 @@ breaking changes with published upgrade recipes.
 | `references/migrations-mapping.md` | v6 `db push`-only story → Next's plan/migrate/verify/sign flow |
 | `references/verify-cutover-checklist.md` | No-data-moves verification: same DB, index parity, staged round-trip before cutover |
 
-## Verified against
+## Prisma Next boundary
 
-Behavioral claims about Prisma Next in this skill were verified against
-[prisma/prisma](https://github.com/prisma/prisma) at commit
-`446acc` (`prisma-next` / `@prisma/orm-mongo` 0.16.0 line). Stable Prisma ORM 7 development lives on the repository's `v7` branch; main is Prisma Next. Prisma Next moves
-quickly in Early Access: **before acting on any Next-side claim, verify it against the
-version actually installed** (check `prisma-next`, `@prisma/orm-mongo`, and the project-local
-Prisma Next skills). Prisma Next requires Node.js 24+. Its Mongo façade currently expects
+Prisma Next moves quickly in Early Access. Before acting on a Next-side claim, verify it against the installed `prisma-next`, `@prisma/orm-mongo`, and project-local Prisma Next skills. Prisma Next requires Node.js 24+. Its Mongo façade currently expects
 `mongodb@^7` as a user-supplied peer dependency and declares MongoDB 8.0 as its current server minimum. Use the version-matched quickstart skill's database probe and inspect the reported version; a below-minimum result is a warning even with `--strict-probe`.
 
 ## Hand-off rule
