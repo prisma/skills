@@ -81,7 +81,7 @@ npx -y @prisma/cli@latest database backup list db_123
 
 `database create` and `database connection create` print a one-time connection URL; store it immediately. Destructive commands (`remove`, `restore`) require exact `--confirm <id>`.
 
-For the full beta CLI surface and its current safety rules, use `prisma-platform-cli`.
+For automation, prefer `--json --no-interactive`, resolve ids before mutations, and verify the installed command's help because this CLI is beta.
 
 ### 3. Link an existing local project
 

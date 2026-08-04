@@ -11,9 +11,9 @@ metadata:
 
 Reference for Prisma ORM CLI commands. This skill provides guidance on command usage, options, and best practices for current Prisma ORM releases.
 
-## Boundary: Compute
+## Boundary: Platform and Compute
 
-Do not confuse the stable ORM package/command (`prisma`) with the public-beta Prisma Platform package (`@prisma/cli`, whose binary is currently `prisma-cli`). Use `prisma-platform-cli` for Platform auth, projects, databases, buckets, Git, and agent commands; use `prisma-compute` for Compute app deployment.
+Do not confuse the stable ORM command (`prisma`) with the public-beta Platform package (`@prisma/cli`, binary `prisma-cli`). Use `prisma-compute` for Compute apps and workspace auth, and `prisma-postgres` for Platform projects and databases.
 
 ## When to Apply
 

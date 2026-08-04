@@ -24,19 +24,6 @@ Complete reference for current Prisma ORM CLI commands. For Prisma Compute app d
 
 ---
 
-### prisma-platform-cli
-
-Current reference for the public-beta Prisma Platform CLI (`@prisma/cli`; installed binary `prisma-cli`).
-
-**Use when:**
-- Authenticating or switching Prisma workspaces
-- Managing Projects, Prisma Postgres databases/connections/backups, buckets/keys, Git links, or platform branches
-- Installing/updating Prisma agent skills or submitting CLI feedback
-
-For Compute builds and deployments, use `prisma-compute`. For ORM migrations and generation, use `prisma-cli`.
-
----
-
 ### prisma-upgrade-v7
 
 Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes.
@@ -195,7 +182,6 @@ Or install specific skills:
 
 ```bash
 npx skills add prisma/skills --skill prisma-cli
-npx skills add prisma/skills --skill prisma-platform-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
