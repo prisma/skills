@@ -54,7 +54,7 @@ const result = await compute.deploy({
   }),
   projectId: "proj_abc",
   appName: "my-app",
-  region: "us-east-1",
+  // region: "us-east-1", // optional: explicit placement for a new app
   envVars: { DATABASE_URL: databaseUrl },
   portMapping: { http: 3000 },
 })
@@ -96,6 +96,30 @@ ap-southeast-1
 ```
 
 Use `--region` in `@prisma/cli app deploy` or `region` in SDK deploy input only when creating a new Compute app. Existing apps keep their current region.
+
+`region` is optional on `deploy` and `createApp`. Omit it to use the Project/platform default when creating an app; do not hard-code a region unless placement is an application requirement.
+
+## Repository-snapshot detection
+
+Tooling that already has an in-memory repository tree can detect a deployable app without checking files out:
+
+```typescript
+import { detectComputeApp } from '@prisma/compute-sdk/config'
+
+const detected = detectComputeApp({
+  root: 'apps/api',
+  manifest: {
+    main: 'src/index.ts',
+    scripts: { start: 'bun src/index.ts' },
+    dependencies: { hono: '^4' },
+  },
+  filePaths: ['apps/api/package.json', 'apps/api/src/index.ts'],
+})
+```
+
+The result contains `framework`, `frameworkName`, `buildType`, `httpPort`, `entrypoint`, and detection `evidence`, or `null` when nothing is deployable. Paths are repository-relative and unsafe absolute/parent-traversal entrypoints are rejected.
+
+The helper detects one app root. A monorepo consumer must enumerate workspaces and call it once per candidate. Detection reads `dependencies` and `devDependencies` (not peer dependencies), recognizes config files and framework packages, and can infer Bun-backed servers from valid `start`/`serve` script entrypoints.
 
 ## Management API Concepts
 

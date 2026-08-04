@@ -4,7 +4,7 @@ description: Prisma Client API reference covering model queries, filters, operat
 license: MIT
 metadata:
   author: prisma
-  version: "7.6.0"
+  version: "7.9.1"
 ---
 
 # Prisma Client API Reference

@@ -4,11 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'skills/**'
+      - 'prisma-*/**'
+      - '.github/workflows/validate-skills.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'skills/**'
+      - 'prisma-*/**'
+      - '.github/workflows/validate-skills.yml'
 
 jobs:
   validate:
@@ -23,7 +25,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install gray-matter
+        run: npm install --no-save gray-matter
 
       - name: Validate SKILL.md files
         run: |
@@ -32,26 +34,13 @@ jobs:
           const path = require('path');
           const matter = require('gray-matter');
 
-          const skillsDir = './skills';
           const errors = [];
 
-          // Find all SKILL.md files
-          function findSkillFiles(dir) {
-            const files = [];
-            const entries = fs.readdirSync(dir, { withFileTypes: true });
-            
-            for (const entry of entries) {
-              const fullPath = path.join(dir, entry.name);
-              if (entry.isDirectory()) {
-                files.push(...findSkillFiles(fullPath));
-              } else if (entry.name === 'SKILL.md') {
-                files.push(fullPath);
-              }
-            }
-            return files;
-          }
-
-          const skillFiles = findSkillFiles(skillsDir);
+          const skillFiles = fs.readdirSync('.', { withFileTypes: true })
+            .filter((entry) => entry.isDirectory() && /^prisma-[a-z0-9-]+$/.test(entry.name))
+            .map((entry) => path.join(entry.name, 'SKILL.md'))
+            .filter((file) => fs.existsSync(file))
+            .sort();
           console.log(`Found ${skillFiles.length} SKILL.md files\n`);
 
           for (const file of skillFiles) {

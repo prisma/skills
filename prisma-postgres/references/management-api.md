@@ -46,21 +46,31 @@ Authorization: Bearer $TOKEN
 
 Workspace -> Project -> Branch -> Database. Branches are a first-class resource: databases attach to a Branch, and branch-scoped env/databases are how preview isolation works.
 
-## Common endpoints
+## Current resource inventory
 
-- `GET /workspaces`
-- `GET /projects`
-- `POST /projects`
-- `GET`/`POST /projects/:projectId/branches`
-- `GET`/`PATCH`/`DELETE /branches/:branchId`
-- Databases at both `/databases` (flat) and `/projects/:projectId/databases`
-- Connection responses return structured `endpoints.direct` and `endpoints.pooled` objects; the flat top-level `connectionString` is deprecated in favor of `endpoints.direct.connectionString`/`endpoints.pooled.connectionString`
-- Connection secrets are one-time view: revealed at creation, never re-readable from later GETs
+The 1.55 OpenAPI surface includes:
+
+- workspaces, subscriptions, workspace integrations, workspace service tokens, and current-user metadata
+- projects, transfers, project databases, and project/branch environment variables
+- branches under a project plus branch get/update/delete operations
+- databases, usage, backups, restore, connections, and connection rotation
+- apps, deployments, promotion/rollback, runtime logs, domains, and build logs
+- buckets and bucket keys
+- source repositories, SCM installations/install intents, and repositories
+- integrations and regions
+
+App/deployment, branch mutation, SCM, and bucket routes include experimental surfaces. Read the installed SDK types or live OpenAPI before building durable automation around them.
+
+Connection create/rotate responses reveal credentials once. Later reads redact or omit the secret, so store the URL immediately. Use the structured direct/pooled endpoint returned by the concrete operation; do not assume a historical flat response shape.
+
+Workspace service-token creation also returns the complete token value exactly once. List calls expose only metadata and a `valueHint`; delete revokes the token. Keep workspace and token ids opaque, and never log a create response.
+
+Database create supports explicit project, region, branch, and source context. A source may be empty, a backup, or another database. Backup records are incremental; rely on current fields and documented units rather than old full-backup examples.
 
 ## Notes
 
-- Management API responses may include direct connection credentials for databases.
-- Build PostgreSQL `DATABASE_URL` from direct connection values when needed.
+- Management API mutation responses may include direct connection credentials; treat the entire response as secret until redacted.
+- Prefer an API-provided connection string over manually assembling one from fields.
 
 ## References
 
