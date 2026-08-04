@@ -25,8 +25,8 @@ the cutover observable and reversible.
 1. **Same database, verified:** the Next config points at the same connection string /
    database name the v6 app uses (minus v6-specific URL parameters that the `mongodb@^7`
    driver rejects — validate the URL with the driver first).
-2. **Runtime and server floor:** Node.js is 24+ and `prisma-next init --probe-db` reports
-   MongoDB 8.0 or newer before contract work. Read the version message: below-minimum is a warning even when `--strict-probe` is also set.
+2. **Server floor:** MongoDB server is 8.0+ (Next's requirement; v6 tolerated older).
+   Confirm before authoring any contract.
 3. **Contract round-trip on a copy:** on a staging copy (or `mongodb-memory-server`), emit
    the contract, run plan → migrate → verify → sign, and confirm `verify` passes against
    data copied from production shape. Verification failures here are contract-mapping bugs,
@@ -41,7 +41,8 @@ the cutover observable and reversible.
 6. **Storage-name addressing audited:** every ported call site uses collection storage
    names (`db.orm.users`), not model names (see `schema-contract-mapping.md`).
 7. **Transaction inventory mapped:** grep the v6 app for `$transaction`; each hit gets a
-   driver-session equivalent (the `mongodb` driver is directly available; see `client-api-mapping.md`).
+   driver-session equivalent (the `mongodb` driver is directly available; the façade wrapper
+   is expected soon — see `client-api-mapping.md`).
 8. **Raw call inventory mapped:** every `$runCommandRaw` / `findRaw` / `aggregateRaw` call
    has an explicit Next-side replacement (`mongoRaw(...)` lane or pipeline builder).
 9. **Staged read-only soak:** run the Next stack read-only against staging/production data
@@ -56,4 +57,4 @@ hand-off rule in `SKILL.md`).
 ## References
 
 - [v6 MongoDB documentation](https://www.prisma.io/docs/orm/overview/databases/mongodb)
-- Prisma Next migrations + queries skills — authoritative for the installed Next version
+- Prisma Next migrations + queries skills — authoritative for the Next side; verified @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`

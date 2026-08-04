@@ -4,7 +4,7 @@ description: Complete migration guide from Prisma ORM v6 to v7 covering all brea
 license: MIT
 metadata:
   author: prisma
-  version: "7.9.1"
+  version: "7.6.0"
 ---
 
 # Upgrade to Prisma ORM 7
@@ -52,7 +52,7 @@ Prisma 7 has no MongoDB connector. Do not apply any step in this guide to a proj
 - **MongoDB projects should stay on Prisma 6.x or migrate to Prisma Next** - do not migrate MongoDB apps to Prisma 7's SQL client path (see `prisma-mongodb-upgrade`)
 - **Node.js 20.19.0+** required
 - **TypeScript 5.4.0+** required
-- **Target Prisma ORM version**: `7.9.1`
+- **Latest stable Prisma ORM version**: `7.6.0`
 
 ## Upgrade Steps Overview
 
@@ -195,19 +195,7 @@ npm install @prisma/adapter-ppg @prisma/ppg
 npm install @prisma/adapter-neon
 ```
 
-MongoDB does not have a connector in Prisma ORM 7. If you're upgrading a MongoDB project, stop and use `prisma-mongodb-upgrade` to choose between the current Prisma 6 line and Prisma Next; do not follow the SQL-oriented v7 migration path.
-
-## Current post-upgrade checks
-
-After the v6-to-v7 migration is green, account for these current behaviors:
-
-- `queryPlanCacheMaxSize` controls the Prisma Client query-plan cache; `0` disables it.
-- `prisma complete` generates shell completions.
-- `prisma init` installs Prisma skills on a best-effort basis; `--no-skills` opts out.
-- Agent-run destructive commands require explicit user consent.
-- The Prisma MCP server does not expose a destructive `migrate-reset` tool.
-
-These do not replace the v7 breaking-change steps above. Use `prisma-cli` and `prisma-client-api` for their detailed current command/API rules.
+MongoDB does not have a SQL `@prisma/adapter-*` package in the published Prisma 7.6.0 packages. If you're upgrading a MongoDB project, stop and keep that project on the latest Prisma 6.x release instead of following the standard Prisma 7 migration path.
 
 ### 6. Update client instantiation
 

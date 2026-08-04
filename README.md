@@ -20,7 +20,7 @@ Complete reference for current Prisma ORM CLI commands. For Prisma Compute app d
 - `init`, `generate`, `dev` (local Prisma Postgres)
 - `migrate dev`, `migrate deploy`, `migrate reset`
 - `db push`, `db pull`, `db seed`, `db execute`
-- `complete`, `studio`, `mcp`
+- `studio`, `mcp`
 
 ---
 
@@ -95,7 +95,7 @@ Implementation guide for Prisma SQL driver adapter development.
 
 **Topics covered:**
 - Required adapter interfaces and contracts
-- Transaction lifecycle protocol and connection-local savepoint hooks
+- Transaction lifecycle protocol (including nested transactions)
 - `SqlQuery` argument mapping and `SqlResultSet` mapping
 - `ColumnTypeEnum` mapping strategy
 - Error conversion to `DriverAdapterError` / `MappedError`
@@ -145,12 +145,6 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 
 ---
 
-### prisma-postgres-setup
-
-Procedural Management API workflow for provisioning one Prisma Postgres database and connecting a Prisma ORM 7 project to it.
-
----
-
 ### prisma-compute
 
 Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
@@ -188,7 +182,6 @@ npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres
-npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
 
@@ -227,7 +220,7 @@ Each skill contains:
 
 ## Prisma Version
 
-The ORM-focused skills target **Prisma ORM 7.9.1**. Platform CLI, Compute, Management API, and Prisma Next surfaces evolve independently, so verify installed help, structured errors, and types before mutations. Prisma Next projects should use their project-local, version-matched skills as the source of truth.
+The ORM-focused skills target **Prisma ORM 7.6.x**.
 
 The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 

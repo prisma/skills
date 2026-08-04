@@ -25,7 +25,7 @@ atomicity.
 | `$runCommandRaw(...)` ([v6 docs](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries#runcommandraw)) | **Name does not exist in Next.** Raw lane is `mongoRaw(...)` → a raw collection with `aggregate`, `insertOne/Many`, `updateOne/Many`, `deleteOne/Many`, `findOneAndUpdate/Delete`. For arbitrary database commands, use the underlying `mongodb` driver directly — it is a user-supplied peer dependency and fully accessible | Check the installed version's raw surface |
 | `<model>.findRaw(...)` ([v6 docs](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries#findraw)) | `mongoRaw(...)` collection reads (e.g. `aggregate` with a `$match` stage) | No direct `findRaw` name |
 | `<model>.aggregateRaw(...)` ([v6 docs](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries#aggregateraw)) | `mongoRaw(...).aggregate(...)` or the typed pipeline builder | |
-| `$transaction(...)` — works on v6 with a replica set ([v6 docs](https://www.prisma.io/docs/orm/overview/databases/mongodb#replica-set-configuration)) | The 0.16 façade does not expose `db.transaction(...)`, **but the underlying `mongodb` driver is directly available** (user-supplied peer dependency): multi-document atomicity works through driver sessions (`client.startSession()` / `session.withTransaction(...)`) on a replica set | Do not promise a façade delivery date |
+| `$transaction(...)` — works on v6 with a replica set ([v6 docs](https://www.prisma.io/docs/orm/overview/databases/mongodb#replica-set-configuration)) | The façade does not wrap `db.transaction(...)` yet, **but the underlying `mongodb` driver is directly available** (user-supplied peer dependency): multi-document atomicity works today via driver sessions (`client.startSession()` / `session.withTransaction(...)`) on a replica set | A façade wrapper is expected soon; this row will be updated when it merges |
 | `$connect` / `$disconnect` | `connect()` / `close()` on the Mongo façade client | |
 
 ## Bad
@@ -58,4 +58,4 @@ await session.withTransaction(async () => {
 
 - [v6 MongoDB raw queries](https://www.prisma.io/docs/orm/prisma-client/using-raw-sql/raw-queries#raw-queries-with-mongodb)
 - [v6 replica set requirement for transactions](https://www.prisma.io/docs/orm/overview/databases/mongodb#replica-set-configuration)
-- Prisma Next queries + runtime skills (`skills/prisma-next-queries`, including `mongo.md`; `skills/prisma-next-runtime`) in `prisma/prisma` — authoritative for the installed version
+- Prisma Next queries + runtime skills (`skills/prisma-next-queries`, incl. its dedicated `mongo.md`; `skills/prisma-next-runtime`) — authoritative for the Next side; verified @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`
