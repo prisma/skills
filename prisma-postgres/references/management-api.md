@@ -61,8 +61,6 @@ The 1.55 OpenAPI surface includes:
 
 App/deployment, branch mutation, SCM, and bucket routes include experimental surfaces. Read the installed SDK types or live OpenAPI before building durable automation around them.
 
-Deprecated `/v1/compute-services` and `/v1/versions` routes have been removed. Use App/Deployment resources for Compute automation.
-
 Connection create/rotate responses reveal credentials once. Later reads redact or omit the secret, so store the URL immediately. Use the structured direct/pooled endpoint returned by the concrete operation; do not assume a historical flat response shape.
 
 Workspace service-token creation also returns the complete token value exactly once. List calls expose only metadata and a `valueHint`; delete revokes the token. Keep workspace and token ids opaque, and never log a create response.

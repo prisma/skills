@@ -65,10 +65,6 @@ const api = createManagementApiSdk({
 4. Use `api.client` for typed endpoint calls.
 5. Call `logout()` when needed.
 
-## Compute route migration
-
-Use `/v1/apps`, `/v1/deployments`, and related promote/rollback/log/domain routes. Do not write new integrations against the removed `/v1/compute-services` or `/v1/versions` paths.
-
 ## References
 
 - [Management API SDK docs](https://www.prisma.io/docs/postgres/introduction/management-api-sdk)
