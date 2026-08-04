@@ -1,6 +1,6 @@
 # api-basics
 
-Core conventions for the Prisma Management API. Use this with `prisma-postgres-setup`; use `prisma-postgres` for the broader current resource inventory and typed SDK guidance.
+Core conventions for the Prisma Management API. All three `prisma-postgres-*` skills share these patterns.
 
 ## Base URL
 
@@ -48,10 +48,10 @@ Every resource ID carries a type prefix:
 |---|---|
 | `proj_` | Project |
 | `db_` | Database |
-| varies | Connection (do not synthesize or normalize its prefix) |
+| `con_` | Connection |
 | `wksp_` | Workspace |
 
-Treat every resource id as opaque and send it exactly as returned. Do not strip prefixes to build Console URLs or guess a connection id format from old examples.
+Always include the prefix when sending IDs in API requests.
 
 ## Pagination
 

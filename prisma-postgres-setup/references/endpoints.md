@@ -52,7 +52,7 @@ POST /v1/projects
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `name` | string | No | Auto-generated | Project display name |
-| `region` | string | No | Platform-selected | Region for the database |
+| `region` | string | No | `us-east-1` | Region for the database |
 | `createDatabase` | boolean | No | `true` | Create a default database with the project |
 
 **Response** (with `createDatabase: true`):
@@ -106,13 +106,11 @@ POST /v1/projects
 }
 ```
 
-Key fields to extract:
+Key field to extract:
 
-- `data.database.defaultConnectionId`
-- the matching item in `data.database.connections`
-- that item's `endpoints.direct.connectionString` → use as `DATABASE_URL` for `@prisma/adapter-pg`
+- `data.database.connections[0].endpoints.direct.connectionString` → use as `DATABASE_URL`
 
-The response may also include pooled and Accelerate endpoints. They serve different runtime paths; do not substitute them into this direct TCP `pg` setup.
+The response also includes `pooled` and `accelerate` endpoints — ignore these for new projects. The direct connection string is all you need.
 
 If `data.database.status` is `provisioning`, poll `GET /v1/databases/{id}` until `status` is `ready`.
 
