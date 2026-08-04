@@ -16,8 +16,7 @@ early adopters' feedback — with a deliberate stay on v6 where a hard blocker a
 
 ## The facts the decision rests on
 
-Prisma Next side (verified against prisma/prisma-next @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`;
-status confirmed by the Prisma team 2026-07):
+Prisma Next side (verified against `prisma/prisma` main at `446acc`, package line 0.16.0):
 
 - **MongoDB support is Early Access**, actively developed, with GA planned after Postgres.
 - The implementation is deep, not a stub: a full package family (ORM, typed
@@ -25,11 +24,10 @@ status confirmed by the Prisma team 2026-07):
   first-class contract-driven migrations, and extensive tests against real in-memory MongoDB.
 - **The Mongo client façade does not wrap `db.transaction(...)` yet** — multi-document
   atomicity is done through the MongoDB driver's session API, which is directly available
-  (the `mongodb` package is a user-supplied peer dependency). A façade wrapper is expected;
-  this skill will be updated when it merges.
+  (the `mongodb` package is a user-supplied peer dependency).
 - Early Access means pre-1.0 minors can carry breaking changes, with published upgrade
   recipes (e.g. 0.11→0.12 changed Mongo validator emission and made `mongodb` a
-  user-supplied peer dependency). Floor: MongoDB 8.0 and `mongodb@^7`.
+  user-supplied peer dependency). The 0.16 façade requires `mongodb@^7` and declares MongoDB 8.0 as its server floor.
 
 Prisma v6 side:
 
@@ -43,10 +41,10 @@ Prisma v6 side:
 
 Run these checks yourself — from the codebase, not by asking the user:
 
-- **Search the codebase for `$transaction` usage** (grep for `$transaction`). If present,
+- **Search the codebase for `$transaction` usage** (`rg '\$transaction'`). If present,
   plan the raw-driver session equivalents before migrating (see `client-api-mapping.md`) —
-  or stay on v6 until the façade wrapper lands.
-- **Check the MongoDB server version** (must be 8.0+ for Next; v6 tolerated older).
+  or stay on v6 until the façade exposes transactions.
+- **Read the MongoDB server version** with the project's existing driver/admin tooling; 0.16 requires MongoDB 8.0+. During a staged Prisma Next init, add `--probe-db` and inspect the reported value. Do not run `init` in the production working tree solely to check a version. `--strict-probe` escalates probe failures but a successfully detected below-minimum server is still reported as a warning.
 - **Confirm the team can absorb pre-1.0 upgrades.** Next publishes versioned upgrade recipes
   between minors; someone has to run them. For a production app, confirm the user accepts
   Early Access status before migrating.
@@ -83,5 +81,5 @@ Staying is a decision, not a default-by-neglect:
 
 ## References
 
-- [Prisma Next repository](https://github.com/prisma/prisma-next)
+- [Prisma repository (Prisma Next on main)](https://github.com/prisma/prisma)
 - [Prisma v6 MongoDB documentation](https://www.prisma.io/docs/orm/overview/databases/mongodb)

@@ -4,14 +4,14 @@ description: Decision and migration guide for Prisma ORM MongoDB projects on v6,
 license: MIT
 metadata:
   author: prisma
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Prisma MongoDB Upgrade Path
 
 MongoDB projects are the one Prisma cohort with no road into Prisma 7: **v6 is the terminal
 classic-ORM major for MongoDB, and v7 never ships a MongoDB connector**. The successor path
-is [Prisma Next](https://github.com/prisma/prisma-next), where MongoDB support is in Early
+is [Prisma Next](https://github.com/prisma/prisma), where MongoDB support is in Early
 Access with GA planned after Postgres. This skill frames the real decision — migrate to
 Prisma Next (the encouraged path), or stay on v6 where a hard blocker applies — and carries
 the migration mechanics.
@@ -27,7 +27,7 @@ the migration mechanics.
 
 | Version | MongoDB status |
 |---------|----------------|
-| Prisma ORM v6 | Fully supported (`mongodb` provider); latest 6.x is the current stable path; maintenance line |
+| Prisma ORM v6 | Fully supported (`mongodb` provider); `6.19.3` is the current maintained classic path verified for this guide |
 | Prisma ORM v7 | **No MongoDB connector — not an option, ever** |
 | Prisma Next | MongoDB support in **Early Access**, actively developed, GA planned after Postgres — the successor path for MongoDB projects |
 
@@ -40,7 +40,7 @@ detailed in the references.
 
 **Staying on the latest v6 remains a legitimate choice where a hard blocker applies** —
 stated plainly: the Next Mongo façade does not wrap transactions yet (the underlying driver
-is available directly; this is expected to change soon), and pre-1.0 minors can carry
+is available directly), and pre-1.0 minors can carry
 breaking changes with published upgrade recipes.
 
 ### Decision table
@@ -49,12 +49,9 @@ breaking changes with published upgrade recipes.
 |--------|-----------|
 | No blockers below apply | Migrate to Next; run the `verify-cutover-checklist` and share feedback with the Prisma team |
 | Greenfield / prototype / internal tool | Migrate to Next |
-| Codebase uses multi-document transactions (`$transaction`) — check with grep, do not ask | Plan raw-driver session equivalents first (see `client-api-mapping`), or stay on v6 until the façade wrapper lands |
+| Codebase uses multi-document transactions (`$transaction`) — check with `rg`, do not ask | Plan raw-driver session equivalents first (see `client-api-mapping`), or stay on v6 until the façade exposes transactions |
 | Team cannot absorb pre-1.0 breaking upgrades between minors | Stay on v6 until GA |
 | Risk-averse but interested | Run a staged Next round-trip on a copy (see `verify-cutover-checklist`), then migrate |
-
-Note: the transactions gap is expected to close soon — this section will be updated when
-façade transactions merge in Prisma Next.
 
 ### If staying on v6: hygiene (a deliberate stay, not neglect)
 
@@ -77,16 +74,15 @@ façade transactions merge in Prisma Next.
 ## Verified against
 
 Behavioral claims about Prisma Next in this skill were verified against
-[prisma/prisma-next](https://github.com/prisma/prisma-next) at commit
-`a2791c5dd59d579b4b3052942ae7f8fe5e2ee852` (pre-1.0, ~v0.14/0.15 line). Prisma Next moves
+[prisma/prisma](https://github.com/prisma/prisma) at commit
+`446acc` (`prisma-next` / `@prisma/orm-mongo` 0.16.0 line). Stable Prisma ORM 7 development lives on the repository's `v7` branch; main is Prisma Next. Prisma Next moves
 quickly in Early Access: **before acting on any Next-side claim, verify it against the
-version actually installed** (check the project's `@prisma-next/*` versions and the
-prisma-next skills installed with it). Next's Mongo target requires MongoDB 8.0+ and expects
-`mongodb@^7` as a user-supplied peer dependency.
+version actually installed** (check `prisma-next`, `@prisma/orm-mongo`, and the project-local
+Prisma Next skills). Prisma Next requires Node.js 24+. Its Mongo façade currently expects
+`mongodb@^7` as a user-supplied peer dependency and declares MongoDB 8.0 as its current server minimum. Use the version-matched quickstart skill's database probe and inspect the reported version; a below-minimum result is a warning even with `--strict-probe`.
 
 ## Hand-off rule
 
 This skill is the **discovery bridge**, not a replacement for Prisma Next's own
-documentation. After a project switches to Prisma Next, run Prisma Next's `init`/skill
-installation and follow its own skills (quickstart, contract, queries, migrations, runtime)
+documentation. After a project switches to Prisma Next, run `npx prisma-next@latest init --target mongodb` and let it install its version-matched skills. Follow those skills (quickstart, contract, queries, migrations, runtime)
 for day-to-day work — do not keep working from this skill's summaries.

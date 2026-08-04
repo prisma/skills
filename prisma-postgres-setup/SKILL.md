@@ -4,7 +4,7 @@ description: Set up a new Prisma Postgres database and connect it to a local pro
 license: MIT
 metadata:
   author: prisma
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Prisma Postgres Setup
@@ -20,15 +20,11 @@ Use this skill when:
 - Obtaining a connection string for Prisma Postgres
 - Provisioning a database via the Management API (not the Console UI)
 
-Do **not** use this skill when:
-
-- Setting up CI/CD preview databases — use `prisma-postgres-cicd`
-- Building multi-tenant database provisioning into an app — use `prisma-postgres-integrator`
-- Working with a database that already exists and is connected (schema/migration tasks are standard Prisma CLI)
+Do **not** use this skill for a database that already exists and is connected; schema and migration tasks belong to `prisma-cli`. For broader Console, CLI, SDK, or Management API operations, use `prisma-postgres`.
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20.19+ for Prisma ORM 7
 - A Prisma Postgres workspace (create one at https://console.prisma.io if needed)
 - A workspace service token (see `references/auth.md`)
 
@@ -97,9 +93,9 @@ The response is wrapped in `{ "data": { ... } }`. Extract:
 
 - `data.id` — the project ID (prefixed with `proj_`)
 - `data.database.id` — the database ID (prefixed with `db_`)
-- `data.database.connections[0].endpoints.direct.connectionString` — the direct PostgreSQL connection string
+- the direct connection string on the connection whose id matches `data.database.defaultConnectionId`
 
-Use the **direct** connection string (`endpoints.direct.connectionString`). Do not use the pooled or accelerate endpoints — those are for legacy Accelerate setups and not needed for new projects.
+Use that connection's **direct** `endpoints.direct.connectionString` for the `pg` adapter workflow. Pooled and Accelerate endpoints serve different runtimes; do not substitute them into this direct TCP setup.
 
 If the response status is `provisioning`, wait a few seconds and poll `GET /v1/databases/<database-id>` until `status` is `ready`.
 
@@ -143,7 +139,7 @@ DATABASE_URL="<direct-connection-string>"
 
 3. Verify `.gitignore` includes `.env`. Create `.gitignore` if it does not exist. Warn the user if `.env` is not gitignored.
 
-4. Ensure `package.json` has `"type": "module"` set (Prisma 7 generates ESM output).
+4. Match the generated client's module format to the application. Prisma 7 defaults to ESM; CommonJS remains supported with `moduleFormat = "cjs"` in the generator block. Do not force `"type": "module"` onto an existing CommonJS app.
 
 5. If `prisma/schema.prisma` does not exist, run `npx prisma init` to scaffold the project. This creates both `prisma/schema.prisma` and `prisma.config.ts`.
 
@@ -158,15 +154,16 @@ datasource db {
 7. Ensure `prisma.config.ts` loads the connection URL from the environment:
 
 ```typescript
-import path from 'node:path'
-import { defineConfig } from 'prisma/config'
 import 'dotenv/config'
+import { defineConfig, env } from 'prisma/config'
 
 export default defineConfig({
-  earlyAccess: true,
-  schema: path.join(import.meta.dirname, 'prisma', 'schema.prisma'),
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+  },
   datasource: {
-    url: process.env.DATABASE_URL!,
+    url: env('DATABASE_URL'),
   },
 })
 ```
@@ -188,9 +185,10 @@ Once the schema has models and the user is ready, create a migration and generat
 
 ```bash
 npx prisma migrate dev --name init
+npx prisma generate
 ```
 
-This creates migration files in `prisma/migrations/` **and** generates the client in one step. Migration history is essential for CI/CD workflows (`prisma migrate deploy`) and production deployments.
+This creates migration files in `prisma/migrations/`. Run `prisma generate` explicitly; do not rely on schema-sync commands to refresh generated files. Migration history is essential for CI/CD workflows (`prisma migrate deploy`) and production deployments.
 
 Only use `npx prisma db push` if the user explicitly asks for prototyping-only mode (no migration history). In that case, follow it with `npx prisma generate`.
 
@@ -202,19 +200,16 @@ Create a file named `test-connection.ts`:
 
 ```typescript
 import 'dotenv/config'
-import pg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from './generated/prisma/client.js'
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
-const adapter = new PrismaPg(pool)
+const adapter = new PrismaPg(process.env.DATABASE_URL!)
 const prisma = new PrismaClient({ adapter })
 
 const result = await prisma.$queryRawUnsafe('SELECT 1 as connected')
 console.log('Connected to Prisma Postgres:', result)
 
 await prisma.$disconnect()
-await pool.end()
 ```
 
 Run it:
@@ -224,9 +219,8 @@ npx tsx test-connection.ts
 ```
 
 **Prisma 7 client instantiation rules:**
-- Import from `./generated/prisma/client.js` (not `./generated/prisma`)
-- Create a `pg.Pool` with the `DATABASE_URL` connection string
-- Wrap it in a `PrismaPg` adapter
+- Import from the client entrypoint under the generator's configured `output` directory; include the runtime extension required by the project's module settings
+- Construct `PrismaPg` from a connection string/config, or supply a `pg.Pool` only when the app needs to own and tune that pool
 - Pass `{ adapter }` to the `PrismaClient` constructor
 - Do **not** use `datasourceUrl` — that option does not exist in Prisma 7
 - Do **not** use `new PrismaClient()` with no arguments — it will throw
@@ -236,7 +230,7 @@ After verification succeeds, delete `test-connection.ts`.
 Then share links for the user to explore their database:
 
 - **Prisma Studio (CLI):** `npx prisma studio` — opens a visual data browser locally
-- **Console:** `https://console.prisma.io/<workspaceId>/<projectId>/<databaseId>/dashboard` — strip the prefixes (`wksp_`, `proj_`, `db_`) from the IDs returned in Step 3 to build this URL
+- **Console:** open `https://console.prisma.io` and select the returned workspace, project, and database. Do not construct a deep link by stripping id prefixes; use a URL returned by the API/CLI when one is available.
 
 Read `references/prisma7-client.md` for the full client instantiation reference.
 

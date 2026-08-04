@@ -20,7 +20,20 @@ Complete reference for current Prisma ORM CLI commands. For Prisma Compute app d
 - `init`, `generate`, `dev` (local Prisma Postgres)
 - `migrate dev`, `migrate deploy`, `migrate reset`
 - `db push`, `db pull`, `db seed`, `db execute`
-- `studio`, `mcp`
+- `complete`, `studio`, `mcp`
+
+---
+
+### prisma-platform-cli
+
+Current reference for the public-beta Prisma Platform CLI (`@prisma/cli`; installed binary `prisma-cli`).
+
+**Use when:**
+- Authenticating or switching Prisma workspaces
+- Managing Projects, Prisma Postgres databases/connections/backups, buckets/keys, Git links, or platform branches
+- Installing/updating Prisma agent skills or submitting CLI feedback
+
+For Compute builds and deployments, use `prisma-compute`. For ORM migrations and generation, use `prisma-cli`.
 
 ---
 
@@ -95,7 +108,7 @@ Implementation guide for Prisma SQL driver adapter development.
 
 **Topics covered:**
 - Required adapter interfaces and contracts
-- Transaction lifecycle protocol (including nested transactions)
+- Transaction lifecycle protocol and connection-local savepoint hooks
 - `SqlQuery` argument mapping and `SqlResultSet` mapping
 - `ColumnTypeEnum` mapping strategy
 - Error conversion to `DriverAdapterError` / `MappedError`
@@ -145,6 +158,12 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 
 ---
 
+### prisma-postgres-setup
+
+Procedural Management API workflow for provisioning one Prisma Postgres database and connecting a Prisma ORM 7 project to it.
+
+---
+
 ### prisma-compute
 
 Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
@@ -176,12 +195,14 @@ Or install specific skills:
 
 ```bash
 npx skills add prisma/skills --skill prisma-cli
+npx skills add prisma/skills --skill prisma-platform-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres
+npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
 
@@ -220,7 +241,11 @@ Each skill contains:
 
 ## Prisma Version
 
-The ORM-focused skills target **Prisma ORM 7.6.x**.
+The stable ORM-focused skills target **Prisma ORM 7.9.1** (the latest stable release verified on 2026-08-04). Prisma ORM 7 is developed on the [`v7` branch](https://github.com/prisma/prisma/tree/v7); the repository's default branch now contains Prisma Next.
+
+The `prisma-platform-cli` skill tracks published `@prisma/cli@3.0.0-beta.29` plus source head `363d3d2` (including source-only plan-limit recovery), the `prisma-compute` SDK reference tracks `@prisma/compute-sdk@0.38.0`, and the Management API SDK reference tracks `@prisma/management-api-sdk@1.56.0`. These beta/independently versioned surfaces must still be verified from installed `--help` output, structured errors, and types before mutations.
+
+The `prisma-mongodb-upgrade` bridge tracks Prisma Next 0.16.0 and tells migrated projects to use Prisma Next's project-local, version-matched skills as the source of truth.
 
 The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 

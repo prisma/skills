@@ -41,6 +41,6 @@ Service tokens are workspace-scoped. A single token grants access to all project
 
 ## OAuth 2.0 (for user-scoped access)
 
-OAuth is used when acting on behalf of a user, typically in partner/integrator flows. See the `prisma-postgres-integrator` skill for OAuth details.
+OAuth is used when acting on behalf of a user, typically in partner/integrator flows. See the Management API SDK reference under `prisma-postgres` for the current OAuth/token-storage flow.
 
 For standard database setup, service tokens are the recommended authentication method.

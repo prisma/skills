@@ -22,7 +22,7 @@ history on disk.
 
 ## Prisma Next: first-class, contract-driven migrations (Mongo included)
 
-Migration authoring in Next is first-class for Postgres **and Mongo** (prisma-next
+Migration authoring in Next is first-class for Postgres **and Mongo** (`prisma/prisma`
 `skills/prisma-next-migrations/SKILL.md`) — MongoDB is not a push-only special case:
 
 - **Flow:** contract *emit* → diff → *plan* (writes a content-hashed migration package) →
@@ -62,4 +62,4 @@ mirroring how `db push` was used on v6.
 ## References
 
 - [v6: no Prisma Migrate for MongoDB](https://www.prisma.io/docs/orm/overview/databases/mongodb#no-support-for-prisma-migrate)
-- Prisma Next migrations skill (`skills/prisma-next-migrations`) — authoritative for the Next side; verified @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`
+- Prisma Next migrations skill (`skills/prisma-next-migrations`) — authoritative for the Next side; verified on the 0.16 line at `446acc`

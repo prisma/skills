@@ -133,7 +133,7 @@ prisma migrate dev
 prisma generate  # Run explicitly if needed
 ```
 
-Local verification with Prisma `7.6.0` showed no generated client files emitted by `migrate dev` or `db push`, even though some CLI help text still says `migrate dev` "trigger[s] generators".
+Current Prisma ORM 7 guidance is to run `prisma generate` explicitly after `migrate dev` or `db push` when generated output must be refreshed. Do not depend on historical help text that said migrations trigger generators.
 
 ### --skip-seed
 

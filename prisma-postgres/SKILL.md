@@ -4,7 +4,7 @@ description: Prisma Postgres setup and operations guidance across Console, creat
 license: MIT
 metadata:
   author: prisma
-  version: "7.7.0"
+  version: "7.9.1"
 ---
 
 # Prisma Postgres
@@ -72,7 +72,7 @@ Temporary databases auto-delete after ~24 hours unless claimed.
 For databases that belong to a Project (not throwaway `create-db` databases), use `@prisma/cli`:
 
 ```bash
-npx -y @prisma/cli@latest database create main --branch main
+npx -y @prisma/cli@latest database create --help
 npx -y @prisma/cli@latest database list --json
 npx -y @prisma/cli@latest database connection create db_123
 npx -y @prisma/cli@latest database usage db_123
@@ -80,6 +80,8 @@ npx -y @prisma/cli@latest database backup list db_123
 ```
 
 `database create` and `database connection create` print a one-time connection URL; store it immediately. Destructive commands (`remove`, `restore`) require exact `--confirm <id>`.
+
+For the full beta CLI surface and its current safety rules, use `prisma-platform-cli`.
 
 ### 3. Link an existing local project
 
@@ -124,6 +126,8 @@ npm install @prisma/management-api-sdk
 ```
 
 Use `createManagementApiClient` for existing tokens, or `createManagementApiSdk` for OAuth + token refresh.
+
+The current SDK line verified for this skill is `@prisma/management-api-sdk@1.56.0`. Always let the installed SDK types/OpenAPI document settle exact beta endpoint shapes. Version 1.56 adds typed workspace service-token list/create/revoke routes; a newly created token value is returned exactly once.
 
 ## Rule Files
 
