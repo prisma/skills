@@ -127,6 +127,7 @@ Use this skill for:
 - `runtime-bind-all-interfaces` - Deployed servers must bind on all interfaces (`0.0.0.0` or the framework equivalent), not hard-coded `localhost` or `127.0.0.1`.
 - `runtime-match-http-port` - The app must listen on the deployed HTTP port: read `process.env.PORT` when possible, or pass the matching `--http-port`.
 - `runtime-readiness-port-only` - Compute readiness watches listening ports; a loopback-only listener can look ready while public ingress cannot reach it.
+- `runtime-respond-within-60s` - The ingress gives an app 60 seconds to start responding, then returns `504 Gateway Time-out` and cancels the request. Design handlers to answer first and run longer work under `waitUntil` or from a queue, never inside the request.
 
 ### 5. Typed Compute Config
 

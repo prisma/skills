@@ -374,6 +374,7 @@ bunx @prisma/cli@latest app logs --json
 Fix by following the first concrete failure:
 
 - connection timeout or 5xx: check logs, host binding, and port mapping
+- `504 Gateway Time-out` with an `openresty` body about 60s in: the ingress request timeout, not the app; see Request Timeout below
 - unexpected status or body: verify the route path and app framework output
 - local URL tested by mistake: rerun against the public deployment URL, not `localhost` or `127.0.0.1`
 
@@ -395,6 +396,28 @@ Fix:
 - bind on `0.0.0.0` or the framework equivalent, such as Astro `server.host: true`
 - for Next.js standalone, do not deploy with `HOSTNAME=localhost`; use `HOSTNAME=0.0.0.0` if the host is overridden
 - keep port and host fixes together: `0.0.0.0:<deployed-http-port>`
+
+## Request Timeout
+
+Symptoms:
+
+- the public URL returns `504 Gateway Time-out` with a short `openresty` body, about 60 seconds after the request was sent
+- the app's own logs show the handler running, with no timeout error
+- the same route works whenever it starts responding in under 60 seconds
+- application timeouts set above 60 seconds never produce a response the caller sees
+
+Why this happens:
+
+Compute's ingress gives an app 60 seconds to start responding, then answers the client itself and cancels the request. The deadline covers the wait for the first bytes, not how long the response takes to finish, so a response that has already started streaming is not cut off. The app is not told directly; the cancellation surfaces as the request's abort signal. Once the request is cancelled, Compute stops counting it as in flight, so the instance can scale to zero while the handler is still working.
+
+Fix:
+
+- respond within 60 seconds; for webhooks, return `200` or `202` before doing the work
+- continue the work after the response with `waitUntil` or `KeepAwakeGuard` from `@prisma/compute`, which hold the instance awake on a best-effort basis
+- for work that must not be lost, persist a job and process it from a separate trigger in steps that each fit inside one request
+- keep in-request timeouts (`AbortSignal.timeout`, fetch timeouts) under 60 seconds so the app's own error handling runs first
+- check `req.signal` when a handler should stop work it no longer needs to finish
+- docs: https://www.prisma.io/docs/compute/request-timeout
 
 ## Env Changes Did Not Apply
 
