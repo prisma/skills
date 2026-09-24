@@ -1,0 +1,5 @@
+{
+  "name": "prisma-setup-eval-app",
+  "private": true,
+  "type": "module"
+}

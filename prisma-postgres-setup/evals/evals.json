@@ -1,0 +1,34 @@
+{
+  "skill_name": "prisma-postgres-setup",
+  "evaluation_type": "planning",
+  "evals": [
+    {
+      "id": 1,
+      "name": "connected-v0",
+      "source": "Reconstructed from an observed v0 session; evaluated against the proposed ORM 8 policy.",
+      "prompt": "Help me finish database setup for a todo app in v0. Prisma Postgres is already connected to this Vercel project as db_todo_existing. DATABASE_URL is available to the app through .env.development.local, but it is absent from the Bash environment. No ORM is installed yet. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Reuse the connected resource, resolve environment loading, and choose Prisma ORM 8 with the package-owned skill handoff.",
+      "files": [],
+      "expectations": [
+        "Reuses db_todo_existing without proposing another database or requesting a service token.",
+        "Explains loading the intended environment for CLI commands without exposing credentials.",
+        "Defaults to Prisma ORM 8 and hands ORM work to prisma-orm-setup.",
+        "Plans prisma skills sync followed by reading the version-matched prisma-8 skill before implementing ORM code."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "existing-prisma-7",
+      "source": "Synthetic requirement check: pause legacy setup for the upgrade workflow.",
+      "prompt": "Help me finish Prisma Postgres setup in our existing PostgreSQL app. It uses prisma@7.10.0, @prisma/client@7.10.0, and prisma/schema.prisma. The intended database is already connected. I have not approved a major-version upgrade. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Detect the legacy application and propose an applicable upgrade workflow without applying Prisma 8 setup to Prisma 7.",
+      "files": [],
+      "expectations": [
+        "Detects Prisma 7 and pauses setup for a separate upgrade to Prisma 8, rather than proposing to finish legacy setup.",
+        "Proposes an applicable upgrade skill, or clearly states it is unavailable and proposes Prisma's documentation for migrating Prisma ORM 7 to 8 on PostgreSQL.",
+        "Preserves existing packages, schema, and database until the upgrade workflow is authorized.",
+        "Does not present prisma-upgrade-v7 or the prisma-8 release-update reference as a 7-to-8 migration, or invent an available skill name."
+      ]
+    }
+  ]
+}
