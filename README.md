@@ -11,12 +11,14 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 Complete reference for current Prisma ORM CLI commands. For Prisma Compute app deployment, use `prisma-compute`.
 
 **Use when:**
+
 - Running Prisma ORM/database commands
 - Setting up new projects (`prisma init`)
 - Managing migrations and database schema
 - Generating Prisma Client
 
 **Commands covered:**
+
 - `init`, `generate`, `dev` (local Prisma Postgres)
 - `migrate dev`, `migrate deploy`, `migrate reset`
 - `db push`, `db pull`, `db seed`, `db execute`
@@ -29,11 +31,13 @@ Complete reference for current Prisma ORM CLI commands. For Prisma Compute app d
 Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes.
 
 **Use when:**
+
 - Upgrading existing projects to Prisma 7
 - Troubleshooting v7 compatibility issues
 - Understanding what changed in v7
 
 **Topics covered:**
+
 - ESM-first module configuration plus CommonJS fallback
 - Driver adapter requirements
 - New `prisma.config.ts` file
@@ -50,11 +54,13 @@ Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes
 Decision and migration guide for MongoDB projects on Prisma v6, which have no path to Prisma 7.
 
 **Use when:**
+
 - A MongoDB project asks about upgrading Prisma versions
 - Evaluating a move from Prisma v6 to Prisma Next
 - Preventing an impossible "upgrade MongoDB to v7" plan
 
 **Topics covered:**
+
 - The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma Next is the successor path)
 - Stay-on-v6 vs migrate-now decision table with no-go signals
 - Schema/contract, client API, and migrations mapping between v6 and Prisma Next
@@ -67,12 +73,14 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 Comprehensive Prisma Client API reference.
 
 **Use when:**
+
 - Writing Prisma Client queries
 - Understanding query options (select, include, where)
 - Working with transactions
 - Using raw SQL queries
 
 **Topics covered:**
+
 - PrismaClient constructor and configuration
 - CRUD operations (findMany, create, update, delete)
 - Query options (select, include, omit, orderBy, pagination)
@@ -88,12 +96,14 @@ Comprehensive Prisma Client API reference.
 Implementation guide for Prisma SQL driver adapter development.
 
 **Use when:**
+
 - Implementing a new SQL driver adapter
 - Modifying `SqlDriverAdapter` or `Transaction` behavior
 - Wiring migration-aware adapter factories
 - Debugging adapter type mapping or transaction issues
 
 **Topics covered:**
+
 - Required adapter interfaces and contracts
 - Transaction lifecycle protocol (including nested transactions)
 - `SqlQuery` argument mapping and `SqlResultSet` mapping
@@ -103,45 +113,21 @@ Implementation guide for Prisma SQL driver adapter development.
 
 ---
 
-### prisma-database-setup
+### prisma-orm-setup
 
-Guides for configuring Prisma with different database providers.
+Set up an application with **Prisma ORM 8** using the version-matched `prisma-8` skill shipped by [prisma/orm](https://github.com/prisma/orm/tree/main/skills).
 
-**Use when:**
-- Setting up a new project with a specific database
-- Connecting to PostgreSQL, MySQL, SQLite, MongoDB, etc.
-- Troubleshooting connection issues
-- Configuring connection strings
+**Use when:** initializing Prisma ORM, connecting an existing database, or assessing an earlier version before setup. Earlier versions require an applicable upgrade workflow; these setup skills do not contain legacy recipes.
 
-**Databases covered:**
-- PostgreSQL & Prisma Postgres
-- MySQL / MariaDB
-- SQLite
-- MongoDB
-- SQL Server
-- CockroachDB
+### prisma-postgres-setup
 
----
+Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Defaults to **Prisma ORM 8** unless the user explicitly requests another ORM, driver, or database-only setup.
 
-### prisma-postgres
+**Use when:** connecting Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
 
-Prisma Postgres workflows across Console, `create-db`, Management API, and SDK integrations.
+The former `prisma-database-setup` and `prisma-postgres` names remain as deprecated compatibility entries that load these replacements. Their duplicated setup recipes have been removed. Remove the compatibility entries only after consumers have migrated.
 
-**Use when:**
-- Setting up and managing Prisma Postgres in Prisma Console
-- Creating instant databases with `npx create-db`
-- Integrating programmatic provisioning with Management API
-- Building typed API integrations using `@prisma/management-api-sdk`
-- Handling auth, regions, claim flow, and connection details
-
-**Workflows covered:**
-- `npx create-db@latest`
-- `npx create-db@latest create --help`
-- `npx create-db@latest regions --help`
-- Programmatic `create-db` usage (`create()` and `regions()`)
-- Console operations (`https://console.prisma.io`)
-- Management API (`https://api.prisma.io/v1`)
-- Management API SDK (`@prisma/management-api-sdk`)
+See the [consolidation notes](docs/setup-skills.md) for what moved.
 
 ---
 
@@ -150,6 +136,7 @@ Prisma Postgres workflows across Console, `create-db`, Management API, and SDK i
 Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
 
 **Use when:**
+
 - Creating a new Prisma app with optional Compute deploy
 - Deploying or redeploying an existing app to Prisma Compute
 - Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts
@@ -157,6 +144,7 @@ Prisma Compute deployment and hosting workflows centered on the Prisma Platform 
 - Building programmatic Compute integrations with SDK/API tooling
 
 **Workflows covered:**
+
 - `@prisma/cli app build/run/deploy`
 - Generated `compute:deploy` scripts
 - `create-prisma --deploy` for new project scaffolds
@@ -180,8 +168,8 @@ npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
-npx skills add prisma/skills --skill prisma-database-setup
-npx skills add prisma/skills --skill prisma-postgres
+npx skills add prisma/skills --skill prisma-orm-setup
+npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
 
@@ -202,12 +190,15 @@ npx skills list
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected.
 
 **Examples:**
+
 ```
 Help me run Prisma migrations in production
 ```
+
 ```
 Upgrade my project from Prisma 6 to Prisma 7
 ```
+
 ```
 How do I use transactions in Prisma?
 ```
@@ -215,12 +206,15 @@ How do I use transactions in Prisma?
 ## Skill Structure
 
 Each skill contains:
+
 - `SKILL.md` - Main instructions with YAML frontmatter (name, description, metadata)
 - `references/` (optional) - Individual reference files with detailed explanations and code examples
 
 ## Prisma Version
 
-The ORM-focused skills target **Prisma ORM 7.6.x**.
+The two setup skills target **Prisma ORM 8**. Install both for the default Prisma Postgres workflow. Detailed Prisma 8 APIs come from the installed package-owned `prisma-8` skill after `prisma skills sync`.
+
+The existing `prisma-cli`, `prisma-client-api`, driver adapter, and earlier-version upgrade skills retain their existing scope; do not use their legacy recipes for Prisma 8 setup.
 
 The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 
