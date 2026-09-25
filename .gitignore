@@ -22,6 +22,10 @@ npm-debug.log*
 # Test
 coverage/
 
+# Generated evaluation runs (including the legacy output location)
+eval-results/
+/docs/eval-runs/
+
 # Temp
 *.tmp
 *.temp

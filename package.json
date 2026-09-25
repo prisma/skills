@@ -1,0 +1,19 @@
+{
+  "name": "prisma-skills",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "eval": "node --experimental-strip-types evals/run.ts",
+    "test": "node --experimental-strip-types --test evals/*.test.ts",
+    "check:types": "tsc --noEmit",
+    "format": "prettier --write 'evals/**/*.{ts,html,md,json}' package.json tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3"
+  }
+}

@@ -234,3 +234,7 @@ See [AGENTS.md](./AGENTS.md) for guidelines on creating and modifying skills.
 ## License
 
 MIT
+
+## Evaluating skills
+
+Run the [local OMP evaluator](evals/README.md) against a skill’s `evals.json`. It produces raw JSON and self-contained HTML reports with per-check evidence, recorded tool calls, and execution/judge token usage. Start with the two planning cases in [Prisma Postgres setup](prisma-postgres-setup/evals/README.md), then try the [execution case](prisma-postgres-setup/evals/execution/README.md) to inspect generated application files, diffs, and independent query verification. Direct ORM coverage is in [Prisma ORM setup evals](prisma-orm-setup/evals/README.md). Reports and run evidence stay local in the ignored `eval-results/` directory; see [saving and sharing results](evals/README.md#saving-and-sharing-results).
