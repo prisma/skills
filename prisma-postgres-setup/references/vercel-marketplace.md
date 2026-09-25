@@ -16,8 +16,4 @@ A general Prisma MCP provisioning tool creates a Prisma resource; that alone doe
 
 The agent calls MCP tools while building the app. The generated app connects through its ORM or database driver; it does not need to call MCP for normal database queries.
 
-## Distribution
-
-The host needs this reference and access to `prisma-orm-setup` as well as the main Postgres skill. Do not assume that publishing a GitHub change automatically refreshes v0's registered skill or that every host resolves sibling skills. Verify loading in v0 before releasing updated Marketplace content.
-
 Sources: [v0 databases](https://v0.app/docs/databases), [v0 MCP](https://v0.app/docs/MCP), [Vercel native integrations](https://vercel.com/docs/integrations/create-integration/native-integration).

@@ -29,7 +29,9 @@ For server-to-server API access, use a workspace service token from the user's s
 
 ## Temporary databases with create-db
 
-Use `create-db` only when a temporary, claimable development database fits the request. Inspect its current commands before creating:
+Use `create-db` only when a temporary, claimable development database fits the request. By default, the database is available for **24 hours** and is automatically deleted if unclaimed. Claim it through the returned claim URL **before its expiry** to keep it; claiming requires a Prisma account. Use the returned expiry as the deadline if a different lifetime was selected. See the [documented lifecycle](https://www.prisma.io/docs/postgres/introduction/npx-create-db#claiming-your-database).
+
+Inspect the current commands when selecting a region or a non-default lifetime:
 
 ```bash
 npx create-db@latest create --help

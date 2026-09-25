@@ -1,6 +1,6 @@
 ---
 name: prisma-postgres-setup
-description: Obtain or reuse a Prisma Postgres database and connect an application. Use for "set up Prisma Postgres", "connect my app to Prisma Postgres", or Prisma Postgres setup in v0 and Vercel Marketplace. Defaults to Prisma ORM 8 unless the user explicitly chooses another ORM, driver, or database-only setup.
+description: Obtain or reuse a Prisma Postgres database and connect an application. Use for "set up Prisma Postgres", "connect my app to Prisma Postgres", or Prisma Postgres setup in v0 and Vercel Marketplace. Defaults new ORM setups to Prisma ORM 8; preserves an existing application or an explicit ORM, driver, or database-only choice.
 license: MIT
 metadata:
   author: prisma
@@ -15,9 +15,8 @@ Connect the intended database, then verify it from the application. Keep provisi
 
 Check the user's requested ORM or driver, installed packages, database connection, and environment-loading files. Check secret presence without printing values.
 
-- Default to **Prisma ORM 8** when no alternative was requested.
+- Default new ORM setups to **Prisma ORM 8**; preserve an existing application's ORM.
 - Honor explicit choices such as Drizzle, `pg`, or database-only setup.
-- If Prisma 7 or earlier is present and Prisma ORM work is needed, load `prisma-orm-setup` for the upgrade handoff before changing packages or schema. Pause setup there until an authorized upgrade establishes a Prisma 8 app; do not proceed with legacy setup. A newer CLI alone does not mean the application was upgraded.
 - For query or schema work in an already configured app, use its version-matched ORM guidance; do not restart setup.
 
 ## 2. Reuse or obtain a database
@@ -39,7 +38,7 @@ Application processes and CLI commands may load different environment files. For
 
 ## 4. Configure the ORM and verify
 
-For the default Prisma ORM path, load **`prisma-orm-setup`** using the host's skill loader or read its installed `SKILL.md`. If it is not installed, obtain it from [prisma/skills](https://github.com/prisma/skills/tree/main/prisma-orm-setup). If that handoff is unavailable, report it; do not substitute Prisma 7 instructions. This skill does not own ORM configuration or migration recipes.
+For Prisma ORM setup, load **`prisma-orm-setup`** using the host's skill loader or read its installed `SKILL.md`. If it is not installed, obtain it from [prisma/skills](https://github.com/prisma/skills/tree/main/prisma-orm-setup). It owns version selection and routes existing applications to the appropriate guidance. If that handoff is unavailable, report it. This skill does not own ORM configuration or migration recipes.
 
 For an explicitly selected alternative, keep that ORM or driver and use its documented setup. For database-only setup, stop after verifying connectivity.
 
