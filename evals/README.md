@@ -138,3 +138,14 @@ npm test
 `run.ts` owns execution and grading. `report.ts` renders both reports from saved results; it makes no model calls. `types.ts` is their shared data contract. The CLI tests use a fake OMP executable to verify token arithmetic, repeated event snapshots, missing usage, malformed grading, failures, timeouts, input validation, HTML escaping, generated-file diffs, and verification failure precedence. Those tests do not establish model quality; real OMP runs do that for the supplied cases.
 
 References: [OMP programmatic usage and HTML export](https://github.com/can1357/oh-my-pi#programmatic-usage), [OMP settings](https://github.com/can1357/oh-my-pi/blob/main/docs/settings.md).
+
+## Version-routing regressions
+
+The restored database guidance has two small planning cases for existing MySQL/Prisma 7 and MongoDB/Prisma 6 apps. The CLI case checks that loading its Prisma 7 reference first still routes default new setup to Prisma 8.
+
+```sh
+npm run eval -- prisma-database-setup/evals/evals.json --model openai-codex/gpt-6-astra
+npm run eval -- prisma-cli/evals/evals.json --model openai-codex/gpt-6-astra
+```
+
+These check behavior after explicitly loading the named skill, not automatic skill discovery.

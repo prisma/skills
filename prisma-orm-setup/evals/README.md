@@ -7,7 +7,7 @@ Three planning cases check the ORM setup workflow directly:
 | Case                                 | What it checks                                                                                                   |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | Existing ORM 8 with stale guidance   | Preserve a working app and load instructions matching its ORM library version, independently of the CLI version. |
-| Prisma 7 client with CLI 8           | Detect the legacy application and stop at a separately authorized migration proposal.                            |
+| Prisma 7 client with CLI 8           | Detect the legacy application and route connection work to its existing-version guidance.                        |
 | Provider support not yet established | Verify ORM 8 support before installation; preserve the user's database and report unsupported configurations.    |
 
 Run all planning cases from the repository root:
@@ -28,4 +28,4 @@ npm run eval -- prisma-orm-setup/evals/execution/evals.json \
 
 Set `DATABASE_URL` for the disposable database before running. Use a fresh database for each execution suite and stop it afterward. Reports include generated code, diffs, independent verification, model grading, and separate executor/judge token usage.
 
-These are synthetic cases with explicit skill loading. They do not measure automatic skill selection, production migration safety, or support for every provider. No 7-to-8 application migration is executed; the legacy case checks the handoff decision only.
+These are synthetic cases with explicit skill loading. They do not measure automatic skill selection, production migration safety, or support for every provider. No 7-to-8 application migration is executed; the legacy case checks preserving the existing version and handing off connection work.

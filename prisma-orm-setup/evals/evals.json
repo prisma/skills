@@ -20,12 +20,12 @@
       "name": "legacy-client-with-new-cli",
       "source": "Synthetic requirement check: CLI 8 does not make an existing Prisma 7 app an ORM 8 app.",
       "prompt": "We installed prisma@8.0.0-rc.15, but our PostgreSQL app still imports @prisma/client@7.10.0 and uses prisma/schema.prisma. The intended database is connected. Finish the ORM setup, but I have not approved a major application upgrade. Describe your next steps only; do not install packages, call external services, or change files.",
-      "expected_output": "Recognize the legacy application despite its CLI version, stop setup at an upgrade proposal, and reference the applicable Prisma migration documentation.",
+      "expected_output": "Recognize the Prisma 7 application despite its CLI version and route setup to the existing-version database guidance without requiring a major upgrade.",
       "files": [],
       "expectations": [
-        "Identifies this as a Prisma 7 or mixed application based on the client and schema, rather than treating CLI 8 as proof of an ORM 8 application.",
-        "Pauses setup at an upgrade proposal and preserves dependencies, schema, configuration, and data until migration is authorized; does not propose completing legacy setup.",
-        "Uses an applicable discovered upgrade workflow or Prisma's ORM 7-to-8 PostgreSQL migration guide, without inventing a skill or using prisma-upgrade-v7 or the prisma-8 release-update reference as a 7-to-8 migration."
+        "Identifies the Prisma 7 or mixed application from its client and schema rather than treating CLI 8 as proof of an ORM 8 app.",
+        "Routes setup or connection work to prisma-database-setup and keeps the application on Prisma 7; does not block the task on an upgrade proposal.",
+        "Preserves the intended database and existing schema, and uses a CLI path compatible with the installed client instead of applying Prisma 8 initialization or package-owned runtime recipes."
       ]
     },
     {
@@ -33,12 +33,12 @@
       "name": "check-provider-support",
       "source": "Synthetic requirement check: verify ORM 8 provider support before setup and preserve the requested database.",
       "prompt": "Set up Prisma ORM for our Node application. We already have a MySQL database and no ORM installed. Keep MySQL and the existing database; changing providers is out of scope. We have not checked which Prisma ORM 8 release supports our provider and runtime. Describe your next steps only; do not install packages, call external services, or change files.",
-      "expected_output": "Check the selected ORM 8 release's documented provider and runtime support before installation. If unsupported or unverified, explain the blocker without switching database or falling back to Prisma 7.",
+      "expected_output": "Check the selected Prisma 8 release provider and runtime support. Preserve MySQL; if unsupported, offer a compatible earlier-version path through prisma-database-setup without selecting it for the user.",
       "files": [],
       "expectations": [
         "Plans to verify provider and runtime support for a selected Prisma ORM 8 release before installing or initializing it, rather than assuming Prisma 7 provider coverage carries over.",
         "Preserves MySQL and the existing database; does not switch to PostgreSQL or provision a replacement.",
-        "Does not fall back to Prisma 7 or invent a supported initialization target; reports a blocker if support cannot be established."
+        "If Prisma 8 support cannot be established, explains the limitation and offers a user-selected compatible earlier-version path through prisma-database-setup; does not silently fall back or invent a supported target."
       ]
     }
   ]

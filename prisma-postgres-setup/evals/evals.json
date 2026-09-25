@@ -19,15 +19,15 @@
     {
       "id": 3,
       "name": "existing-prisma-7",
-      "source": "Synthetic requirement check: pause legacy setup for the upgrade workflow.",
+      "source": "Synthetic regression check: preserve an existing Prisma 7 app when finishing its database connection.",
       "prompt": "Help me finish Prisma Postgres setup in our existing PostgreSQL app. It uses prisma@7.10.0, @prisma/client@7.10.0, and prisma/schema.prisma. The intended database is already connected. I have not approved a major-version upgrade. Describe your next steps only; do not install packages, call external services, or change files.",
-      "expected_output": "Detect the legacy application and propose an applicable upgrade workflow without applying Prisma 8 setup to Prisma 7.",
+      "expected_output": "Reuse the connected database and finish setup through the Prisma 7 database guidance without requiring a major upgrade.",
       "files": [],
       "expectations": [
-        "Detects Prisma 7 and pauses setup for a separate upgrade to Prisma 8, rather than proposing to finish legacy setup.",
-        "Proposes an applicable upgrade skill, or clearly states it is unavailable and proposes Prisma's documentation for migrating Prisma ORM 7 to 8 on PostgreSQL.",
-        "Preserves existing packages, schema, and database until the upgrade workflow is authorized.",
-        "Does not present prisma-upgrade-v7 or the prisma-8 release-update reference as a 7-to-8 migration, or invent an available skill name."
+        "Recognizes the existing Prisma 7 application and preserves its major version without requiring an upgrade to finish setup.",
+        "Hands ORM setup to prisma-orm-setup and its prisma-database-setup route, or directly selects the matching prisma-database-setup guidance.",
+        "Reuses the intended database and preserves the schema and dependencies unless a diagnosed setup issue requires a scoped change.",
+        "Plans to verify environment loading and a read-only query through the existing client without claiming those checks have already run."
       ]
     }
   ]

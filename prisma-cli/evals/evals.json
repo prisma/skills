@@ -1,0 +1,19 @@
+{
+  "skill_name": "prisma-cli",
+  "evaluation_type": "planning",
+  "evals": [
+    {
+      "id": 1,
+      "name": "new-app-init-routing",
+      "source": "Synthetic regression from review: loading the CLI reference first must not select Prisma 7 for default new setup.",
+      "prompt": "Run prisma init to add Prisma to our Node application. We have an existing PostgreSQL database, no ORM installed, and no Prisma version selected. Use the current default setup path and keep our database. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Recognize the CLI reference is scoped to Prisma 7 and load prisma-orm-setup for the default Prisma 8 path.",
+      "files": [],
+      "expectations": [
+        "Routes to prisma-orm-setup for default new setup rather than following the Prisma 7 init examples in prisma-cli.",
+        "Plans a supported Prisma 8 release and the package-owned skill handoff while preserving the existing PostgreSQL database.",
+        "Does not install floating prisma@latest or use legacy schema.prisma/defineConfig/PrismaClient setup as the Prisma 8 recipe."
+      ]
+    }
+  ]
+}
