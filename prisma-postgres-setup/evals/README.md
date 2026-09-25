@@ -7,7 +7,7 @@ Start with [evals.json](evals.json). It contains two cases:
 | Case                  | What it catches                                                                                                     |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Connected v0 database | Creating a duplicate database, mistaking missing shell variables for a missing database, or defaulting to Prisma 7. |
-| Existing Prisma 7 app | Applying Prisma 8 setup directly to a legacy app or using the wrong upgrade guide.                                  |
+| Existing Prisma 7 app | Applying Prisma 8 setup to a legacy app or requiring an upgrade to repair its connection.                           |
 
 Each case has a `prompt`, a short `expected_output`, and individual `expectations`. The expectations are the grader's checklist, not extra instructions for the agent being tested.
 
