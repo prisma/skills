@@ -25,11 +25,11 @@ the migration mechanics.
 
 ## The version landscape
 
-| Version | MongoDB status |
-|---------|----------------|
-| Prisma ORM v6 | Fully supported (`mongodb` provider); latest 6.x is the current stable path; maintenance line |
-| Prisma ORM v7 | **No MongoDB connector — not an option, ever** |
-| Prisma Next | MongoDB support in **Early Access**, actively developed, GA planned after Postgres — the successor path for MongoDB projects |
+| Version       | MongoDB status                                                                                                               |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Prisma ORM v6 | Fully supported (`mongodb` provider); latest 6.x is the current stable path; maintenance line                                |
+| Prisma ORM v7 | **No MongoDB connector — not an option, ever**                                                                               |
+| Prisma Next   | MongoDB support in **Early Access**, actively developed, GA planned after Postgres — the successor path for MongoDB projects |
 
 ## The decision, up front
 
@@ -45,13 +45,13 @@ breaking changes with published upgrade recipes.
 
 ### Decision table
 
-| Signal | Direction |
-|--------|-----------|
-| No blockers below apply | Migrate to Next; run the `verify-cutover-checklist` and share feedback with the Prisma team |
-| Greenfield / prototype / internal tool | Migrate to Next |
+| Signal                                                                                   | Direction                                                                                                          |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| No blockers below apply                                                                  | Migrate to Next; run the `verify-cutover-checklist` and share feedback with the Prisma team                        |
+| Greenfield / prototype / internal tool                                                   | Migrate to Next                                                                                                    |
 | Codebase uses multi-document transactions (`$transaction`) — check with grep, do not ask | Plan raw-driver session equivalents first (see `client-api-mapping`), or stay on v6 until the façade wrapper lands |
-| Team cannot absorb pre-1.0 breaking upgrades between minors | Stay on v6 until GA |
-| Risk-averse but interested | Run a staged Next round-trip on a copy (see `verify-cutover-checklist`), then migrate |
+| Team cannot absorb pre-1.0 breaking upgrades between minors                              | Stay on v6 until GA                                                                                                |
+| Risk-averse but interested                                                               | Run a staged Next round-trip on a copy (see `verify-cutover-checklist`), then migrate                              |
 
 Note: the transactions gap is expected to close soon — this section will be updated when
 façade transactions merge in Prisma Next.
@@ -61,18 +61,18 @@ façade transactions merge in Prisma Next.
 - Pin the Prisma packages to the latest 6.x line and keep taking 6.x patch releases.
 - Track Prisma release notes and security advisories for the 6.x line.
 - Keep the classic v6 MongoDB setup: `url = env("DATABASE_URL")` in the schema, `db push`
-  workflow, no SQL driver adapters (see `prisma-database-setup` for the v6 MongoDB shape).
+  workflow, no SQL driver adapters (see the [Prisma 6 MongoDB documentation](https://www.prisma.io/docs/v6/orm/overview/databases/mongodb) for the legacy shape).
 - Re-evaluate when Prisma Next's MongoDB is GA, or when blockers for trying EA are resolved.
 
 ## Reference files
 
-| Reference | What it covers |
-|-----------|----------------|
-| `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail |
-| `references/schema-contract-mapping.md` | v6 schema (`mongodb` provider, `@db.ObjectId`, composite types) → Next contract concepts |
-| `references/client-api-mapping.md` | v6 client calls → Next equivalents, incl. raw escape hatches and transactions — names map, parity does not |
-| `references/migrations-mapping.md` | v6 `db push`-only story → Next's plan/migrate/verify/sign flow |
-| `references/verify-cutover-checklist.md` | No-data-moves verification: same DB, index parity, staged round-trip before cutover |
+| Reference                                | What it covers                                                                                             |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail                                         |
+| `references/schema-contract-mapping.md`  | v6 schema (`mongodb` provider, `@db.ObjectId`, composite types) → Next contract concepts                   |
+| `references/client-api-mapping.md`       | v6 client calls → Next equivalents, incl. raw escape hatches and transactions — names map, parity does not |
+| `references/migrations-mapping.md`       | v6 `db push`-only story → Next's plan/migrate/verify/sign flow                                             |
+| `references/verify-cutover-checklist.md` | No-data-moves verification: same DB, index parity, staged round-trip before cutover                        |
 
 ## Verified against
 

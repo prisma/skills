@@ -1,6 +1,6 @@
 # SQL Server Setup
 
-Configure Prisma with Microsoft SQL Server.
+Configure **Prisma ORM 7** with SQL Server. For an existing Prisma 6 app, keep its configuration and use the [Prisma 6 docs](https://www.prisma.io/docs/orm/v6); the configuration and adapter examples below are for 7.
 
 ## Prerequisites
 
@@ -27,14 +27,15 @@ generator client {
 In `prisma.config.ts`:
 
 ```typescript
-import { defineConfig, env } from 'prisma/config'
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: "prisma/schema.prisma",
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env("DATABASE_URL"),
   },
-})
+});
 ```
 
 ## 3. Environment Variable
@@ -59,36 +60,44 @@ sqlserver://HOST:PORT;database=DB;user=USER;password=PASS;encrypt=true;trustServ
 Use a driver adapter for the standard SQL workflow.
 
 1. Install adapter and driver:
+
    ```bash
-   npm install @prisma/adapter-mssql mssql
+   npm install @prisma/adapter-mssql@7 mssql
    ```
 
-2. Instantiate Prisma Client with the adapter:
+2. Set `SQLSERVER_USER` and `SQLSERVER_PASSWORD` in the application environment to match the CLI URL, and use the same server, port, database, and TLS options. The following example is for local development with a self-signed certificate; use certificate verification for hosted databases. Instantiate Prisma Client with the adapter:
+
    ```typescript
-   import 'dotenv/config'
-   import { PrismaClient } from '../generated/client'
-   import { PrismaMssql } from '@prisma/adapter-mssql'
+   import "dotenv/config";
+   import { PrismaClient } from "../generated/client";
+   import { PrismaMssql } from "@prisma/adapter-mssql";
 
    const adapter = new PrismaMssql({
-     server: 'localhost',
+     server: "localhost",
      port: 1433,
-     database: 'mydb',
+     database: "mydb",
      user: process.env.SQLSERVER_USER,
      password: process.env.SQLSERVER_PASSWORD,
      options: {
        encrypt: true,
        trustServerCertificate: true,
      },
-   })
+   });
 
-   const prisma = new PrismaClient({ adapter })
+   const prisma = new PrismaClient({ adapter });
    ```
 
 ## Common Issues
 
 ### "Login failed for user"
+
 - SQL Server auth vs Windows auth. Prisma typically uses SQL Server authentication (username/password).
 - Ensure TCP/IP is enabled in SQL Server Configuration Manager.
 
 ### "Table not found" (dbo schema)
-Prisma assumes `dbo` schema by default. If using another schema, update the model or connection string? SQL Server provider mostly sticks to default schema.
+
+Check that the connection URL's `schema` parameter (normally `dbo`) matches the intended schema. Preserve an existing multi-schema configuration and model mappings.
+
+## References
+
+- [Prisma 7 SQL Server documentation](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/sql-server)

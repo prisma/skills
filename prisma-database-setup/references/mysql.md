@@ -1,6 +1,6 @@
 # MySQL Setup
 
-Configure Prisma with MySQL (or MariaDB).
+Configure **Prisma ORM 7** with MySQL and MariaDB. For an existing Prisma 6 app, keep its configuration and use the [Prisma 6 docs](https://www.prisma.io/docs/orm/v6); the configuration and adapter examples below are for 7.
 
 ## Prerequisites
 
@@ -27,14 +27,15 @@ generator client {
 In `prisma.config.ts`:
 
 ```typescript
-import { defineConfig, env } from 'prisma/config'
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: "prisma/schema.prisma",
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env("DATABASE_URL"),
   },
-})
+});
 ```
 
 ## 3. Environment Variable
@@ -62,26 +63,28 @@ mysql://USER:PASSWORD@HOST:PORT/DATABASE
 Use a driver adapter for the standard SQL workflow.
 
 1. Install adapter and driver:
+
    ```bash
-   npm install @prisma/adapter-mariadb mariadb
+   npm install @prisma/adapter-mariadb@7 mariadb
    ```
 
-2. Instantiate Prisma Client with the adapter:
+2. Set `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DATABASE` in the application environment to match the CLI URL, and use the same host and port. Instantiate Prisma Client with the adapter:
+
    ```typescript
-   import 'dotenv/config'
-   import { PrismaClient } from '../generated/client'
-   import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+   import "dotenv/config";
+   import { PrismaClient } from "../generated/client";
+   import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
    const adapter = new PrismaMariaDb({
-     host: 'localhost',
+     host: "localhost",
      port: 3306,
      connectionLimit: 5,
      user: process.env.MYSQL_USER,
      password: process.env.MYSQL_PASSWORD,
      database: process.env.MYSQL_DATABASE,
-   })
+   });
 
-   const prisma = new PrismaClient({ adapter })
+   const prisma = new PrismaClient({ adapter });
    ```
 
 ### Text protocol option
@@ -89,21 +92,21 @@ Use a driver adapter for the standard SQL workflow.
 If you need the MariaDB driver's text protocol instead of the default binary `execute()` path, enable `useTextProtocol` explicitly:
 
 ```typescript
-import { PrismaClient } from '../generated/client'
-import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import { PrismaClient } from "../generated/client";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL!, {
   useTextProtocol: true,
-})
+});
 
-const prisma = new PrismaClient({ adapter })
+const prisma = new PrismaClient({ adapter });
 ```
 
 Use this only when you specifically need text-protocol compatibility for your MariaDB setup.
 
 ## PlanetScale Setup
 
-PlanetScale uses MySQL but requires specific settings because it doesn't support foreign key constraints.
+Check whether foreign key constraints are enabled on the PlanetScale database. When they are disabled, use `relationMode = "prisma"` and add indexes for relation fields. Do not override an existing database that has foreign keys enabled.
 
 In `prisma/schema.prisma`:
 
@@ -117,10 +120,16 @@ datasource db {
 ## Common Issues
 
 ### "Too many connections"
-MySQL has a connection limit. Adjust connection pool size in URL:
-```env
-DATABASE_URL="mysql://...?connection_limit=5"
-```
+
+Set `connectionLimit` on `PrismaMariaDb`, as in the example above. The Prisma 6 `connection_limit` URL parameter does not configure the Prisma 7 adapter pool.
 
 ### JSON Support
+
 MySQL 5.7+ supports JSON. MariaDB 10.2+ supports JSON (as an alias for LONGTEXT with check constraints). Prisma handles this, but verify your version.
+
+## References
+
+- [Prisma 7 connection pool settings](https://www.prisma.io/docs/orm/v7/prisma-client/setup-and-configuration/databases-connections/connection-pool)
+- [PlanetScale foreign key configuration](https://www.prisma.io/docs/orm/v7/overview/databases/planetscale)
+
+- [Prisma 7 MySQL and MariaDB documentation](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/mysql)

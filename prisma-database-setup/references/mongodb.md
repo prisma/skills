@@ -1,14 +1,13 @@
 # MongoDB Setup
 
-MongoDB projects should stay on the latest Prisma 6.x release. Do not upgrade a MongoDB app to Prisma 7's SQL client path.
+This reference configures **Prisma ORM 6 MongoDB** applications. Preserve an existing Prisma 6 app or use this path when 6 is explicitly selected. For new Prisma 8 setup, use `prisma-orm-setup`; do not apply Prisma 7 SQL adapters here.
 
 ## Prerequisites
 
 - MongoDB 4.2+
 - Replica Set configured (required for transactions)
 - Latest Prisma 6.x release, or your team's pinned Prisma 6 version
-- Node.js 20.19.0+
-- TypeScript 5.4.0+
+- A Node.js and TypeScript version supported by the selected Prisma 6 release
 
 ## 1. Schema Configuration
 
@@ -40,6 +39,7 @@ model User {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
   name  String?
+  posts Post[]
 }
 ```
 
@@ -69,22 +69,36 @@ DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/mydb?retryWrites=t
 - **db push**: Use `prisma db push` to sync indexes and constraints.
 - **db pull**: Use `prisma db pull` to generate schema from existing data (sampling).
 
-## Current Verification Notes
+## Client setup
 
-- `prisma init --datasource-provider mongodb` is still implemented in Prisma's CLI source.
-- Prisma's upstream repo still contains MongoDB fixtures and tests.
-- Local verification shows Prisma 7 can still recognize MongoDB inputs, but the generated client path does not provide a supported MongoDB upgrade path.
-- Local verification shows Prisma 6.x works end to end with `prisma-client-js`, `prisma db push`, and `new PrismaClient()` against a MongoDB replica set.
+Keep existing pinned versions. For a new explicitly selected Prisma 6 setup:
 
-## Version Guidance
+```bash
+npm install --save-dev prisma@6
+npm install @prisma/client@6 dotenv
+```
 
-- For MongoDB, stay on the latest available Prisma 6.x release.
-- Treat Prisma 7 MongoDB migration attempts as unsupported until Prisma ships a real MongoDB upgrade path.
+Generate with the matching CLI, then initialize the client without a SQL adapter:
+
+```typescript
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+```
+
+Use a read-only model query to verify connectivity. Review any index changes before applying `db push` to an existing database.
 
 ## Common Issues
 
 ### "Transactions not supported"
+
 Ensure your MongoDB instance is a **Replica Set**. Standalone instances do not support transactions. Atlas clusters are replica sets by default.
 
 ### "Invalid ObjectID"
+
 Ensure fields referencing IDs are decorated with `@db.ObjectId` if the target is an ObjectID.
+
+## References
+
+- [Prisma 6 MongoDB connector](https://www.prisma.io/docs/orm/v6/overview/databases/mongodb)

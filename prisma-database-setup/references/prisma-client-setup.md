@@ -1,13 +1,15 @@
 # Prisma Client Setup
 
-Generate and instantiate Prisma Client for Prisma's standard SQL provider workflow. For MongoDB, follow the provider-specific notes in `references/mongodb.md` instead of copying the SQL adapter example below.
+Generate and instantiate **Prisma ORM 7** Client for SQL providers. For MongoDB, follow [Prisma 6 MongoDB setup](mongodb.md). For an existing Prisma 6 SQL app, preserve its client setup rather than copying these examples.
 
 ## 1. Install dependencies
 
 ```bash
-npm install prisma --save-dev
-npm install @prisma/client
+npm install --save-dev prisma@7
+npm install @prisma/client@7 dotenv
 ```
+
+For an existing application, retain its pinned releases. For a new Prisma 7 application, use compatible CLI, client, and adapter versions and check the [Prisma 7 runtime requirements](https://www.prisma.io/docs/guides/upgrade-prisma-orm/v7#prerequisites).
 
 ## 2. Add generator block
 
@@ -33,11 +35,12 @@ Re-run `prisma generate` after every schema change to keep the client in sync.
 ## 4. Instantiate Prisma Client
 
 ```typescript
-import { PrismaClient } from '../generated/client'
-import { PrismaPg } from '@prisma/adapter-pg'
+import "dotenv/config";
+import { PrismaClient } from "../generated/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
-const prisma = new PrismaClient({ adapter })
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 ```
 
 If you change the generator `output`, update the import path to match. For the SQL provider workflow, replace `PrismaPg` with the adapter for your database.

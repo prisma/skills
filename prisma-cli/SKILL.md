@@ -1,24 +1,27 @@
 ---
 name: prisma-cli
-description: Prisma ORM CLI commands reference covering init, generate, migrate, db, dev, complete, studio, validate, format, debug, and mcp. Use for ORM/database CLI workflows, not the Prisma Platform CLI. Triggers on "prisma init", "prisma generate", "prisma migrate", "prisma db", "prisma complete", "prisma studio", "prisma mcp".
+description: Prisma ORM 7 CLI reference for existing Prisma 7 applications or explicitly selected Prisma 7 workflows. Covers prisma init, generate, migrate, db, dev, studio, and mcp. For default new setup or Prisma 8, use prisma-orm-setup; not the Prisma Platform CLI.
 license: MIT
 metadata:
   author: prisma
   version: "7.9.1"
 ---
 
-# Prisma CLI Reference
+# Prisma ORM 7 CLI reference
 
-Reference for Prisma ORM CLI commands. This skill provides guidance on command usage, options, and best practices for current Prisma ORM releases.
+These commands and examples apply to **Prisma ORM 7**. For new setup without an explicit version choice or a Prisma 8 application, load [prisma-orm-setup](../prisma-orm-setup/SKILL.md). For Prisma 6/7 connection configuration, load [prisma-database-setup](../prisma-database-setup/SKILL.md).
+
+Use the project's version-matched CLI. Do not install a floating `prisma@latest` to run these commands.
 
 ## Boundary: Platform and Compute
 
-Do not confuse the stable ORM command (`prisma`) with the public-beta Platform package (`@prisma/cli`, binary `prisma-cli`). Use `prisma-compute` for Compute apps and workspace auth, and `prisma-postgres` for Platform projects and databases.
+Do not confuse the stable ORM command (`prisma`) with the public-beta Platform package (`@prisma/cli`, binary `prisma-cli`). Use `prisma-compute` for Compute apps and workspace auth, and `prisma-postgres-setup` for Platform projects and databases.
 
 ## When to Apply
 
 Reference this skill when:
-- Setting up a new Prisma project (`prisma init`)
+
+- Setting up an explicitly selected Prisma 7 project (`prisma init`)
 - Generating Prisma Client (`prisma generate`)
 - Running database migrations (`prisma migrate`)
 - Managing database state (`prisma db push/pull`)
@@ -28,26 +31,26 @@ Reference this skill when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Setup | HIGH | `init` |
-| 2 | Generation | HIGH | `generate` |
-| 3 | Development | HIGH | `dev` |
-| 4 | Database | HIGH | `db-` |
-| 5 | Migrations | CRITICAL | `migrate-` |
-| 6 | Utility | MEDIUM | `complete`, `studio`, `validate`, `format`, `debug`, `mcp` |
+| Priority | Category    | Impact   | Prefix                                                     |
+| -------- | ----------- | -------- | ---------------------------------------------------------- |
+| 1        | Setup       | HIGH     | `init`                                                     |
+| 2        | Generation  | HIGH     | `generate`                                                 |
+| 3        | Development | HIGH     | `dev`                                                      |
+| 4        | Database    | HIGH     | `db-`                                                      |
+| 5        | Migrations  | CRITICAL | `migrate-`                                                 |
+| 6        | Utility     | MEDIUM   | `complete`, `studio`, `validate`, `format`, `debug`, `mcp` |
 
 ## Command Categories
 
-| Category | Commands | Purpose |
-|----------|----------|---------|
-| Setup | `init` | Initialize a Prisma project |
-| Generation | `generate` | Generate Prisma Client |
-| Validation | `validate`, `format` | Schema validation and formatting |
-| Development | `dev` | Local Prisma Postgres for development |
-| Database | `db pull`, `db push`, `db seed`, `db execute` | Direct database operations |
-| Migrations | `migrate dev`, `migrate deploy`, `migrate reset`, `migrate status`, `migrate diff`, `migrate resolve` | Schema migrations |
-| Utility | `complete`, `studio`, `mcp`, `version`, `debug` | Shell, development, and AI tooling |
+| Category    | Commands                                                                                              | Purpose                               |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Setup       | `init`                                                                                                | Initialize a Prisma project           |
+| Generation  | `generate`                                                                                            | Generate Prisma Client                |
+| Validation  | `validate`, `format`                                                                                  | Schema validation and formatting      |
+| Development | `dev`                                                                                                 | Local Prisma Postgres for development |
+| Database    | `db pull`, `db push`, `db seed`, `db execute`                                                         | Direct database operations            |
+| Migrations  | `migrate dev`, `migrate deploy`, `migrate reset`, `migrate status`, `migrate diff`, `migrate resolve` | Schema migrations                     |
+| Utility     | `complete`, `studio`, `mcp`, `version`, `debug`                                                       | Shell, development, and AI tooling    |
 
 ## Quick Reference
 
@@ -203,19 +206,19 @@ Read `references/agent-safety.md` before any destructive Prisma command.
 Use `prisma.config.ts` for CLI configuration:
 
 ```typescript
-import 'dotenv/config'
-import { defineConfig, env } from 'prisma/config'
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: "prisma/schema.prisma",
   migrations: {
-    path: 'prisma/migrations',
-    seed: 'tsx prisma/seed.ts',
+    path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env("DATABASE_URL"),
   },
-})
+});
 ```
 
 ### Current Command Behavior
@@ -230,7 +233,7 @@ Load environment variables explicitly in `prisma.config.ts`, commonly with `dote
 
 ```typescript
 // prisma.config.ts
-import 'dotenv/config'
+import "dotenv/config";
 ```
 
 ## Rule Files
