@@ -8,45 +8,58 @@ HIGH
 
 ## Why It Matters
 
-Prisma 8 does not consume the v6 `schema.prisma` as-is: the schema becomes a *contract*
-(authored in PSL or TypeScript via the contract builder), and several v6 MongoDB idioms have
-different — or deliberately absent — equivalents. Translating mechanically without knowing
-the mapping produces contracts that fail verification or, worse, silently change collection
-addressing.
+Prisma 8 describes the database with a *contract* (authored in PSL or TypeScript), and
+several v6 MongoDB idioms have different equivalents. Translating mechanically without
+knowing the mapping produces contracts that fail `contract emit` or verification, or that
+silently change collection addressing.
+
+## Start without porting
+
+Prisma 8 can read the v6 `schema.prisma` directly: set
+`contract: prisma6Schema('prisma/schema.prisma')` in `prisma.config.ts`, with `prisma6Schema`
+from `@prisma/orm-mongo/config`. v6 keeps owning the database; after each schema change there,
+run `prisma contract emit` and `prisma db sign`. A construct Prisma 8 cannot express fails
+`contract emit` with a `PSL.PRISMA6_MONGO_*` diagnostic. Port the schema to a contract when
+you need what v6 syntax cannot express, such as polymorphism.
 
 ## The mapping
 
 | v6 concept | Prisma 8 equivalent | Notes |
 |------------|------------------------|-------|
-| `datasource db { provider = "mongodb" }` + `url = env(...)` ([v6 docs](https://www.prisma.io/docs/orm/overview/databases/mongodb#example)) | `defineConfig` from `@prisma-next/mongo/config` wiring the mongo family/target/adapter/driver descriptors | Prisma 8 selects MongoDB by importing the `@prisma-next/mongo` façade, not by a provider string in the schema; `prisma-next init` accepts `mongodb` as a target name |
-| `@id @default(auto()) @map("_id") @db.ObjectId` ([using ObjectId](https://www.prisma.io/docs/orm/overview/databases/mongodb#using-objectid)) | ObjectId-typed id field in the Prisma 8 contract (PSL or TS builder) | Verify the exact attribute surface against the installed Prisma 8 version's `prisma-next-contract` skill — the contract builder also exposes `index` and `valueObject` |
-| Composite (embedded) types — MongoDB-only in v6 ([composite types](https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/composite-types)) | Value objects / embedded shapes in the Prisma 8 contract (`valueObject` in the Mongo contract builder) | Same conceptual role: documents embedded in a parent document |
-| Model names address the client (`prisma.user`) | **Collection storage names** address the ORM: `db.orm.users`, i.e. the `@@map(...)` name or the lowercased model name — not `db.orm.User` | prisma-next `skills/prisma-next/SKILL.md`, `skills/prisma-next-quickstart/SKILL.md`; the most common porting mistake |
-| Indexes declared in schema, applied by `db push` | Indexes are contract-declared and applied through migrations (`createIndex`/`dropIndex` factories) | See `migrations-mapping.md` |
-| No native polymorphism | No schema-layer polymorphism on Mongo either: `@@base`/`@@discriminator` are SQL-only in Prisma 8; model an explicit `discriminator` field | prisma-next `skills/prisma-next-contract/SKILL.md` |
+| (nothing) | `// use prisma-8` as the first line of `contract.prisma` | Without it, `contract emit` fails with `CONTRACT.SOURCE_LOAD_FAILED` |
+| `datasource db { provider = "mongodb" }` + `url = env(...)` ([v6 docs](https://www.prisma.io/docs/orm/overview/databases/mongodb#example)) | No provider in the contract. `prisma.config.ts` wraps `defineConfig` from `@prisma/orm-mongo/config` in `definePrismaConfig`, with `db.connection` | `prisma orm init --target mongodb` scaffolds it; point the connection at the same database v6 uses |
+| `id String @id @default(auto()) @map("_id") @db.ObjectId` ([using ObjectId](https://www.prisma.io/docs/orm/overview/databases/mongodb#using-objectid)) | `id ObjectId @id @map("_id")` | |
+| `Int`, `Float`, `Boolean`, `DateTime` | `Int32`, `Double`, `Bool`, `Date` | The v6 names still work with a `PSL_DEPRECATED_SCALAR_NAME` warning; a later release removes them |
+| `BigInt`, `Decimal`, `Bytes`, `Json` | `Int64`, `Decimal128`, `Binary`, `Json` | `Json` holds only JSON values; type a field that holds other BSON values, such as a `Date`, as `Bson` |
+| `@default(now())`, `@updatedAt` | `temporal.createdAt()`, `temporal.updatedAt()` | |
+| Composite types: `type Address { ... }` ([composite types](https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/composite-types)) | `type Address { ... }` | Unchanged |
+| Enums read and written by key | Enums read and write their **storage value** (`role: 'author'`, not `'Author'`) | Declare the storage value in the enum, for example `Author = "author"` |
+| Model names address the client (`prisma.user`) | **Collection names** address the ORM: `db.orm.users` — the `@@map(...)` value, or the model name exactly as written when there is no `@@map`. `db.orm.User` does not exist for a model mapped to `users` | The most common porting mistake |
+| Indexes declared in schema, applied by `db push` | `@@index(...)` / `@@unique(...)` in the contract, applied by migrations | See `migrations-mapping.md` |
+| No native polymorphism | `@@discriminator(field)` on the base model and `@@base(Base, "value")` on each variant | Declare a variant for **every** value the field has in existing data: the generated validator rejects writes to documents with an undeclared value. A variant must declare at least one field |
 
 ## Bad
 
 ```typescript
 // Ported from v6 and addressed by model name:
-const user = await db.orm.User.first(); // undefined — Mongo ORM keys are storage names
+const user = await db.orm.User.where({ email }).first(); // no such key — the collection is mapped to "users"
 ```
 
 ## Good
 
 ```typescript
-// Mongo ORM keys are collection storage names (@@map or lowercased model name):
-const user = await db.orm.users.first();
+// Mongo ORM keys are collection names (@@map value, or the model name as written):
+const user = await db.orm.users.where({ email }).first();
 ```
 
 ## Environment requirements
 
-Prisma 8's Mongo target requires MongoDB 8.0+ and `mongodb@^7` installed by the user as a
-peer dependency (prisma-next `CHANGELOG.md`, 0.11→0.12). v6 supports older MongoDB servers,
-so check the server version before planning a migration.
+Prisma 8 on MongoDB requires MongoDB 8.0+ and `mongodb@7` as a peer dependency. v6 supports
+older MongoDB servers, so check the server version before planning a migration.
 
 ## References
 
+- [Prisma ORM 6 to 8 (MongoDB) guide, step 2](https://www.prisma.io/docs/guides/upgrade-prisma-orm/mongodb#2-port-the-schema-to-a-contract)
 - [v6 MongoDB schema documentation](https://www.prisma.io/docs/orm/overview/databases/mongodb)
 - [v6 composite types (MongoDB-only)](https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/composite-types)
-- Prisma 8 contract skill (`skills/prisma-next-contract`) in the prisma-next repository — authoritative for the Prisma 8 side
+- The `prisma-8` skill's `references/contract.md` — authoritative for the Prisma 8 side

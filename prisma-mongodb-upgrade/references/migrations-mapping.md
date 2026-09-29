@@ -20,46 +20,64 @@ on internal schemas" ([no support for Prisma Migrate](https://www.prisma.io/docs
 The workflow is `prisma db push` to sync indexes and unique constraints, with no migration
 history on disk.
 
-## Prisma 8: first-class, contract-driven migrations (Mongo included)
+## Prisma 8: bring the existing database under management
 
-Migration authoring in Prisma 8 is first-class for Postgres **and Mongo** (prisma-next
-`skills/prisma-next-migrations/SKILL.md`) — MongoDB is not a push-only special case:
+The database already has collections and data, so bootstrap it with `db update`. It diffs the
+live database against the contract, applies the difference (strict validators, plus indexes
+the contract declares that v6 never created), and signs the database:
 
-- **Flow:** contract *emit* → diff → *plan* (writes a content-hashed migration package) →
-  *migrate* (apply in graph order) → *verify* (live schema vs destination contract) →
-  *sign* (advance the marker after a verify pass).
-- **Mongo migration ops** come from dedicated factories: `createCollection`,
-  `dropCollection`, `validatedCollection`, `setValidation`, `createIndex`, `dropIndex`,
-  `collMod`, and `dataTransform` for data backfills.
-- **Marker storage:** Prisma 8 records migration state in a document in the
-  `_prisma_migrations` collection (per space) — the same collection name family v6 users
-  know from SQL, repurposed for Mongo state.
-- **DDL is not transactional on Mongo:** the runner applies operations, verifies the live
-  schema against the destination contract, and only advances the marker on a verify pass —
-  making interrupted runs resumable rather than atomic (see Prisma 8's
-  `prisma-next-migrations` skill).
-- **Push-style alternative still exists:** `db update` diffs the live database against the
-  contract and applies directly without writing a migration directory — the closest
-  analogue to the v6 `db push` habit, at the cost of no history.
-- Validators: Prisma 8 emits closed `$jsonSchema` validators by default since 0.12 (prisma-next
-  `CHANGELOG.md`) — collections gain schema enforcement v6 never applied.
+```bash
+npx prisma contract emit
+npx prisma db update --db "$DATABASE_URL" --dry-run
+npx prisma db update --db "$DATABASE_URL" --advance-ref db
+```
+
+`--advance-ref db` records the result as the `db` ref that later migration plans diff from.
+
+**Do not use `db init` here.** It only applies additive changes, and adding a validator to a
+collection with existing documents counts as destructive, so it refuses.
+
+## Prisma 8: every later schema change
+
+```bash
+npx prisma contract emit
+npx prisma migration plan --name add_posts_indexes
+npx prisma db migrate --db "$DATABASE_URL" --advance-ref db
+npx prisma db verify --db "$DATABASE_URL"
+```
+
+- **Declare, do not hand-write:** indexes and validators live in the contract, and
+  `migration plan` derives the operations. Rendered MongoDB migrations import their factories
+  (`createCollection`, `validatedCollection`, `setValidation`, `createIndex`, `dropIndex`,
+  `collMod`, `dataTransform`) from `@prisma/orm-mongo/target/migration`.
+- **Marker storage:** Prisma 8 records the database's contract state in a document in the
+  `_prisma_migrations` collection.
+- **DDL is not transactional on MongoDB:** an interrupted `db migrate` is resumed by running
+  it again. After fixing anything by hand, run `prisma db sign` so the signature matches the
+  database.
+- **Push-style alternative:** `db update` without a migration plan is the `db push` analogue
+  for local experiments. It keeps no history.
+- **Validators:** Prisma 8 adds strict `$jsonSchema` validators to each collection by default.
+  Once they are live, writes to documents that do not match the contract fail with
+  `Document failed validation`.
 
 ## Bad
 
 ```text
-Porting the v6 habit: run the Prisma 8 equivalent of `db push` for every change in production,
-accumulating no migration history, and hand-editing collections when verification fails.
+Porting the v6 habit: run `db update` for every change in production, accumulating no
+migration history, and hand-editing collections when verification fails.
 ```
 
 ## Good
 
 ```text
-Adopt the Prisma 8 lifecycle: emit the contract, plan a migration package, apply it with
-migrate, let verify gate the marker, and sign. Reserve `db update` for local prototyping,
-mirroring how `db push` was used on v6.
+Bootstrap once with `db update --advance-ref db`. Then emit the contract, plan a migration,
+apply it with `db migrate`, and check with `db verify`. Reserve plain `db update` for local
+experiments, mirroring how `db push` was used on v6.
 ```
 
 ## References
 
+- [Prisma ORM 6 to 8 (MongoDB) guide, step 4](https://www.prisma.io/docs/guides/upgrade-prisma-orm/mongodb#4-adopt-the-migration-lifecycle)
 - [v6: no Prisma Migrate for MongoDB](https://www.prisma.io/docs/orm/overview/databases/mongodb#no-support-for-prisma-migrate)
-- Prisma 8 migrations skill (`skills/prisma-next-migrations`) — authoritative for the Prisma 8 side; verified @ `a2791c5dd59d579b4b3052942ae7f8fe5e2ee852`
+- The `prisma-8` skill's `references/migrations.md` — authoritative for the Prisma 8 side
