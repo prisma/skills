@@ -8,11 +8,11 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 
 ### prisma-cli
 
-Complete reference for current Prisma ORM CLI commands. For Prisma Compute app deployment, use `prisma-compute`.
+Reference for Prisma ORM 7 CLI commands. For Prisma Compute app deployment, use `prisma-compute`.
 
 **Use when:**
-- Running Prisma ORM/database commands
-- Setting up new projects (`prisma init`)
+- Running Prisma ORM 7/database commands
+- Setting up explicitly selected Prisma 7 projects (`prisma init`)
 - Managing migrations and database schema
 - Generating Prisma Client
 
@@ -51,13 +51,13 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 
 **Use when:**
 - A MongoDB project asks about upgrading Prisma versions
-- Evaluating a move from Prisma v6 to Prisma Next
+- Evaluating a move from Prisma v6 to Prisma 8
 - Preventing an impossible "upgrade MongoDB to v7" plan
 
 **Topics covered:**
-- The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma Next is the successor path)
+- The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma 8 is the successor path)
 - Stay-on-v6 vs migrate-now decision table with no-go signals
-- Schema/contract, client API, and migrations mapping between v6 and Prisma Next
+- Schema/contract, client API, and migrations mapping between v6 and Prisma 8
 - No-data-moves cutover verification checklist
 
 ---
@@ -103,45 +103,21 @@ Implementation guide for Prisma SQL driver adapter development.
 
 ---
 
-### prisma-database-setup
+### prisma-orm-setup
 
-Guides for configuring Prisma with different database providers.
+Set up an application with **Prisma ORM 8** using the version-matched `prisma-8` skill shipped by [prisma/orm](https://github.com/prisma/orm/tree/main/skills).
 
-**Use when:**
-- Setting up a new project with a specific database
-- Connecting to PostgreSQL, MySQL, SQLite, MongoDB, etc.
-- Troubleshooting connection issues
-- Configuring connection strings
+Also keeps existing Prisma 6/7 applications on their version, with provider references for Prisma 7 SQL (PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB, Prisma Postgres) and Prisma 6 MongoDB.
 
-**Databases covered:**
-- PostgreSQL & Prisma Postgres
-- MySQL / MariaDB
-- SQLite
-- MongoDB
-- SQL Server
-- CockroachDB
+**Use when:** setting up Prisma in an application, connecting its database, or troubleshooting a connection. Major upgrades are separate tasks.
 
----
+`prisma-database-setup` is a deprecated compatibility name that loads `prisma-orm-setup`.
 
-### prisma-postgres
+### prisma-postgres-setup
 
-Prisma Postgres workflows across Console, `create-db`, Management API, and SDK integrations.
+Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Hands Prisma ORM configuration to `prisma-orm-setup`, and honors explicit driver, alternative ORM, or database-only choices.
 
-**Use when:**
-- Setting up and managing Prisma Postgres in Prisma Console
-- Creating instant databases with `npx create-db`
-- Integrating programmatic provisioning with Management API
-- Building typed API integrations using `@prisma/management-api-sdk`
-- Handling auth, regions, claim flow, and connection details
-
-**Workflows covered:**
-- `npx create-db@latest`
-- `npx create-db@latest create --help`
-- `npx create-db@latest regions --help`
-- Programmatic `create-db` usage (`create()` and `regions()`)
-- Console operations (`https://console.prisma.io`)
-- Management API (`https://api.prisma.io/v1`)
-- Management API SDK (`@prisma/management-api-sdk`)
+**Use when:** connecting Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
 
 ---
 
@@ -180,8 +156,8 @@ npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
-npx skills add prisma/skills --skill prisma-database-setup
-npx skills add prisma/skills --skill prisma-postgres
+npx skills add prisma/skills --skill prisma-orm-setup
+npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
 
@@ -220,7 +196,9 @@ Each skill contains:
 
 ## Prisma Version
 
-The ORM-focused skills target **Prisma ORM 7.6.x**.
+New ORM setups default to **Prisma ORM 8**. Install `prisma-orm-setup` and `prisma-postgres-setup` for the default Prisma Postgres workflow. `prisma-orm-setup` also keeps existing Prisma 6/7 applications on their version; repairing a connection does not require an upgrade. Detailed Prisma 8 APIs come from the installed package-owned `prisma-8` skill after `prisma skills sync`.
+
+The existing `prisma-cli`, `prisma-client-api`, driver adapter, and earlier-version upgrade skills retain their existing scope; do not use their legacy recipes for Prisma 8 setup.
 
 The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
 

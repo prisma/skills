@@ -1,6 +1,6 @@
 # CockroachDB Setup
 
-Configure Prisma with CockroachDB.
+Configure **Prisma ORM 7** with CockroachDB. For an existing Prisma 6 app, keep its configuration and use the [Prisma 6 docs](https://www.prisma.io/docs/orm/v6); the configuration and adapter examples below are for 7.
 
 ## Prerequisites
 
@@ -26,6 +26,7 @@ generator client {
 In `prisma.config.ts`:
 
 ```typescript
+import 'dotenv/config'
 import { defineConfig, env } from 'prisma/config'
 
 export default defineConfig({
@@ -52,7 +53,7 @@ Use a driver adapter for the standard SQL workflow. CockroachDB is PostgreSQL-co
 
 1. Install adapter and driver:
    ```bash
-   npm install @prisma/adapter-pg pg
+   npm install @prisma/adapter-pg@7 pg
    ```
 
 2. Instantiate Prisma Client with the adapter:
@@ -87,3 +88,7 @@ model User {
 
 ### Schema Introspection
 Always use `provider = "cockroachdb"` to ensure correct type mapping during `db pull`.
+
+## References
+
+- [Prisma 7 CockroachDB documentation](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/cockroachdb)

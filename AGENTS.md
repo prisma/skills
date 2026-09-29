@@ -162,6 +162,16 @@ To test a skill before committing:
 
 3. Verify the agent applies rules correctly
 
+## Skill Versions
+
+- A skill scoped to one Prisma ORM release sets `metadata.version` to the release its examples were verified against, for example `"7.9.1"` for `prisma-cli`.
+- Every other skill uses its own semantic version, starting at `"1.0.0"`.
+- Never lower a published version. Skill installers compare versions to find updates. When a skill becomes a compatibility redirect, bump its major version.
+
+## Marketplace Distribution
+
+Publishers must include the Postgres references and the ORM setup handoff, including the Prisma 6/7 references in `prisma-orm-setup` for existing applications. Verify that v0 can load these and the package-owned `prisma-8` skill before releasing updated Marketplace content. A GitHub update alone does not prove that v0 refreshed its registered skill or can resolve sibling skills.
+
 ## End-User Installation
 
 Document these installation methods for users:

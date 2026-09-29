@@ -1,24 +1,26 @@
 ---
 name: prisma-cli
-description: Prisma ORM CLI commands reference covering init, generate, migrate, db, dev, complete, studio, validate, format, debug, and mcp. Use for ORM/database CLI workflows, not the Prisma Platform CLI. Triggers on "prisma init", "prisma generate", "prisma migrate", "prisma db", "prisma complete", "prisma studio", "prisma mcp".
+description: Prisma ORM 7 CLI reference for existing Prisma 7 applications or explicitly selected Prisma 7 workflows. Covers prisma init, generate, migrate, db, dev, studio, and mcp. For setup, connection repair, or Prisma 8, use prisma-orm-setup; not the Prisma Platform CLI.
 license: MIT
 metadata:
   author: prisma
   version: "7.9.1"
 ---
 
-# Prisma CLI Reference
+# Prisma ORM 7 CLI reference
 
-Reference for Prisma ORM CLI commands. This skill provides guidance on command usage, options, and best practices for current Prisma ORM releases.
+These commands and examples apply to **Prisma ORM 7** only. For setup, connection repair, or a Prisma 8 application, load [prisma-orm-setup](../prisma-orm-setup/SKILL.md).
+
+Use the project's version-matched CLI. Do not install a floating `prisma@latest` to run these commands.
 
 ## Boundary: Platform and Compute
 
-Do not confuse the stable ORM command (`prisma`) with the public-beta Platform package (`@prisma/cli`, binary `prisma-cli`). Use `prisma-compute` for Compute apps and workspace auth, and `prisma-postgres` for Platform projects and databases.
+Do not confuse the stable ORM command (`prisma`) with the public-beta Platform package (`@prisma/cli`, binary `prisma-cli`). Use `prisma-compute` for Compute apps and workspace auth, and `prisma-postgres-setup` for Platform projects and databases.
 
 ## When to Apply
 
 Reference this skill when:
-- Setting up a new Prisma project (`prisma init`)
+- Setting up an explicitly selected Prisma 7 project (`prisma init`)
 - Generating Prisma Client (`prisma generate`)
 - Running database migrations (`prisma migrate`)
 - Managing database state (`prisma db push/pull`)
