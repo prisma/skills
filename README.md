@@ -51,13 +51,13 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 
 **Use when:**
 - A MongoDB project asks about upgrading Prisma versions
-- Evaluating a move from Prisma v6 to Prisma Next
+- Evaluating a move from Prisma v6 to Prisma 8
 - Preventing an impossible "upgrade MongoDB to v7" plan
 
 **Topics covered:**
-- The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma Next is the successor path)
+- The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma 8 is the successor path)
 - Stay-on-v6 vs migrate-now decision table with no-go signals
-- Schema/contract, client API, and migrations mapping between v6 and Prisma Next
+- Schema/contract, client API, and migrations mapping between v6 and Prisma 8
 - No-data-moves cutover verification checklist
 
 ---
