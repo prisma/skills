@@ -129,5 +129,4 @@ MySQL 5.7+ supports JSON. MariaDB 10.2+ supports JSON (as an alias for LONGTEXT 
 
 - [Prisma 7 connection pool settings](https://www.prisma.io/docs/orm/v7/prisma-client/setup-and-configuration/databases-connections/connection-pool)
 - [PlanetScale foreign key configuration](https://www.prisma.io/docs/orm/v7/overview/databases/planetscale)
-
 - [Prisma 7 MySQL and MariaDB documentation](https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/mysql)

@@ -26,6 +26,3 @@ coverage/
 *.tmp
 *.temp
 .cache/
-
-# Local agent diaries
-/.agents/diary/

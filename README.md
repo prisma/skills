@@ -204,10 +204,6 @@ The `prisma-compute` skill tracks the active Prisma Compute launch flow and inst
 
 If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migration-specific guidance.
 
-## Marketplace distribution
-
-Publishers must include the Postgres references and the ORM setup handoff, including the Prisma 6/7 references in `prisma-orm-setup` for existing applications. Verify that v0 can load these and the package-owned `prisma-8` skill before releasing updated Marketplace content. A GitHub update alone does not prove that v0 refreshed its registered skill or can resolve sibling skills.
-
 ## Contributing
 
 See [AGENTS.md](./AGENTS.md) for guidelines on creating and modifying skills.
