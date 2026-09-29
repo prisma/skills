@@ -107,17 +107,15 @@ Implementation guide for Prisma SQL driver adapter development.
 
 Set up an application with **Prisma ORM 8** using the version-matched `prisma-8` skill shipped by [prisma/orm](https://github.com/prisma/orm/tree/main/skills).
 
-**Use when:** setting up a new Prisma 8 application or finishing a Prisma 8 setup. Existing Prisma 6/7 connection work routes to `prisma-database-setup`; major upgrades are separate tasks.
+Also keeps existing Prisma 6/7 applications on their version, with provider references for Prisma 7 SQL (PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB, Prisma Postgres) and Prisma 6 MongoDB.
 
-### prisma-database-setup
+**Use when:** setting up Prisma in an application, connecting its database, or troubleshooting a connection. Major upgrades are separate tasks.
 
-Database setup and connection troubleshooting for **Prisma 7 SQL** and **Prisma 6 MongoDB**, with environment configuration, provider prerequisites, connection strings, runtime drivers, and common errors. Existing Prisma 6 SQL apps retain their version and use the linked Prisma 6 documentation.
-
-**Use when:** configuring an existing Prisma 6/7 app or explicitly choosing an earlier version for new setup. New applications otherwise default to `prisma-orm-setup`.
+`prisma-database-setup` is a deprecated compatibility name that loads `prisma-orm-setup`.
 
 ### prisma-postgres-setup
 
-Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Defaults new ORM setups to **Prisma ORM 8**, while preserving existing applications and explicit ORM, driver, or database-only choices.
+Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Hands Prisma ORM configuration to `prisma-orm-setup`, and honors explicit driver, alternative ORM, or database-only choices.
 
 **Use when:** connecting Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
 
@@ -159,7 +157,6 @@ npx skills add prisma/skills --skill prisma-mongodb-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-orm-setup
-npx skills add prisma/skills --skill prisma-database-setup
 npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
@@ -199,7 +196,7 @@ Each skill contains:
 
 ## Prisma Version
 
-New ORM setups default to **Prisma ORM 8**. Install `prisma-orm-setup` and `prisma-postgres-setup` for the default Prisma Postgres workflow. `prisma-database-setup` retains the Prisma 6/7 configuration paths; repairing an existing connection does not require an upgrade. Detailed Prisma 8 APIs come from the installed package-owned `prisma-8` skill after `prisma skills sync`.
+New ORM setups default to **Prisma ORM 8**. Install `prisma-orm-setup` and `prisma-postgres-setup` for the default Prisma Postgres workflow. `prisma-orm-setup` also keeps existing Prisma 6/7 applications on their version; repairing a connection does not require an upgrade. Detailed Prisma 8 APIs come from the installed package-owned `prisma-8` skill after `prisma skills sync`.
 
 The existing `prisma-cli`, `prisma-client-api`, driver adapter, and earlier-version upgrade skills retain their existing scope; do not use their legacy recipes for Prisma 8 setup.
 
@@ -209,7 +206,7 @@ If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migrati
 
 ## Marketplace distribution
 
-Publishers must include the Postgres references and the ORM setup handoff, including `prisma-database-setup` for existing applications. Verify that v0 can load these and the package-owned `prisma-8` skill before releasing updated Marketplace content. A GitHub update alone does not prove that v0 refreshed its registered skill or can resolve sibling skills.
+Publishers must include the Postgres references and the ORM setup handoff, including the Prisma 6/7 references in `prisma-orm-setup` for existing applications. Verify that v0 can load these and the package-owned `prisma-8` skill before releasing updated Marketplace content. A GitHub update alone does not prove that v0 refreshed its registered skill or can resolve sibling skills.
 
 ## Contributing
 

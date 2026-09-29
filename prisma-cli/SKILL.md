@@ -1,6 +1,6 @@
 ---
 name: prisma-cli
-description: Prisma ORM 7 CLI reference for existing Prisma 7 applications or explicitly selected Prisma 7 workflows. Covers prisma init, generate, migrate, db, dev, studio, and mcp. For default new setup or Prisma 8, use prisma-orm-setup; not the Prisma Platform CLI.
+description: Prisma ORM 7 CLI reference for existing Prisma 7 applications or explicitly selected Prisma 7 workflows. Covers prisma init, generate, migrate, db, dev, studio, and mcp. For setup, connection repair, or Prisma 8, use prisma-orm-setup; not the Prisma Platform CLI.
 license: MIT
 metadata:
   author: prisma
@@ -9,7 +9,7 @@ metadata:
 
 # Prisma ORM 7 CLI reference
 
-These commands and examples apply to **Prisma ORM 7**. For new setup without an explicit version choice or a Prisma 8 application, load [prisma-orm-setup](../prisma-orm-setup/SKILL.md). For Prisma 6/7 connection configuration, load [prisma-database-setup](../prisma-database-setup/SKILL.md).
+These commands and examples apply to **Prisma ORM 7** only. For setup, connection repair, or a Prisma 8 application, load [prisma-orm-setup](../prisma-orm-setup/SKILL.md).
 
 Use the project's version-matched CLI. Do not install a floating `prisma@latest` to run these commands.
 

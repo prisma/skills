@@ -61,7 +61,7 @@ façade transactions merge in Prisma Next.
 - Pin the Prisma packages to the latest 6.x line and keep taking 6.x patch releases.
 - Track Prisma release notes and security advisories for the 6.x line.
 - Keep the classic v6 MongoDB setup: `url = env("DATABASE_URL")` in the schema, `db push`
-  workflow, no SQL driver adapters (see the [Prisma 6 MongoDB documentation](https://www.prisma.io/docs/v6/orm/overview/databases/mongodb) for the legacy shape).
+  workflow, no SQL driver adapters (see [`prisma-orm-setup`](../prisma-orm-setup/references/v6-mongodb.md) for the v6 MongoDB shape).
 - Re-evaluate when Prisma Next's MongoDB is GA, or when blockers for trying EA are resolved.
 
 ## Reference files

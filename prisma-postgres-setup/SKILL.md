@@ -1,6 +1,6 @@
 ---
 name: prisma-postgres-setup
-description: Obtain or reuse a Prisma Postgres database and connect an application. Use for "set up Prisma Postgres", "connect my app to Prisma Postgres", or Prisma Postgres setup in v0 and Vercel Marketplace. Defaults new ORM setups to Prisma ORM 8; preserves an existing application or an explicit ORM, driver, or database-only choice.
+description: Obtain or reuse a Prisma Postgres database and connect an application. Use for "set up Prisma Postgres", "connect my app to Prisma Postgres", or Prisma Postgres setup in v0 and Vercel Marketplace. Hands Prisma ORM configuration to prisma-orm-setup; honors an explicit driver, alternative ORM, or database-only choice.
 license: MIT
 metadata:
   author: prisma
@@ -15,7 +15,6 @@ Connect the intended database, then verify it from the application. Keep provisi
 
 Check the user's requested ORM or driver, installed packages, database connection, and environment-loading files. Check secret presence without printing values.
 
-- Default new ORM setups to **Prisma ORM 8**; preserve an existing application's ORM.
 - Honor explicit choices such as Drizzle, `pg`, or database-only setup.
 - For query or schema work in an already configured app, use its version-matched ORM guidance; do not restart setup.
 
@@ -28,17 +27,17 @@ Check the user's requested ORM or driver, installed packages, database connectio
 | Standalone persistent database               | Read [provisioning](references/provisioning.md); use an authenticated CLI, MCP tool, Console, or Management API. |
 | Temporary development database requested     | Read the `create-db` section in [provisioning](references/provisioning.md), including expiry and claiming.       |
 
-Resolve the workspace, project, and region before creation. If several resources fit, ask which one to use. Missing shell environment variables do not prove the database is missing. If provisioning is blocked by permissions or quota, report the blocker; do not delete another resource or switch workspaces to get around it.
+Resolve the workspace, project, and region before creation. If several resources fit, ask which one to use. If provisioning is blocked by permissions or quota, report the blocker; do not delete another resource or switch workspaces to get around it.
 
 ## 3. Connect the application
 
 Use the connection appropriate to the chosen driver and runtime. Store it in the project's secret environment configuration, never source code or chat. Preserve unrelated entries, update the intended variable once, and ensure local secret files are ignored by Git.
 
-Application processes and CLI commands may load different environment files. For example, a framework may load `.env.development.local` while a shell command does not. Load the intended file for that command without displaying credentials or replacing the database.
+Application processes and CLI commands may load different environment files. For example, a framework may load `.env.development.local` while a shell command does not. A variable missing from the shell does not mean the database is missing: load the intended file for that command without displaying credentials, and do not provision another database.
 
 ## 4. Configure the ORM and verify
 
-For Prisma ORM setup, load **`prisma-orm-setup`** using the host's skill loader or read its installed `SKILL.md`. If it is not installed, obtain it from [prisma/skills](https://github.com/prisma/skills/tree/main/prisma-orm-setup). It owns version selection and routes existing applications to the appropriate guidance. If that handoff is unavailable, report it. This skill does not own ORM configuration or migration recipes.
+For Prisma ORM setup, load **`prisma-orm-setup`** using the host's skill loader or read its installed `SKILL.md`. If it is not installed, obtain it from [prisma/skills](https://github.com/prisma/skills/tree/main/prisma-orm-setup). It owns ORM version selection and configuration. If that handoff is unavailable, report it.
 
 For an explicitly selected alternative, keep that ORM or driver and use its documented setup. For database-only setup, stop after verifying connectivity.
 

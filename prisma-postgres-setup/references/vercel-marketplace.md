@@ -5,7 +5,7 @@ Use the native integration to obtain a database that belongs to the user's Marke
 1. Inspect whether Prisma Postgres is already connected to the current project and environment. Reuse that resource.
 2. If it is not connected, use the host's native integration flow to select an existing resource or create one. In v0 this may appear as an integration request tool; discover what the host exposes instead of assuming a fixed tool name.
 3. Wait for the connection and injected environment configuration. Verify which variables the application uses without printing their values.
-4. If the app sees a variable but a shell command does not, inspect the framework's environment loading and load the same intended file for the command. An empty shell variable is not a reason to provision another database.
+4. If the app sees a variable but a shell command does not, follow the environment-loading step in `prisma-postgres-setup`.
 5. Return to `prisma-postgres-setup` for the chosen ORM and query verification.
 
 ## Where MCP fits

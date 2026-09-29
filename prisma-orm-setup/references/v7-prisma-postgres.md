@@ -1,10 +1,10 @@
 # Prisma Postgres with Prisma ORM 7
 
-Use this reference for an existing or explicitly selected **Prisma ORM 7** app. Obtain or reuse the database through [prisma-postgres-setup](../../prisma-postgres-setup/SKILL.md); do not create a replacement while configuring the client.
+Use this reference for an existing or explicitly selected **Prisma ORM 7** app. Obtain or reuse the database through [prisma-postgres-setup](../../prisma-postgres-setup/SKILL.md).
 
 ## Node.js connections
 
-Use the PostgreSQL TCP connection supplied by Prisma Console or the integration and follow [PostgreSQL setup](postgresql.md). Use a pooled or direct connection according to the intended operation. A `prisma+postgres://` Accelerate URL is not a TCP connection string for `PrismaPg`.
+Use the PostgreSQL TCP connection supplied by Prisma Console or the integration and follow [PostgreSQL setup](v7-postgresql.md). Use a pooled or direct connection according to the intended operation. A `prisma+postgres://` Accelerate URL is not a TCP connection string for `PrismaPg`.
 
 ## Edge connections
 

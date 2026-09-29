@@ -1,6 +1,6 @@
 # MongoDB Setup
 
-This reference configures **Prisma ORM 6 MongoDB** applications. Preserve an existing Prisma 6 app or use this path when 6 is explicitly selected. For new Prisma 8 setup, use `prisma-orm-setup`; do not apply Prisma 7 SQL adapters here.
+This reference configures **Prisma ORM 6 MongoDB** applications. Preserve an existing Prisma 6 app or use this path when 6 is explicitly selected. Do not apply Prisma 7 SQL adapters here.
 
 ## Prerequisites
 

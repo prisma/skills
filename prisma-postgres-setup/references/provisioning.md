@@ -25,7 +25,7 @@ For server-to-server API access, use a workspace service token from the user's s
 | Resource not found                   | Verify the resource ID and workspace; do not create a replacement automatically.         |
 | Invalid request                      | Check the current schema and selected region.                                            |
 | Rate limit or transient read failure | Retry with bounded backoff, honoring retry guidance.                                     |
-| Quota exhausted                      | Report the limit and available options. Do not delete another project as setup recovery. |
+| Quota exhausted                      | Report the limit and available options.                                                  |
 
 ## Temporary databases with create-db
 
