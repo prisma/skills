@@ -11,14 +11,12 @@ Skills follow the [Agent Skills](https://agentskills.io/) format and are compati
 Reference for Prisma ORM 7 CLI commands. For Prisma Compute app deployment, use `prisma-compute`.
 
 **Use when:**
-
 - Running Prisma ORM 7/database commands
 - Setting up explicitly selected Prisma 7 projects (`prisma init`)
 - Managing migrations and database schema
 - Generating Prisma Client
 
 **Commands covered:**
-
 - `init`, `generate`, `dev` (local Prisma Postgres)
 - `migrate dev`, `migrate deploy`, `migrate reset`
 - `db push`, `db pull`, `db seed`, `db execute`
@@ -31,13 +29,11 @@ Reference for Prisma ORM 7 CLI commands. For Prisma Compute app deployment, use 
 Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes.
 
 **Use when:**
-
 - Upgrading existing projects to Prisma 7
 - Troubleshooting v7 compatibility issues
 - Understanding what changed in v7
 
 **Topics covered:**
-
 - ESM-first module configuration plus CommonJS fallback
 - Driver adapter requirements
 - New `prisma.config.ts` file
@@ -54,13 +50,11 @@ Step-by-step migration guide from Prisma v6 to v7, covering all breaking changes
 Decision and migration guide for MongoDB projects on Prisma v6, which have no path to Prisma 7.
 
 **Use when:**
-
 - A MongoDB project asks about upgrading Prisma versions
 - Evaluating a move from Prisma v6 to Prisma Next
 - Preventing an impossible "upgrade MongoDB to v7" plan
 
 **Topics covered:**
-
 - The version landscape (v6 terminal for MongoDB; v7 has no connector; Prisma Next is the successor path)
 - Stay-on-v6 vs migrate-now decision table with no-go signals
 - Schema/contract, client API, and migrations mapping between v6 and Prisma Next
@@ -73,14 +67,12 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 Comprehensive Prisma Client API reference.
 
 **Use when:**
-
 - Writing Prisma Client queries
 - Understanding query options (select, include, where)
 - Working with transactions
 - Using raw SQL queries
 
 **Topics covered:**
-
 - PrismaClient constructor and configuration
 - CRUD operations (findMany, create, update, delete)
 - Query options (select, include, omit, orderBy, pagination)
@@ -96,14 +88,12 @@ Comprehensive Prisma Client API reference.
 Implementation guide for Prisma SQL driver adapter development.
 
 **Use when:**
-
 - Implementing a new SQL driver adapter
 - Modifying `SqlDriverAdapter` or `Transaction` behavior
 - Wiring migration-aware adapter factories
 - Debugging adapter type mapping or transaction issues
 
 **Topics covered:**
-
 - Required adapter interfaces and contracts
 - Transaction lifecycle protocol (including nested transactions)
 - `SqlQuery` argument mapping and `SqlResultSet` mapping
@@ -138,7 +128,6 @@ Reuse or provision a Prisma Postgres database, connect it to the application, an
 Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
 
 **Use when:**
-
 - Creating a new Prisma app with optional Compute deploy
 - Deploying or redeploying an existing app to Prisma Compute
 - Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts
@@ -146,7 +135,6 @@ Prisma Compute deployment and hosting workflows centered on the Prisma Platform 
 - Building programmatic Compute integrations with SDK/API tooling
 
 **Workflows covered:**
-
 - `@prisma/cli app build/run/deploy`
 - Generated `compute:deploy` scripts
 - `create-prisma --deploy` for new project scaffolds
@@ -193,15 +181,12 @@ npx skills list
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected.
 
 **Examples:**
-
 ```
 Help me run Prisma migrations in production
 ```
-
 ```
 Upgrade my project from Prisma 6 to Prisma 7
 ```
-
 ```
 How do I use transactions in Prisma?
 ```
@@ -209,7 +194,6 @@ How do I use transactions in Prisma?
 ## Skill Structure
 
 Each skill contains:
-
 - `SKILL.md` - Main instructions with YAML frontmatter (name, description, metadata)
 - `references/` (optional) - Individual reference files with detailed explanations and code examples
 

@@ -81,10 +81,10 @@ npm install @prisma/client@6 dotenv
 Generate with the matching CLI, then initialize the client without a SQL adapter:
 
 ```typescript
-import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import 'dotenv/config'
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 ```
 
 Use a read-only model query to verify connectivity. Review any index changes before applying `db push` to an existing database.
@@ -92,11 +92,9 @@ Use a read-only model query to verify connectivity. Review any index changes bef
 ## Common Issues
 
 ### "Transactions not supported"
-
 Ensure your MongoDB instance is a **Replica Set**. Standalone instances do not support transactions. Atlas clusters are replica sets by default.
 
 ### "Invalid ObjectID"
-
 Ensure fields referencing IDs are decorated with `@db.ObjectId` if the target is an ObjectID.
 
 ## References

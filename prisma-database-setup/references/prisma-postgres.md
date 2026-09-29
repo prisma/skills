@@ -15,14 +15,14 @@ npm install @prisma/adapter-ppg@7 @prisma/ppg
 ```
 
 ```typescript
-import { PrismaClient } from "../generated/client";
-import { PrismaPostgresAdapter } from "@prisma/adapter-ppg";
+import { PrismaClient } from '../generated/client'
+import { PrismaPostgresAdapter } from '@prisma/adapter-ppg'
 
 const prisma = new PrismaClient({
   adapter: new PrismaPostgresAdapter({
     connectionString: process.env.DATABASE_URL!,
   }),
-});
+})
 ```
 
 The serverless driver takes a direct Prisma Postgres connection string as its credential and communicates over HTTP/WebSockets. It does not open a TCP connection. Load secrets through the host's supported mechanism and set the Prisma 7 generator's `runtime` to that deployment target.
