@@ -37,7 +37,7 @@ Application processes and CLI commands may load different environment files. For
 
 ## 4. Configure the ORM and verify
 
-For Prisma ORM setup, load **`prisma-orm-setup`** using the host's skill loader or read its installed `SKILL.md`. If it is not installed, obtain it from [prisma/skills](https://github.com/prisma/skills/tree/main/prisma-orm-setup). It owns ORM version selection and configuration. If that handoff is unavailable, report it.
+For Prisma ORM setup, read [prisma-orm-setup/SKILL.md](https://github.com/prisma/skills/blob/main/prisma-orm-setup/SKILL.md) directly, or load the installed `prisma-orm-setup` skill when the host resolves sibling skills by name. It owns ORM version selection and configuration. If that handoff is unavailable, report it.
 
 For an explicitly selected alternative, keep that ORM or driver and use its documented setup. For database-only setup, stop after verifying connectivity.
 
