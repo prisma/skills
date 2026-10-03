@@ -1,0 +1,21 @@
+{
+  "skill_name": "prisma-postgres-setup",
+  "evaluation_type": "execution",
+  "evals": [
+    {
+      "id": 1,
+      "name": "generate-working-node-app",
+      "source": "Synthetic execution case. Local PostgreSQL stands in for an already connected Prisma Postgres database; this does not test cloud provisioning or v0.",
+      "prompt": "An existing database connection is available as DATABASE_URL. For this eval it points to a disposable local PostgreSQL database. Set up this minimal Node.js app using the default ORM from the Prisma Postgres setup skill. Actually install, configure, and use it. Create a model EvalNote mapped to public.\"EvalNote\" with id (integer primary key) and body (text). Initialize that table in the supplied database. Implement src/index.ts exporting async readNote(id: number), returning { id, body } or null via the ORM, and async close(), releasing any connections. Use native Node.js TypeScript support and explicit .ts imports so another process can import these exports. Include a tsconfig.json that type-checks the application. Run a read-only query through your application. Do not provision any database, create unrelated app features, or use a different connection. Report the generated files and what you verified.",
+      "expected_output": "A real Prisma ORM 8 application with package-owned guidance loaded, a contract and initialized EvalNote table, a working readNote function, and successful type and database checks.",
+      "expectations": [
+        "Installs and uses Prisma ORM 8; reads the generated prisma-8 skill and checks its library version against the installed ORM package.",
+        "Creates application, schema/contract, and configuration files that reuse DATABASE_URL without provisioning a replacement database.",
+        "The independent verifier type-checks the generated app and reads its inserted probe row through readNote, then confirms a missing row returns null."
+      ],
+      "files": [],
+      "fixture": "evals/fixtures/node-postgres/project",
+      "verify": "evals/fixtures/node-postgres/verify.mjs"
+    }
+  ]
+}
