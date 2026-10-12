@@ -29,7 +29,7 @@ For server-to-server API access, use a workspace service token from the user's s
 
 ## Temporary databases with create-db
 
-Use `create-db` only when a temporary, claimable development database fits the request. By default, the database is available for **24 hours** and is automatically deleted if unclaimed. Claim it through the returned claim URL **before its expiry** to keep it; claiming requires a Prisma account. Use the returned expiry as the deadline if a different lifetime was selected. See the [documented lifecycle](https://www.prisma.io/docs/postgres/introduction/npx-create-db#claiming-your-database).
+Use `create-db` when the user needs a working database now and has no connection or Prisma account. By default, the database is available for **24 hours** and is automatically deleted if unclaimed. Claim it through the returned claim URL **before its expiry** to keep it; claiming requires a Prisma account. Use the returned expiry as the deadline if a different lifetime was selected. See the [documented lifecycle](https://www.prisma.io/docs/postgres/npx-create-db#claiming-your-database).
 
 Inspect the current commands when selecting a region or a non-default lifetime:
 
@@ -40,4 +40,4 @@ npx create-db@latest regions --help
 
 Choose a supported region and lifetime. Store the connection string and claim URL privately, then tell the user when the database expires and how to claim it using the returned lifecycle information. Do not promise persistence until claiming is complete. Avoid flags that print credentials into shared output.
 
-For programmatic provisioning, the `create-db` package exposes `create()` and `regions()`. Check the installed types, handle success and error results, and store returned connection/claim information without logging it. See the [create-db documentation](https://www.prisma.io/docs/postgres/introduction/npx-create-db).
+For programmatic provisioning, the `create-db` package exposes `create()` and `regions()`. Check the installed types, handle success and error results, and store returned connection/claim information without logging it. See the [create-db documentation](https://www.prisma.io/docs/postgres/npx-create-db).
