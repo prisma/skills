@@ -4,7 +4,7 @@ description: Obtain or reuse a Prisma Postgres database and connect an applicati
 license: MIT
 metadata:
   author: prisma
-  version: "2.1.0"
+  version: "2.2.0"
 ---
 
 # Prisma Postgres setup
@@ -23,7 +23,7 @@ Check the user's requested ORM or driver, installed packages, database connectio
 | Situation                                    | Action                                                                                                           |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Existing connection or connected integration | Verify its project, database, and environment; reuse it.                                                         |
-| v0 or Vercel Marketplace                     | Read [Marketplace setup](references/vercel-marketplace.md) and use the native integration flow.                  |
+| v0, Vercel Marketplace, or a Vercel project  | Read [Marketplace setup](references/vercel-marketplace.md) and use the native integration flow.                  |
 | No database yet and no provider named        | Offer `npx create-db@latest` for a working database now with no account (it is deleted after 24 hours unless claimed, and claiming needs a free Prisma account; read the create-db section in [provisioning](references/provisioning.md)), or a persistent database through [provisioning](references/provisioning.md). Ask which one when the request does not say. |
 | Standalone persistent database               | Read [provisioning](references/provisioning.md); use an authenticated CLI, MCP tool, Console, or Management API. |
 | Temporary development database requested     | Read the `create-db` section in [provisioning](references/provisioning.md), including expiry and claiming.       |
