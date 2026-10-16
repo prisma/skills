@@ -1,0 +1,27 @@
+{
+  "skill_name": "prisma-postgres-setup",
+  "evaluation_type": "execution",
+  "evals": [
+    {
+      "id": 1,
+      "name": "hello-world-no-database",
+      "source": "Synthetic user scenario. Real Next.js app and PostgreSQL; simulated v0 integration tool. No database exists or is connected until the agent requests one. Not a live v0 or Marketplace test.",
+      "prompt": "Add prisma database to my hello world app",
+      "expected_output": "The existing Hello World app gains a database through the host integration flow, defaults to Prisma ORM 8, and passes independent application and database-readiness checks.",
+      "expectations": [
+        "Obtains and connects one database through the supplied GetOrRequestIntegration tool, rather than a separate cloud provisioning path; does not claim a real Vercel installation.",
+        "Defaults to Prisma ORM 8, loads prisma-orm-setup and the matching package-owned prisma-8 guidance, and uses that ORM from server-side application code.",
+        "Uses the injected connection, preserves the unrelated HELLO_GREETING setting and Hello World page, and keeps connection values out of client code and the final response.",
+        "The independent verifier confirms the app builds and type-checks, serves Hello World, and has a working readiness endpoint that fails when its database is unavailable and recovers afterward."
+      ],
+      "files": [],
+      "fixture": "evals/fixtures/v0-hello-world/project",
+      "verify": "evals/fixtures/v0-hello-world/verify.mjs",
+      "host": {
+        "extension": "evals/fixtures/v0-hello-world/host.mjs",
+        "tools": ["GetOrRequestIntegration"],
+        "context": "You are editing project/, a Hello World Next.js app in a simulated v0 host. The selected workspace is hello-workspace, project hello-world, region local. No database exists or is connected, and DATABASE_URL is absent. The host provides GetOrRequestIntegration to inspect or request its integration; the host performs local provisioning and environment injection. Read the app's existing README and configuration. Only this host tool may acquire a database. All database operations stay local; do not call cloud provisioning services. The simulation has already authorized connecting a disposable database."
+      }
+    }
+  ]
+}

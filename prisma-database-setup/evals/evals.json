@@ -1,0 +1,32 @@
+{
+  "skill_name": "prisma-database-setup",
+  "evaluation_type": "planning",
+  "evals": [
+    {
+      "id": 1,
+      "name": "existing-mysql-environment",
+      "source": "Synthetic regression from review: a Prisma 7 connection repair must not become a major upgrade.",
+      "prompt": "Our Node app uses prisma@7.10.0, @prisma/client@7.10.0 and @prisma/adapter-mariadb. It already has a working MySQL schema and migrations. DATABASE_URL is in an ignored .env file, but prisma.config.ts does not load that file, and the app uses MYSQL_USER, MYSQL_PASSWORD and MYSQL_DATABASE. Help fix the connection configuration. Keep our MySQL database and ORM version. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Use the Prisma 7 MySQL reference, load the intended environment for both CLI and app, and check that both address the same database without a major upgrade.",
+      "files": [],
+      "expectations": [
+        "Uses the Prisma 7 MySQL setup guidance and preserves MySQL and the installed ORM major; does not require a Prisma 8 upgrade.",
+        "Plans explicit environment loading for prisma.config.ts and checks runtime adapter variables, host, port and database against the intended CLI connection without printing credentials.",
+        "Preserves the schema and migrations and verifies a read-only application query before claiming the connection is fixed."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "existing-mongodb-replica-set",
+      "source": "Synthetic regression from review: preserve Prisma 6 MongoDB prerequisites rather than applying SQL adapter recipes.",
+      "prompt": "Our application uses prisma@6.19.3, @prisma/client@6.19.3 and prisma-client-js with MongoDB. The .env connection points at our standalone local mongod. A nested write fails with a transactions-not-supported error. Help us diagnose the setup; keep the database, data and ORM version. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Use the Prisma 6 MongoDB guidance, identify the replica-set prerequisite, and preserve data and client configuration.",
+      "files": [],
+      "expectations": [
+        "Uses Prisma 6 MongoDB guidance and preserves the existing client/generator without adding a SQL adapter or requiring an ORM upgrade.",
+        "Identifies that MongoDB transactions require a replica set and proposes verifying and configuring the intended deployment without deleting data or provisioning an unrelated replacement.",
+        "Does not propose Prisma Migrate for MongoDB or applying db push as a transaction fix; plans connection verification without claiming it already succeeded."
+      ]
+    }
+  ]
+}
