@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents (Claude Code, OpenCode, Cursor, 
 
 ## Repository Overview
 
-A collection of skills for AI coding agents working with Prisma ORM. Skills are packaged instructions and rules that extend agent capabilities for database development, query optimization, and best practices.
+A collection of skills for AI coding agents working with Prisma ORM, Prisma Postgres and Prisma Compute. Skills are packaged instructions and rules that extend agent capabilities for database development, app deployment, query optimization, and best practices.
 
 ## Creating a New Skill
 

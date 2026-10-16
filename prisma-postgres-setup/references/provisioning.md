@@ -7,7 +7,7 @@ First reuse an existing connection or resource. For v0 or Vercel Marketplace, us
 Choose an available authenticated surface: Prisma Console, the Prisma Platform CLI, a connected Prisma MCP server, or the Management API. Reuse existing authentication; do not ask the user to paste tokens into chat.
 
 - **Console:** select the intended workspace and project at [Prisma Console](https://console.prisma.io), then obtain the database's connection details.
-- **Platform CLI:** inspect the current command help before mutation. The package is `@prisma/cli`, distinct from the `prisma` ORM CLI. Start with `npx -y @prisma/cli@latest database --help`; discover list, create, and connection commands from that version.
+- **Platform CLI:** inspect the current command help before mutation. The Platform commands ship in the Prisma 8 CLI (`prisma` 8, also published as `@prisma/cli`); the `postgres` group of a Prisma 7 `prisma` binary only links an existing database. Start with `npx -y @prisma/cli@latest postgres --help`; discover list, create, and connection commands from that version.
 - **MCP:** discover available tools and their input schemas. Confirm the workspace and resource context before invoking a provisioning tool. Missing tools or authentication are blockers, not permission to switch accounts.
 - **Management API:** use the [current schema](https://api.prisma.io/v1/doc) at `https://api.prisma.io/v1`, or installed SDK types, for exact endpoints and payloads. Do not copy an older project/database response shape blindly.
 
