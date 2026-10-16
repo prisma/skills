@@ -1,6 +1,6 @@
 # Prisma Skills
 
-A collection of skills for AI coding agents working with Prisma ORM. Skills are packaged instructions that extend agent capabilities for database development.
+A collection of skills for AI coding agents working with Prisma ORM, Prisma Postgres and Prisma Compute. Skills are packaged instructions that extend agent capabilities for database development and app deployment.
 
 Skills follow the [Agent Skills](https://agentskills.io/) format and are compatible with `npx skills add`.
 
@@ -117,28 +117,29 @@ Also keeps existing Prisma 6/7 applications on their version, with provider refe
 
 Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Hands Prisma ORM configuration to `prisma-orm-setup`, and honors explicit driver, alternative ORM, or database-only choices.
 
-**Use when:** connecting Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
+**Use when:** the user needs a database and has none yet ("I need a database"), runs `npx create-db`, or connects Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
 
 ---
 
 ### prisma-compute
 
-Prisma Compute deployment and hosting workflows centered on the Prisma Platform CLI, with `create-prisma` covered as the new-project scaffold path, plus framework readiness, SDK automation, and operational debugging.
+Deploy and operate apps on Prisma Compute with the Prisma 8 CLI. Every app deploys as a Prisma Composer app (`module.ts`), from a terminal with `prisma deploy` or on every push through `prisma/cloud-deploy-action`.
 
 **Use when:**
-- Creating a new Prisma app with optional Compute deploy
-- Deploying or redeploying an existing app to Prisma Compute
-- Checking framework deploy readiness for Hono, Elysia, Next.js, TanStack Start, Astro, Nuxt, Svelte, Nest, Turborepo, or custom/prebuilt artifacts
-- Managing Compute app logs, deployments, environment variables, branches, and domains
-- Building programmatic Compute integrations with SDK/API tooling
+- Deploying a new or existing app to Prisma Compute
+- Porting a project from the removed `@prisma/cli app deploy`, `prisma.compute.ts`, or `compute:deploy` flow
+- Setting up preview stages, deploy on push, or CI deploys
+- Reading service logs, promoting, or rolling back versions
+- Managing environment variables, custom domains, databases, and buckets for a Compute project
+- Debugging failed deploys, unreachable services, 504s, or sleeping instances
 
 **Workflows covered:**
-- `@prisma/cli app build/run/deploy`
-- Generated `compute:deploy` scripts
-- `create-prisma --deploy` for new project scaffolds
-- Framework-specific build output requirements
-- `@prisma/compute-sdk` and Management API App/Deployment concepts
-- Troubleshooting auth, env, build, deploy, log, and port issues
+- Composer app declaration: `module.ts`, `compute()`, build adapters per framework, and the `composer` section of `prisma.config.ts`
+- `prisma dev` and `prisma deploy`, `--stage` previews, regions, and service-token CI
+- Deploy on push with `prisma git connect` and `prisma/cloud-deploy-action`
+- `prisma service` logs, versions, rollback, and domains; `prisma project env`
+- Compute runtime limits: Bun, binding `0.0.0.0`, 60 seconds to first byte, `waitUntil` and `KeepAwakeGuard`
+- `create-prisma` scaffolds, the REST API, and the Composer control API
 
 ## Installation
 
@@ -200,7 +201,7 @@ New ORM setups default to **Prisma ORM 8**. Install `prisma-orm-setup` and `pris
 
 The existing `prisma-cli`, `prisma-client-api`, driver adapter, and earlier-version upgrade skills retain their existing scope; do not use their legacy recipes for Prisma 8 setup.
 
-The `prisma-compute` skill tracks the active Prisma Compute launch flow and instructs agents to verify the current Prisma Platform CLI and `create-prisma` command surfaces before acting.
+The `prisma-compute` skill covers the Composer-based deploy flow of the Prisma 8 CLI. For API details it defers to the version-matched `prisma-platform-core-concepts` and `prisma-composer-core-concepts` skills, which `prisma skills sync` installs from the `prisma` and `@prisma/composer` packages.
 
 If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migration-specific guidance.
 

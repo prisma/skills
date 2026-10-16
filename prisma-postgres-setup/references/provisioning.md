@@ -7,7 +7,7 @@ First reuse an existing connection or resource. For v0 or Vercel Marketplace, us
 Choose an available authenticated surface: Prisma Console, the Prisma Platform CLI, a connected Prisma MCP server, or the Management API. Reuse existing authentication; do not ask the user to paste tokens into chat.
 
 - **Console:** select the intended workspace and project at [Prisma Console](https://console.prisma.io), then obtain the database's connection details.
-- **Platform CLI:** inspect the current command help before mutation. The package is `@prisma/cli`, distinct from the `prisma` ORM CLI. Start with `npx -y @prisma/cli@latest database --help`; discover list, create, and connection commands from that version.
+- **Platform CLI:** inspect the current command help before mutation. The Platform commands ship in the Prisma 8 CLI (`prisma` 8, also published as `@prisma/cli`); the `postgres` group of a Prisma 7 `prisma` binary only links an existing database. Start with `npx -y @prisma/cli@latest postgres --help`; discover list, create, and connection commands from that version.
 - **MCP:** discover available tools and their input schemas. Confirm the workspace and resource context before invoking a provisioning tool. Missing tools or authentication are blockers, not permission to switch accounts.
 - **Management API:** use the [current schema](https://api.prisma.io/v1/doc) at `https://api.prisma.io/v1`, or installed SDK types, for exact endpoints and payloads. Do not copy an older project/database response shape blindly.
 
@@ -29,7 +29,7 @@ For server-to-server API access, use a workspace service token from the user's s
 
 ## Temporary databases with create-db
 
-Use `create-db` only when a temporary, claimable development database fits the request. By default, the database is available for **24 hours** and is automatically deleted if unclaimed. Claim it through the returned claim URL **before its expiry** to keep it; claiming requires a Prisma account. Use the returned expiry as the deadline if a different lifetime was selected. See the [documented lifecycle](https://www.prisma.io/docs/postgres/introduction/npx-create-db#claiming-your-database).
+Use `create-db` when the user needs a working database now and has no connection or Prisma account. By default, the database is available for **24 hours** and is automatically deleted if unclaimed. Claim it through the returned claim URL **before its expiry** to keep it; claiming requires a Prisma account. Use the returned expiry as the deadline if a different lifetime was selected. See the [documented lifecycle](https://www.prisma.io/docs/postgres/npx-create-db#claiming-your-database).
 
 Inspect the current commands when selecting a region or a non-default lifetime:
 
@@ -40,4 +40,4 @@ npx create-db@latest regions --help
 
 Choose a supported region and lifetime. Store the connection string and claim URL privately, then tell the user when the database expires and how to claim it using the returned lifecycle information. Do not promise persistence until claiming is complete. Avoid flags that print credentials into shared output.
 
-For programmatic provisioning, the `create-db` package exposes `create()` and `regions()`. Check the installed types, handle success and error results, and store returned connection/claim information without logging it. See the [create-db documentation](https://www.prisma.io/docs/postgres/introduction/npx-create-db).
+For programmatic provisioning, the `create-db` package exposes `create()` and `regions()`. Check the installed types, handle success and error results, and store returned connection/claim information without logging it. See the [create-db documentation](https://www.prisma.io/docs/postgres/npx-create-db).
