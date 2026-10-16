@@ -1,6 +1,6 @@
 # Prisma Skills
 
-A collection of skills for AI coding agents working with Prisma ORM. Skills are packaged instructions that extend agent capabilities for database development.
+A collection of skills for AI coding agents working with Prisma ORM, Prisma Postgres and Prisma Compute. Skills are packaged instructions that extend agent capabilities for database development and app deployment.
 
 Skills follow the [Agent Skills](https://agentskills.io/) format and are compatible with `npx skills add`.
 
