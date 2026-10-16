@@ -29,7 +29,7 @@ Re-run the failing command with `--json` (and `--report deploy-report.json` for 
 |---------|-------|-----|
 | `CLI.UNKNOWN_COMMAND` for `app`, `build`, `database`, `agent`, `destroy`, `compute` | The command was removed | Use the replacement in the SKILL.md table |
 | `Unknown command "auth"` or `"deploy"`, or `prisma dev` starts a database server | A Prisma 6 or 7 `prisma` binary | Install `prisma` 8.x as a dev dependency, or use `npx @prisma/cli@latest` |
-| `ERR_UNKNOWN_FILE_EXTENSION` | Node.js older than 22.18 loading `module.ts` | Upgrade Node.js |
+| `ERR_UNKNOWN_FILE_EXTENSION` | Node.js too old to load `module.ts`. Composer supports 22.18 or newer on the 22 line, 24.11 or newer on the 24 line, or 26 or newer | Upgrade Node.js |
 | `CLI.CONFIG_UNREADABLE` with a module error from `effect` | Another `effect` version hoisted over the one `@prisma/composer` pins | Match the app's `effect` to `@prisma/composer`'s `dependencies.effect`, or force it with `overrides` (npm), `pnpm.overrides` or `pnpm-workspace.yaml` `overrides` (pnpm), `resolutions` (Yarn); reinstall |
 | `CLI.CONFIG_SECTION_INVALID` with `CONFIG.SECTION_MISSING` | No `composer` section in `prisma.config.ts` | Add the section ([`app-composer-setup.md`](app-composer-setup.md)) |
 | `CONFIG.FILE_RETIRED` or `CONFIG.FIELD_RETIRED` | A `prisma-composer.config.ts` or `configPath` from an older Composer | Move `extensions` and `state` into the `composer` section and delete the old file |
@@ -67,7 +67,7 @@ Re-run the failing command with `--json` (and `--report deploy-report.json` for 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
 | Public URL times out or returns 502 at once | Listener on `localhost`, wrong port, or a crash at boot | Bind `0.0.0.0` on `service.port()`; read `npx prisma service logs <service>` |
-| `Cannot find module` in logs | A dependency was not inlined into the single-file entry | Bundle every dependency (`bun build --target=bun`), or use a `dir` build that contains them |
+| `Cannot find package`, `Cannot find module`, or `ENOENT while resolving package` in logs | The build left a package as an import, and the default `dependencies: "bundled"` ships only the build output | Bundle every dependency (`bun build --target=bun`), or set `dependencies: "external"` on `node()` so the deploy stages the installed packages |
 | 502s in a loop after the app was idle | A database client dies when idle connections close | Small reconnect-friendly pool; log `uncaughtException` and `unhandledRejection` instead of exiting |
 | `504 Gateway Time-out` with an `openresty` body after about 60 seconds | The handler sent nothing for 60 seconds | Respond first, continue under `waitUntil`, or queue the work |
 | Background work stops or never finishes | The instance slept | `waitUntil` or `KeepAwakeGuard` from `@prisma/compute`; persist progress |

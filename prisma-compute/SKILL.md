@@ -11,7 +11,7 @@ metadata:
 
 Deploy TypeScript apps to Prisma Compute and operate them afterwards. Every deploy goes through a Prisma Composer app (a `module.ts` root module) and the Prisma 8 CLI, `prisma`.
 
-Verified against `prisma` 8.0.0-rc.21 (published identically as `@prisma/cli`), `@prisma/composer` and `@prisma/composer-prisma-cloud` 0.28.0, `@prisma/compute` 0.1.0-beta.0, and `create-prisma` 0.14.1. The CLI moves fast: run `npx prisma <group> --help` before using a flag this skill does not show.
+Verified against `prisma` 8.0.0-rc.21 (published identically as `@prisma/cli`), `@prisma/composer` and `@prisma/composer-prisma-cloud` 0.28.0, `@prisma/compute` 0.1.0-beta.0, and `create-prisma` 0.14.1. Re-checked against `prisma` 8.0.0-rc.23, whose command surface matches rc.21, and Composer 0.30.0, which adds `node()`'s `dependencies` option (0.29.0) and narrows the supported Node.js versions. The CLI moves fast: run `npx prisma <group> --help` before using a flag this skill does not show.
 
 ## Version-Matched Skills
 
@@ -83,7 +83,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 ### 2. App declaration (CRITICAL)
 
 - `app-composer-required` - A deployable app has `module.ts` (default export `module(name, ...)`), a `service.ts` per server (`compute({ name, deps, build })`), and a `composer` section in `prisma.config.ts` with `prismaCloud()`, `nodeBuild()` (plus `nextjsBuild()` for Next.js), and `state: prismaState()`.
-- `app-build-adapter` - `node({ module: import.meta.url, entry })` for one self-contained bundle, `node({ module, dir, entry })` for a built directory, `nextjs({ module, appDir })` for Next.js standalone. See [`app-framework-builds.md`](references/app-framework-builds.md).
+- `app-build-adapter` - `node({ module: import.meta.url, entry })` for one self-contained bundle, `node({ module, dir, entry })` for a built directory, `nextjs({ module, appDir })` for Next.js standalone. Add `dependencies: "external"` to `node()` when the build leaves packages as imports. See [`app-framework-builds.md`](references/app-framework-builds.md).
 - `app-region` - The first deploy creates the project and needs a region: `prismaCloud({ region: "eu-central-1" })` or `PRISMA_REGION`. The region cannot change later.
 - `app-databases` - `rawPostgres()` (package root) delivers `{ url }`; `postgres(contract)` from `@prisma/composer-prisma-cloud/orm` adds a typed client and applies committed migrations on deploy. Read both through `service.load()`, not `process.env.DATABASE_URL`.
 - `app-names` - Provision ids and service names allow `[A-Za-z0-9]` only, and the platform rejects ids shorter than three characters. The root module name becomes the project name.
@@ -91,7 +91,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 ### 3. Runtime (CRITICAL)
 
 - `runtime-bind-all-interfaces` - Listen on `service.port()` (also exported as `PORT`, default 3000) and bind `0.0.0.0`. A loopback listener is unreachable.
-- `runtime-bun` - Services run on Bun. Builds must inline every dependency except runtime built-ins; `node_modules` is not shipped with a single-file entry.
+- `runtime-bun` - Services run on Bun. By default (`dependencies: "bundled"`) a deploy ships only the build output, never the project's `node_modules`, so the build must inline every dependency except runtime built-ins. A build that leaves packages as imports (`tsc`, Astro's Node adapter) sets `dependencies: "external"` on `node()`, and the deploy stages the installed packages its entry imports.
 - `runtime-first-byte-60s` - A request that sends no bytes for 60 seconds gets `504 Gateway Time-out` and is cancelled. Respond first, then continue under `waitUntil` or from a queue.
 - `runtime-sleep` - Idle instances are snapshotted and resumed. Timers and floating promises can stall. `waitUntil` and `KeepAwakeGuard` from `@prisma/compute` keep an instance awake on a best-effort basis; they do not make work durable.
 - `runtime-no-websockets` - WebSocket servers are not supported.

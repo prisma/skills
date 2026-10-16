@@ -12,7 +12,7 @@ CRITICAL
 
 ## Requirements
 
-- Node.js 22.18 or newer. Composer loads the `.ts` entry directly; older versions stop at `ERR_UNKNOWN_FILE_EXTENSION`.
+- Node.js 22.18 or newer on the 22 line, 24.11 or newer on the 24 line, or 26 or newer (`engines.node` is `^22.18.0 || ^24.11.0 || >=26.0.0` since Composer 0.30.0). Composer loads the `.ts` entry directly; older versions stop at `ERR_UNKNOWN_FILE_EXTENSION`.
 - Bun. Deployed services run on Bun, and `bun build --target=bun` is the simplest way to produce the single-file entry a service needs.
 - The packages:
 

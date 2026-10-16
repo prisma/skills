@@ -12,7 +12,7 @@ A deploy can converge cleanly and still serve nothing: a loopback listener is un
 
 ## Runtime
 
-- Services run on **Bun**, in a VM next to their Prisma Postgres database. Write server code for Bun, and bundle with `bun build --target=bun` or another bundler that inlines all dependencies.
+- Services run on **Bun**, in a VM next to their Prisma Postgres database. Write server code for Bun, and bundle with `bun build --target=bun` or another bundler that inlines all dependencies. A build that leaves packages as imports needs `dependencies: "external"` on `node()` (Composer 0.29.0 and later).
 - There is no global `Temporal`. A service that reads Prisma ORM `DateTime` columns as `Temporal` values compiles, deploys, then fails on the first read. Import a polyfill at the server entry or use string column types.
 
 ## Host and Port
