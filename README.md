@@ -117,7 +117,7 @@ Also keeps existing Prisma 6/7 applications on their version, with provider refe
 
 Reuse or provision a Prisma Postgres database, connect it to the application, and verify a query. Hands Prisma ORM configuration to `prisma-orm-setup`, and honors explicit driver, alternative ORM, or database-only choices.
 
-**Use when:** connecting Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
+**Use when:** the user needs a database and has none yet ("I need a database"), runs `npx create-db`, or connects Prisma Postgres through v0/Vercel Marketplace, Console, Platform CLI, MCP, `create-db`, or the Management API. Marketplace guidance is a reference in this skill, not a separate skill.
 
 ---
 
