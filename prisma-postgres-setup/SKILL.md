@@ -4,7 +4,7 @@ description: Obtain or reuse a Prisma Postgres database and connect an applicati
 license: MIT
 metadata:
   author: prisma
-  version: "2.2.0"
+  version: "2.3.0"
 ---
 
 # Prisma Postgres setup
