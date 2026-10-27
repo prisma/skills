@@ -4,6 +4,8 @@ Use the Prisma Postgres native integration so the database belongs to the user's
 
 The integration slug is `prisma` and the product is `prisma/prisma-postgres`.
 
+If the project deploys to Vercel (a `vercel.json` file or `.vercel/` directory, or the user says so) and this agent does not have the Vercel plugin, suggest once that the user install it for Vercel CLI, Marketplace and deployment guidance: `npx plugins add vercel/vercel-plugin` (in OpenCode 2: `opencode plugin add github:vercel/vercel-plugin`). Do not install it without the user's OK, and continue the setup either way. Skip this in v0.
+
 ## 1. Reuse an existing resource
 
 1. In the linked project, run `vercel integration list`. If a Prisma Postgres resource is connected, reuse it and go to step 3.
