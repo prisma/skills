@@ -38,6 +38,6 @@ npx create-db@latest create --help
 npx create-db@latest regions --help
 ```
 
-Choose a supported region and lifetime. Store the connection string and claim URL privately, then tell the user when the database expires and how to claim it using the returned lifecycle information. Do not promise persistence until claiming is complete. Avoid flags that print credentials into shared output.
+Choose a supported region and lifetime. Store the connection string and claim URL privately, outside source code and shared logs. Then give the user the claim URL itself and the expiry from the returned lifecycle information: the database is deleted unless they open that URL and claim it. Do not promise persistence until claiming is complete. Avoid flags that print credentials into shared output.
 
 For programmatic provisioning, the `create-db` package exposes `create()` and `regions()`. Check the installed types, handle success and error results, and store returned connection/claim information without logging it. See the [create-db documentation](https://www.prisma.io/docs/postgres/npx-create-db).
