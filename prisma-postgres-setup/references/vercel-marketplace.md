@@ -32,15 +32,19 @@ In v0, use the host's native integration flow instead. It may appear as an integ
 
 Connecting a resource sets these variables on each connected environment:
 
-| Variable              | Value                                                                                                                          | Use                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| `DATABASE_URL`        | `postgres://<user>:<key>@db.prisma.io:5432/postgres?sslmode=require`                                                           | The application and Prisma CLI commands    |
-| `POSTGRES_URL`        | The same value as `DATABASE_URL`                                                                                               | Libraries that read `POSTGRES_URL`         |
-| `PRISMA_DATABASE_URL` | The same value on resources created now. On older resources it can be a `prisma+postgres://accelerate.prisma-data.net/...` URL | Do not use in new code; use `DATABASE_URL` |
+| Variable              | Value                                                                                                                          | Use                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| `DATABASE_URL`        | `postgres://<user>:<key>@db.prisma.io:5432/postgres?sslmode=require` (direct)                                                  | Prisma CLI commands, and the application's fallback |
+| `DATABASE_URL_POOLED` | `postgres://<user>:<key>@pooled.db.prisma.io:5432/postgres?sslmode=require` (pooled). Set on resources created from 2026-10-29 | Application traffic                                 |
+| `POSTGRES_URL`        | The same value as `DATABASE_URL`                                                                                               | Libraries that read `POSTGRES_URL`                  |
+| `PRISMA_DATABASE_URL` | The same value on resources created now. On older resources it can be a `prisma+postgres://accelerate.prisma-data.net/...` URL | Do not use in new code; use `DATABASE_URL`          |
 
-- With `--prefix`, each name gets the prefix as-is (`--prefix DB2_` gives `DB2_DATABASE_URL`). Read the prefixed name.
-- Never print the values. `vercel env ls <environment>` lists names without values.
-- `db.prisma.io` is the direct endpoint. It works for the application, migrations and Prisma Studio, so setup needs nothing else. Direct connections are capped low: 10 on Free and Starter, 5 of them reserved for the platform. Before production load from Vercel Functions, tell the user that application traffic should use the pooled endpoint (`pooled.db.prisma.io`), whose connection string Prisma Console shows for the database; `vercel integration open prisma` signs the user in. Do not overwrite the integration's variables: add the pooled string under a new name with `vercel env add`, keep `DATABASE_URL` for migrations, and switch the runtime client only if the user agrees.
+- With `--prefix`, each name gets the prefix as-is (`--prefix DB2_` gives `DB2_DATABASE_URL` and `DB2_DATABASE_URL_POOLED`). Read the prefixed names.
+- Never print the values. `vercel env ls` can show the start of a value, so check a name with `vercel env ls <environment> | grep -qw <NAME>`.
+- Direct connections (`db.prisma.io`) are capped low: 10 on Free and Starter, 5 of them reserved for the platform. Vercel Functions scale out, so the application reads the pooled string with the direct one as fallback: `process.env.DATABASE_URL_POOLED ?? process.env.DATABASE_URL`. Migrations, Prisma Studio and other Prisma CLI commands keep `DATABASE_URL`.
+- Keep the application on `DATABASE_URL` instead when it uses the Prisma Postgres serverless driver (`@prisma/ppg`, `@prisma/adapter-ppg`), which takes the direct string, depends on session state (`LISTEN`/`NOTIFY`, temporary tables, session-level `SET`, advisory locks), or runs queries longer than 10 minutes, which the pooler stops.
+- If `DATABASE_URL_POOLED` is missing, the resource predates 2026-10-29. The fallback keeps the app working; tell the user that production traffic should use the pooled string. Prisma Console shows it for the database (`vercel integration open prisma` signs the user in). With the user's agreement, add it with `vercel env add DATABASE_URL_POOLED <environment>` for each connected environment. Never overwrite the integration's other variables.
+- If `.env.local` has `DATABASE_URL_POOLED` but the Development environment doesn't (`vercel env ls development | grep -qw DATABASE_URL_POOLED` fails), `vercel env pull` kept an old local value. Ask the user before using it.
 
 ## 4. First successful request
 
@@ -52,7 +56,7 @@ Connecting a resource sets these variables on each connected environment:
 ## 5. Validate and report
 
 - `vercel integration list` shows the resource, its status and the connected project.
-- `vercel env ls production` lists `DATABASE_URL`.
+- `vercel env ls production | grep -qw DATABASE_URL_POOLED` succeeds (`DATABASE_URL` on resources created before 2026-10-29).
 - The local query and the deployed query both succeed.
 
 Report the resource name, the environments it is connected to, the variable the application reads, and the query result, without secrets. If a step was blocked or not tested, say so.
@@ -71,8 +75,8 @@ Report the resource name, the environments it is connected to, the variable the 
 | Connecting fails with an error that names an existing variable, project and environments | The project already has a variable such as `DATABASE_URL`                   | Ask the user. Remove the stale variable with `vercel env rm <name> <environment>`, or connect with `--prefix` and read the prefixed name.                |
 | A Prisma CLI command reports `DATABASE_URL` missing, but the app runs                    | The command does not load `.env.local`                                      | Run it as `vercel env run -- <command>`, or load the intended file for that command. Do not provision another database.                                  |
 | `PRISMA_DATABASE_URL` starts with `prisma+postgres://accelerate.prisma-data.net`         | An older resource still carries an Accelerate URL in that variable          | Read `DATABASE_URL`, which holds a standard `postgres://` string.                                                                                        |
-| Works locally; the deployment has no `DATABASE_URL` or old credentials                   | The deployment predates the connection or a secret rotation                 | Check `vercel env ls <environment>` and that the resource is connected to that environment, then redeploy.                                               |
-| "Too many connections" or connection-limit errors under load                             | Application traffic on the direct endpoint, or a client created per request | Create the database client once, outside the request handler. Move application traffic to the pooled endpoint (section 3).                               |
+| Works locally; the deployment has no `DATABASE_URL` or old credentials                   | The deployment predates the connection or a secret rotation                 | Check the name with `vercel env ls <environment> \| grep -qw DATABASE_URL` and that the resource is connected to that environment, then redeploy.        |
+| "Too many connections" or connection-limit errors under load                             | Application traffic on the direct endpoint, or a client created per request | Create the database client once, outside the request handler. Read `DATABASE_URL_POOLED` for application traffic (section 3).                            |
 | Data is gone after a schema diff or reset                                                | A shadow database or reset command ran against the connected database       | Never point a shadow database URL or a reset command at the connected database; use a separate throwaway database. Restoring needs a paid plan's backup. |
 
 ## Where MCP fits
