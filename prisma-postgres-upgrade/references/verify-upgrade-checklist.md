@@ -17,7 +17,7 @@ change. Checks the agent writes for itself prove only what the agent expected.
 - **Use what the repo has.** Find the type check, build, lint and test scripts in `package.json`
   and CI config, and run exactly those.
 - **Same commands before and after.** Record each command and its result before step 1. Run
-  the identical commands after step 7. A check that was already failing before is reported as
+  the identical commands after step 6. A check that was already failing before is reported as
   such, not fixed silently.
 - **Do not invent checks.** Do not write new tests, smoke scripts or per-route requests to
   stand in for missing ones, and do not change existing tests to make them pass.
@@ -29,10 +29,10 @@ change. Checks the agent writes for itself prove only what the agent expected.
 
 1. **Baseline:** run the type check (`tsc --noEmit` or the repo's script), the build, and the
    test script, then start the app with its own start command and confirm it boots and connects.
-2. **After step 5:** same commands, against the same local database. No file imports
+2. **After step 4:** same commands, against the same local database. No file imports
    `@prisma/client` or the generated client.
-3. **After step 6:** `npm run build`, then `npx prisma dev module.mjs` reaches `dev: ready`.
-4. **After step 7:** the same commands as the baseline, plus `npx prisma db verify` against the
+3. **After step 5:** `npm run build`, then `npx prisma dev module.mjs` reaches `dev: ready`.
+4. **After step 6:** the same commands as the baseline, plus `npx prisma db verify` against the
    signed database.
 5. **Report:** each command, before and after, pass or fail. List what was not verified: the
    Console flow, the preview deploy, and any behavior the tests do not cover, including the rc.20

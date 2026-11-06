@@ -78,6 +78,7 @@ Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 8 and deploy 
 - Query rewrites and the `@prisma/orm-postgres@8.0.0-rc.20` gotchas
 - `service.load().db.client` on Compute and the setup pull request fixes
 - Verifying with the repository's own checks, before and after
+- Handing Prisma 8 details to the `prisma-8` skill that ships in `@prisma/orm-postgres` (`npx prisma skills sync`)
 
 ---
 

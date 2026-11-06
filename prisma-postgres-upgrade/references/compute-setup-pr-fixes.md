@@ -12,6 +12,10 @@ On Compute, `DATABASE_URL` is a reserved variable holding the placeholder `-`. A
 reading it deploys, then fails every query with `P1001` and `host: "base"`. And only the build
 output (`dist/`) ships, so anything the server loads from outside it is missing at runtime.
 
+Fixes 1 to 3 and 5 work around current gaps in the setup pull request, which the Console is
+fixing. Read what the pull request already contains first, and only change what it gets wrong.
+For deploy operations beyond these fixes, follow the `prisma-compute` skill.
+
 ## What the setup pull request adds
 
 On branch `prisma-cloud/setup`, titled **Set up Prisma Cloud deploys**:
