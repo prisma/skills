@@ -62,6 +62,25 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 
 ---
 
+### prisma-postgres-upgrade
+
+Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 8 and deploy it on Prisma Compute, following the [Prisma ORM 6 or 7 to 8 on Prisma Compute guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute).
+
+**Use when:**
+- A PostgreSQL project on Prisma ORM 6 or 7 wants Prisma 8
+- Deploying a Prisma ORM 6 or 7 app on Prisma Compute
+- Finishing the Console's "Set up Prisma Cloud deploys" pull request
+
+**Topics covered:**
+- The Prisma 8 versions the Console's Compute setup pins, and why not `@latest`
+- Reading the existing `schema.prisma` with `prisma7Schema(...)`, `contract emit` and `db sign`
+- Prisma 8 owning migrations in `migrations/app/`
+- Query rewrites and the `@prisma/orm-postgres@8.0.0-rc.20` gotchas
+- `service.load().db.client` on Compute and the setup pull request fixes
+- Verifying with the repository's own checks, before and after
+
+---
+
 ### prisma-client-api
 
 Comprehensive Prisma Client API reference.
@@ -155,6 +174,7 @@ Or install specific skills:
 npx skills add prisma/skills --skill prisma-cli
 npx skills add prisma/skills --skill prisma-upgrade-v7
 npx skills add prisma/skills --skill prisma-mongodb-upgrade
+npx skills add prisma/skills --skill prisma-postgres-upgrade
 npx skills add prisma/skills --skill prisma-client-api
 npx skills add prisma/skills --skill prisma-driver-adapter-implementation
 npx skills add prisma/skills --skill prisma-orm-setup
