@@ -13,28 +13,50 @@ Porting the schema by hand risks a contract that no longer matches the tables, w
 from `migrations/app/`, so without a baseline there, previews and production start with no
 tables.
 
+## The first `prisma.config.ts` (step 2)
+
+```typescript
+import "dotenv/config"; // only if the app already uses dotenv
+import { defineConfig as orm, prisma7Schema } from "@prisma/orm-postgres/config";
+import { definePrismaConfig } from "prisma/config";
+
+export default definePrismaConfig({
+  orm: orm({
+    contract: prisma7Schema("prisma/schema.prisma"), // the same file, Prisma ORM 6 or 7
+    output: "src/prisma",
+    db: { connection: process.env["DATABASE_URL"]! },
+  }),
+  skills: { agents: ["claude"] }, // only the agents the repository uses
+});
+```
+
+Then run `npx prisma skills sync`. Step 5 adds a `composer` section to the same config.
+
 ## What is specific to coming from 6 or 7
 
 - **`prisma7Schema(...)` also reads a Prisma ORM 6 schema unchanged**, including the
   `generator client` block and `url = env(...)`. Do not edit `schema.prisma` or port it to a
-  `contract.prisma`. Wire it in the Prisma 8 `prisma.config.ts` with `output: "src/prisma"`, so
-  `contract.json` and `contract.d.ts` land where `tsc` and the Compute service find them. In a
-  Prisma ORM 7 app, replace the old `prisma.config.ts`: Prisma 8 reads only its own format
-  under that name.
+  `contract.prisma`. `output: "src/prisma"` puts `contract.json` and `contract.d.ts` where `tsc`
+  and the Compute service find them. In a Prisma ORM 7 app, this file replaces the old
+  `prisma.config.ts`: Prisma 8 reads only its own format under that name.
 - **A CommonJS app built with `tsc` stays CommonJS.** Set `"module"` and `"moduleResolution"`
   to `"nodenext"`, add `"resolveJsonModule": true`, keep `include` at `src`, and do not add
   `"type": "module"`.
-- **Sign the existing database, then plan the baseline:** `contract emit`, `db sign`,
-  `migration plan --name init`. Sign every other existing database (staging) too; databases the
-  Compute deploy creates do not need it.
+- **Sign the existing database, then plan the baseline:** `npx prisma contract emit`,
+  `npx prisma db sign`, `npx prisma migration plan`. The first plan on a signed database writes
+  `migrations/app/<timestamp>_baseline/` and ignores `--name`; `db verify` then passes and
+  `db migrate` has nothing to apply. Sign every other existing database (staging) too; databases
+  the Compute deploy creates do not need it.
 - **Retire the old migration setup:** delete `prisma/migrations` (with `migration_lock.toml`),
-  remove `prisma generate`, `prisma migrate *` and `prisma db seed` from scripts, and remove the
-  `"prisma": { "seed": ... }` key. Prisma 8 has no `generate` or seed command. The
-  `_prisma_migrations` table stays in the database; dropping it is the user's call.
+  remove `prisma generate`, `prisma migrate *` and `prisma db seed` from scripts (including
+  `postinstall`), and remove the `"prisma": { "seed": ... }` key. Prisma 8 has no `generate` or
+  seed command; keep the seed script and run it with `tsx` (see `compute-setup-pr-fixes.md`,
+  fix 4). The `_prisma_migrations` table stays in the database; dropping it is the user's call.
 
-For the config shape, `contract emit`, `db sign`, the migration commands and every later
-schema change, follow the synced `prisma-8` skill (`references/contract.md`,
-`references/migration-model.md`, `references/migrations.md`). It matches the installed version.
+For `contract emit`, `db sign`, the migration commands and every later schema change, follow the
+synced `prisma-8` skill (`references/contract.md`, `references/migration-model.md`,
+`references/migrations.md`). Where it shows `definePrismaConfig` from another package, use
+`prisma/config` as above: that is what the installed CLI exports.
 
 ## Bad
 
@@ -45,12 +67,8 @@ npx prisma7 migrate dev
 
 ## Good
 
-```typescript
-contract: prisma7Schema("prisma/schema.prisma"), // the same file, Prisma ORM 6 or 7
-```
-
 ```bash
-npx prisma contract emit && npx prisma db sign && npx prisma migration plan --name init
+npx prisma contract emit && npx prisma db sign && npx prisma migration plan
 rm -r prisma/migrations
 ```
 

@@ -29,14 +29,18 @@ change. Checks the agent writes for itself prove only what the agent expected.
 
 1. **Baseline:** run the type check (`tsc --noEmit` or the repo's script), the build, and the
    test script, then start the app with its own start command and confirm it boots and connects.
+   Record `SHOW timezone` on the database.
 2. **After step 4:** same commands, against the same local database. No file imports
    `@prisma/client` or the generated client.
 3. **After step 5:** `npm run build`, then `npx prisma dev module.mjs` reaches `dev: ready`.
-4. **After step 6:** the same commands as the baseline, plus `npx prisma db verify` against the
-   signed database.
+4. **After step 6:** a fresh install, then the same commands as the baseline, plus
+   `npx prisma db verify` against the signed database. `npm start` now fails outside Composer
+   by design (`compute-setup-pr-fixes.md`, fix 4), so start the app with `prisma dev`
+   instead and report that the start command changed.
 5. **Report:** each command, before and after, pass or fail. List what was not verified: the
    Console flow, the preview deploy, and any behavior the tests do not cover, including the rc.20
-   `DateTime` and `now()` notes in `client-api-mapping.md`.
+   `DateTime` and `now()` notes in `client-api-mapping.md`. If the database's time zone is not
+   UTC, say so first: new rows store a different time than before.
 
 ## Bad
 

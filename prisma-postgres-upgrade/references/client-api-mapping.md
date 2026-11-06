@@ -1,6 +1,6 @@
 # client-api-mapping
 
-Map each Prisma ORM 6 or 7 call to the Prisma 8 client; four differences break most rewrites.
+Map each Prisma ORM 6 or 7 call to the Prisma 8 client; five differences break most rewrites.
 
 ## Priority
 
@@ -21,9 +21,9 @@ Compute the client comes from `service.load().db.client` (see `compute-setup-pr-
 | Prisma ORM 6 / 7 | Prisma 8 |
 |------------------|----------|
 | `findMany({ where, orderBy })` | `.where({...}).orderBy((m) => m.field.asc()).all()` |
-| `include: { _count: { select: { posts: true } } }` | `.include("posts", (p) => p.count())`; the number is `row.posts` |
+| `include: { _count: { select: { posts: true } } }` | `.include("posts", (p) => p.count())`; the number is `row.posts`, not `row._count.posts` |
 | `orderBy: { votes: { _count: "desc" } }` | `.orderBy((p) => p.votes.count().desc())` |
-| `findUnique({ where: { id } })` | `.whereUnique({ id }).first()` |
+| `findUnique({ where: { id } })` | `.first({ id })` |
 | `findUnique` on an `@unique` or `@@unique` field | `.where({...}).first()` |
 | `create({ data: { ..., votes: { create: {...} } } })` | `.create({ ..., votes: (v) => v.create([{...}]) })` |
 | `deleteMany({ where })` then `.count` | `.where({...}).deleteAndCount()` |
@@ -33,10 +33,10 @@ Compute the client comes from `service.load().db.client` (see `compute-setup-pr-
 What has no Prisma 8 form yet, such as `increment` in an update, is listed in
 [Coming from Prisma ORM 7](https://www.prisma.io/docs/orm/coming-from-prisma-orm-7#queries).
 
-## The four differences
+## The five differences
 
-1. **`whereUnique` only on the primary key.** A 6/7 `@unique` or `@@unique` becomes a unique
-   index, which `whereUnique` does not accept. Use `.where({...}).first()`.
+1. **Unique lookups use `.first(...)` or `.where(...).first()`.** A 6/7 `@unique` or `@@unique`
+   becomes a unique index, which `whereUnique` does not accept, so do not reach for it.
 2. **Enums are under `db.nativeEnums`**, not `db.enums`. The values are the same strings.
 3. **`DateTime` may read as a string** (`"2026-11-06 09:10:48.497"`, UTC, no offset) at
    `@prisma/orm-postgres@8.0.0-rc.20`. `row.createdAt.toISOString()` then throws at runtime,
@@ -44,19 +44,24 @@ What has no Prisma 8 form yet, such as `increment` in an update, is listed in
    `prisma-8` skill before converting.
 4. **`@default(now())` is filled by the database** at rc.20, so a `timestamp` column gets the
    database's local time where 6/7 sent UTC. If `SHOW timezone` is not `UTC`, tell the user
-   rather than changing data.
+   rather than changing data: new rows will store a different time than before, which is a
+   behavior change the user has to decide on.
+5. **Templates and other code `tsc` does not check still read the old shapes.** Search views
+   (`.ejs`, `.hbs`, `.pug`) and plain `.js` files for `_count.`, `.toISOString()` on dates, and
+   enum imports, and change them with the queries.
 
 ## Bad
 
-```typescript
+```text
 const board = await db.orm.public.Board.whereUnique({ slug }).first(); // does not compile
-const label = post.createdAt.toISOString(); // compiles in an .ejs view, throws at runtime
+<%= post._count.votes %> <!-- an .ejs view tsc never checks: undefined after the rewrite -->
 ```
 
 ## Good
 
 ```typescript
 const board = await db.orm.public.Board.where({ slug }).first();
+const post = await db.orm.public.Post.include("votes", (v) => v.count()).first({ id }); // post.votes
 ```
 
 ## References

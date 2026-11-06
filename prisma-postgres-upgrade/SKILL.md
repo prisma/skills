@@ -4,20 +4,22 @@ description: Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 
 license: MIT
 metadata:
   author: prisma
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Prisma Postgres Upgrade: Prisma ORM 6 or 7 to Prisma 8 on Compute
 
 Move a Node.js server on Prisma ORM 6 or 7 and PostgreSQL to Prisma 8 in one pass, then deploy
-it on Prisma Compute through the Console's setup pull request. The schema, the database and its
-data stay.
+it on Prisma Compute. The schema, the database and its data stay.
 
 This skill is the bridge. It covers only what is specific to leaving Prisma ORM 6 or 7 and
 landing on Compute. Prisma 8 itself (the contract, migrations, queries, errors) is covered by the
-`prisma-8` skill that ships inside `@prisma/orm-postgres`: install it with `npx prisma skills sync`
-as soon as step 2 is done, and follow it for anything Prisma 8 specific. It matches the
-installed version; this skill does not.
+`prisma-8` skill that ships inside `@prisma/orm-postgres`, which step 2 installs. Follow it for
+anything Prisma 8 specific; it matches the installed version, and this skill does not.
+
+`prisma-8` says it does not apply to a project that still has `schema.prisma` and
+`@prisma/client`. That is expected mid-upgrade: this skill keeps both until step 6, and
+`prisma7Schema(...)` reads that `schema.prisma`. Use `prisma-8` for the Prisma 8 side anyway.
 
 The [Prisma ORM 6 or 7 to 8 on Prisma Compute (PostgreSQL) guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute)
 is the source of truth for the steps.
@@ -26,9 +28,9 @@ is the source of truth for the steps.
 
 - Never route a PostgreSQL Prisma ORM 6 app through Prisma ORM 7 first. Prisma 8 reads a
   Prisma ORM 6 `schema.prisma` unchanged, so `prisma-upgrade-v7` is only for apps that stay on 7.
-- Never install `prisma@latest` or `@prisma/orm-postgres@latest` while the Console's Compute
-  setup pins versions: the latest pair does not work with the Composer version the setup
-  installs, so the deploy fails.
+- Never install `prisma@latest`, `@prisma/orm-postgres@latest` or the latest Composer packages
+  while the Console's Compute setup pins versions: the latest set does not work together, so the
+  deploy fails.
 
 ## When to Apply
 
@@ -45,9 +47,11 @@ a project already on Prisma 8 (use the synced `prisma-8` skill), or a new projec
 ## Versions
 
 Install exactly the versions the Console's setup uses, with `--save-exact`: today `prisma`
-`8.0.0-rc.27` (dev dependency) and `@prisma/orm-postgres` `8.0.0-rc.20`. If the repository
-already has a setup pull request, or the Console's message names other versions, use those.
-Use Node.js 24.11 or newer; `prisma dev` needs it.
+`8.0.0-rc.27` (dev dependency), `@prisma/orm-postgres` `8.0.0-rc.20`, and in step 5
+`@prisma/composer` and `@prisma/composer-prisma-cloud` `0.34.0` (the release that peers on
+`@prisma/orm-postgres` `8.0.0-rc.20`). If the repository already has a setup pull request, or
+the Console's message names other versions, use those. Use Node.js 24.11 or newer; `prisma dev`
+needs it.
 
 ## The path
 
@@ -55,44 +59,53 @@ Use Node.js 24.11 or newer; `prisma dev` needs it.
 |------|--------------|---------------------|
 | 0 | Run the repo's own checks and record the results | `verify-upgrade-checklist` |
 | 1 | Remove `prisma`, install the versions above | this file |
-| 2 | Prisma 8 `prisma.config.ts` reading the existing schema, `contract emit`, `db sign` | `adopt-schema-and-migrations` |
-| 2b | `npx prisma skills sync`; from here, use the `prisma-8` skill for Prisma 8 details | `prisma-8` |
-| 3 | Baseline migration, retire `prisma/migrations` | `adopt-schema-and-migrations` |
+| 2 | Write the Prisma 8 `prisma.config.ts`, then `npx prisma skills sync` | `adopt-schema-and-migrations` |
+| 3 | `contract emit`, `db sign`, baseline migration, retire `prisma/migrations` | `adopt-schema-and-migrations` |
 | 4 | Rewrite every query for the Prisma 8 client | `client-api-mapping` |
-| 5 | Console setup pull request, then what it gets wrong | `compute-setup-pr-fixes` |
+| 5 | Compute: the Console setup pull request and its fixes, or the same files written by hand | `compute-setup-pr-fixes` |
 | 6 | Remove `@prisma/client`, the adapter and the generated client | this file |
 | 7 | Run the same checks again and start the app | `verify-upgrade-checklist` |
 
 Step 1 removes the only command that generated the old client. It keeps working locally, but a
 fresh install (CI, a new clone) has none, so finish step 4 before pushing to a branch CI builds.
-`npx prisma skills sync` fails with `CLI.CONFIG_UNREADABLE` while a Prisma ORM 7
-`prisma.config.ts` is still in place, which is why it waits for step 2. Run it again after
-step 5 to add the Composer skill.
+
+The sync in step 2 installs `prisma-8`, `prisma-platform-core-concepts` and
+`prisma-composer-core-concepts` in one go, because the CLI depends on Composer. It writes them
+for every agent it knows unless `skills.agents` in the config lists only the ones the repository
+uses. In a Prisma ORM 7 app, replace the old `prisma.config.ts` before syncing: the sync fails
+with `CLI.CONFIG_UNREADABLE` while the old one is in place.
+
+In step 6, `npm uninstall @prisma/client` leaves the generated client behind; delete
+`node_modules/.prisma` too, then run a fresh install and the checks so nothing still imports it.
 
 ## What the user does
 
 The agent cannot do these; stop and ask:
 
 - Connect the repository in the [Prisma Console](https://console.prisma.io), which opens the
-  setup pull request.
+  setup pull request, or run `npx prisma git connect`, which is interactive.
+- Choose the region for the first deploy. It cannot be changed later.
 - Provide values for the environment variables the app reads (`prisma project env add`).
 - Approve the push to `prisma-cloud/setup`. Every push deploys a preview; merging deploys
   production.
+- Decide what to do about a database time zone other than UTC (see `client-api-mapping`).
 
 ## Reference files
 
 | Reference | What it covers |
 |-----------|----------------|
-| `references/adopt-schema-and-migrations.md` | Keeping `schema.prisma` as the contract, CommonJS `tsconfig`, the baseline, retiring the old migration setup |
-| `references/client-api-mapping.md` | Prisma ORM 6/7 calls to Prisma 8, and four differences that break rewrites |
-| `references/compute-setup-pr-fixes.md` | What the Console's setup pull request currently gets wrong |
+| `references/adopt-schema-and-migrations.md` | The first `prisma.config.ts`, keeping `schema.prisma` as the contract, CommonJS `tsconfig`, the baseline, retiring the old migration setup |
+| `references/client-api-mapping.md` | Prisma ORM 6/7 calls to Prisma 8, and the differences that break rewrites |
+| `references/compute-setup-pr-fixes.md` | What the Console's setup pull request gets wrong, and the files to write without one |
 | `references/verify-upgrade-checklist.md` | Proving the upgrade with the repo's own checks |
 
 ## Verified against
 
-A Prisma ORM 6.19 app (Express 4, `tsc`, CommonJS) on PostgreSQL 18, with `prisma`
-8.0.0-rc.27, `@prisma/orm-postgres` 8.0.0-rc.20 and Composer 0.34.0, run locally under
-`prisma dev`. The Console flow and the Compute runtime were not deployed end to end.
+A Prisma ORM 6.19 app (Express 4, EJS, `tsc`, CommonJS) on PostgreSQL 18, with `prisma`
+8.0.0-rc.27, `@prisma/orm-postgres` 8.0.0-rc.20 and Composer 0.34.0. An agent with only this
+skill upgraded it with no setup pull request: pages and API output were identical before and
+after against the same database, and `npx prisma dev module.mjs` reached `dev: ready`. The
+Console flow and the Compute runtime were not deployed end to end.
 
 ## Hand-off rule
 
