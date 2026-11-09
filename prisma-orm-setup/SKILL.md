@@ -29,7 +29,7 @@ Use an existing database when supplied. Load `prisma-postgres-setup` only when P
 
 ## 2. Handle requested major upgrades separately
 
-When the user requests a major upgrade, load a workflow that supports the source version and provider. For PostgreSQL 7-to-8, use the [Prisma migration guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql); for MongoDB 6-to-8, use [prisma-mongodb-upgrade](../prisma-mongodb-upgrade/SKILL.md). Other providers need an explicitly supported migration path. `prisma-upgrade-v7` covers **6 to 7**; the package-owned `prisma-8` upgrade reference covers updates within 8.
+When the user requests a major upgrade, load a workflow that supports the source version and provider. For PostgreSQL 6 or 7 to 8 in one pass, use [prisma-postgres-upgrade](../prisma-postgres-upgrade/SKILL.md); for PostgreSQL 7-to-8 one route at a time, use the [route-by-route guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-incremental); for MongoDB 6-to-8, use [prisma-mongodb-upgrade](../prisma-mongodb-upgrade/SKILL.md). Other providers need an explicitly supported migration path. `prisma-upgrade-v7` covers **6 to 7**; the package-owned `prisma-8` upgrade reference covers updates within 8.
 
 ## 3. Bootstrap a new Prisma 8 application
 
