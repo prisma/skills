@@ -30,7 +30,8 @@ export default definePrismaConfig({
 });
 ```
 
-Then run `npx prisma skills sync`. Step 5 adds a `composer` section to the same config.
+Then run `npx prisma skills sync`. Deploying on Compute later adds a `composer` section to the same
+config; that belongs to the `prisma-compute` skill, not to this upgrade.
 
 ## What is specific to coming from 6 or 7
 
