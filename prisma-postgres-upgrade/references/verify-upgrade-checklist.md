@@ -17,10 +17,13 @@ change. Checks the agent writes for itself prove only what the agent expected.
 - **Use what the repo has.** Find the type check, build, lint and test scripts in `package.json`
   and CI config, and run exactly those.
 - **Same commands before and after.** Record each command and its result before step 1. Run
-  the identical commands after step 6. A check that was already failing before is reported as
+  the identical commands after step 5. A check that was already failing before is reported as
   such, not fixed silently.
-- **Do not invent checks.** Do not write new tests, smoke scripts or per-route requests to
-  stand in for missing ones, and do not change existing tests to make them pass.
+- **Do not invent checks.** Do not write or commit new tests or smoke scripts to stand in for
+  missing ones, and do not change existing tests to make them pass.
+- **Comparing pages by hand is fine, and it is not a test.** Requesting a few read-only pages
+  before and after, against the same database, catches templates `tsc` never checks. Report it
+  as a manual comparison, never as test coverage.
 - **No tests? Say so.** If the repository has no tests, tell the user plainly that the upgrade
   is verified only by type check, build and the app starting, and leave the change for them to
   review before it ships.
@@ -32,13 +35,11 @@ change. Checks the agent writes for itself prove only what the agent expected.
    Record `SHOW timezone` on the database.
 2. **After step 4:** same commands, against the same local database. No file imports
    `@prisma/client` or the generated client.
-3. **After step 5:** `npm run build`, then `npx prisma dev module.mjs` reaches `dev: ready`.
-4. **After step 6:** a fresh install, then the same commands as the baseline, plus
-   `npx prisma db verify` against the signed database. `npm start` now fails outside Composer
-   by design (`compute-setup-pr-fixes.md`, fix 4), so start the app with `prisma dev`
-   instead and report that the start command changed.
-5. **Report:** each command, before and after, pass or fail. List what was not verified: the
-   Console flow, the preview deploy, and any behavior the tests do not cover, including the rc.20
+3. **After step 5:** a fresh install, then the same commands as the baseline, plus
+   `npx prisma db verify` against the signed database. Start the app with its own start command
+   again.
+4. **Report:** each command, before and after, pass or fail. List what was not verified,
+   including any behavior the tests do not cover, including the rc.20
    `DateTime` and `now()` notes in `client-api-mapping.md`. If the database's time zone is not
    UTC, say so first: new rows store a different time than before.
 
@@ -52,9 +53,9 @@ change. Checks the agent writes for itself prove only what the agent expected.
 
 ```text
 Before: tsc ok, build ok, npm test 42 passed. After: tsc ok, build ok, npm test 42 passed,
-app starts. The preview deploy is not verified.
+app starts. Not verified: behavior the tests do not cover.
 ```
 
 ## References
 
-- [Guide, steps 5.3 and 7](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute#53-run-the-app-locally)
+- [Guide, step 5.3](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql#53-run-the-app-locally)

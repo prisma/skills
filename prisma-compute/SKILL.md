@@ -4,7 +4,7 @@ description: Deploy and operate apps on Prisma Compute with the Prisma 8 CLI. Us
 license: MIT
 metadata:
   author: prisma
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # Prisma Compute
@@ -52,6 +52,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 ## When to Apply
 
 - Deploying a new or existing app to Prisma Compute
+- Finishing the Console's **Set up Prisma Cloud deploys** pull request (`prisma-cloud/setup`)
 - Porting a project that uses `prisma.compute.ts`, `compute:deploy`, or `@prisma/cli app deploy`
 - Setting up preview stages, deploy on push, or CI deploys
 - Reading service logs, listing versions, promoting, or rolling back
@@ -104,6 +105,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 - `deploy-auth` - On a workstation the user runs `npx prisma auth login` (browser). In CI set `PRISMA_SERVICE_TOKEN` and `PRISMA_WORKSPACE_ID`. Check `npx prisma auth whoami --json` (`envelope.result.authenticated`, `envelope.result.workspace`) before deploying.
 - `deploy-link-after` - `deploy` finds or creates the project by the root module name (or `--name`) and does not write `.prisma/local.json`. Run `npx prisma project link <app-name>` afterwards, or pass `--project`, before `service`, `git`, or `project env` commands.
 - `deploy-on-push` - Deploy on push needs both `npx prisma git connect` (interactive) and a workflow running `prisma/cloud-deploy-action@v1`. Connecting alone deploys nothing.
+- `deploy-existing-app` - An existing server built with `tsc` deploys through `module.mjs` and `src/service.mts`, takes its client from `service.load().db.client` (`DATABASE_URL` is the placeholder `-` on Compute), and ships `views/`, `public/` and other runtime files inside `dist/`. The Console's setup pull request gets some of this wrong. See [`deploy-existing-app.md`](references/deploy-existing-app.md); a Prisma 6 or 7 app upgrades with `prisma-postgres-upgrade` first.
 - `deploy-verify-url` - Take each service URL from the deploy output (`--json` result or `--report <path>`) and request it.
 
 ### 5. Operations (HIGH)
@@ -129,7 +131,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 ## Preferred Workflow
 
 1. Inspect `package.json` (is `prisma` 8.x a dev dependency, are `@prisma/composer` and `@prisma/composer-prisma-cloud` installed?), `module.ts`, `prisma.config.ts`, the build script, and leftovers from the removed flow (`prisma.compute.ts`, `compute:deploy`).
-2. Install what is missing and sync the package skills:
+2. Install what is missing and sync the package skills. In an existing project, pin the Composer packages with `--save-exact` to the version that matches the installed `prisma` and `@prisma/orm-postgres` (see [`deploy-existing-app.md`](references/deploy-existing-app.md)); unpinned installs take the latest release, which may not work with them:
    ```bash
    npm install @prisma/composer @prisma/composer-prisma-cloud
    npm install -D prisma
@@ -160,6 +162,7 @@ A repository with `prisma.compute.ts` or a `compute:deploy` script was set up fo
 - [`runtime-requirements.md`](references/runtime-requirements.md): Bun, host and port, 60-second first byte, sleep, keep-awake, regions
 - [`deploy-cli-and-ci.md`](references/deploy-cli-and-ci.md): `prisma deploy`, stages, credentials, output, CI, teardown
 - [`deploy-on-push.md`](references/deploy-on-push.md): GitHub connection and the `prisma/cloud-deploy-action` workflow
+- [`deploy-existing-app.md`](references/deploy-existing-app.md): an existing `tsc` server, the Console's setup pull request and its fixes, and the same files without one
 - [`ops-services-and-config.md`](references/ops-services-and-config.md): services, versions, logs, domains, env vars, databases, buckets
 - [`debug-deploy-failures.md`](references/debug-deploy-failures.md): symptoms, causes, and fixes
 - [`automation-create-prisma.md`](references/automation-create-prisma.md): scaffolding a new Composer app

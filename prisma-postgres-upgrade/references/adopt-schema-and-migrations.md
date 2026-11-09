@@ -45,13 +45,13 @@ Then run `npx prisma skills sync`. Step 5 adds a `composer` section to the same 
 - **Sign the existing database, then plan the baseline:** `npx prisma contract emit`,
   `npx prisma db sign`, `npx prisma migration plan`. The first plan on a signed database writes
   `migrations/app/<timestamp>_baseline/` and ignores `--name`; `db verify` then passes and
-  `db migrate` has nothing to apply. Sign every other existing database (staging) too; databases
-  the Compute deploy creates do not need it.
+  `db migrate` has nothing to apply, whatever its hint says. Commit `migrations/`. Sign every
+  other existing database (staging) too; databases the Compute deploy creates do not need it.
 - **Retire the old migration setup:** delete `prisma/migrations` (with `migration_lock.toml`),
   remove `prisma generate`, `prisma migrate *` and `prisma db seed` from scripts (including
   `postinstall`), and remove the `"prisma": { "seed": ... }` key. Prisma 8 has no `generate` or
-  seed command; keep the seed script and run it with `tsx` (see `compute-setup-pr-fixes.md`,
-  fix 4). The `_prisma_migrations` table stays in the database; dropping it is the user's call.
+  seed command; keep the seed script and run it with `tsx` (`client-api-mapping.md` shows its
+  client). The `_prisma_migrations` table stays in the database; dropping it is the user's call.
 
 For `contract emit`, `db sign`, the migration commands and every later schema change, follow the
 synced `prisma-8` skill (`references/contract.md`, `references/migration-model.md`,
@@ -74,5 +74,5 @@ rm -r prisma/migrations
 
 ## References
 
-- [Guide, steps 2 and 3](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute#2-create-the-contract-from-your-schema)
+- [Guide, steps 2 and 3](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql#2-create-the-contract-from-your-schema)
 - The synced `prisma-8` skill, authoritative for the installed version

@@ -64,19 +64,17 @@ Decision and migration guide for MongoDB projects on Prisma v6, which have no pa
 
 ### prisma-postgres-upgrade
 
-Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 8 and deploy it on Prisma Compute, following the [Prisma ORM 6 or 7 to 8 on Prisma Compute guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute).
+Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 8 in one pass, following the [Prisma ORM 6 or 7 to 8 (PostgreSQL) guide](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql). To deploy the result on Prisma Compute, use `prisma-compute`.
 
 **Use when:**
 - A PostgreSQL project on Prisma ORM 6 or 7 wants Prisma 8
-- Deploying a Prisma ORM 6 or 7 app on Prisma Compute
-- Finishing the Console's "Set up Prisma Cloud deploys" pull request
+- A Prisma ORM 6 or 7 app has to reach Prisma 8 before it can deploy on Prisma Compute
 
 **Topics covered:**
-- The Prisma 8 versions the Console's Compute setup pins, and why not `@latest`
+- Exact versions, and why not `@latest` for apps headed to Compute
 - Reading the existing `schema.prisma` with `prisma7Schema(...)`, `contract emit` and `db sign`
 - Prisma 8 owning migrations in `migrations/app/`
-- Query rewrites and the `@prisma/orm-postgres@8.0.0-rc.20` gotchas
-- `service.load().db.client` on Compute, the setup pull request fixes, and the same files without one
+- The Prisma 8 client, query rewrites and the `@prisma/orm-postgres@8.0.0-rc.20` gotchas, including a database time zone other than UTC
 - Verifying with the repository's own checks, before and after
 - Handing Prisma 8 details to the `prisma-8` skill that ships in `@prisma/orm-postgres` (`npx prisma skills sync`)
 
@@ -148,6 +146,7 @@ Deploy and operate apps on Prisma Compute with the Prisma 8 CLI. Every app deplo
 **Use when:**
 - Deploying a new or existing app to Prisma Compute
 - Porting a project from the removed `@prisma/cli app deploy`, `prisma.compute.ts`, or `compute:deploy` flow
+- Deploying an existing Prisma 8 app, or finishing the Console's "Set up Prisma Cloud deploys" pull request
 - Setting up preview stages, deploy on push, or CI deploys
 - Reading service logs, promoting, or rolling back versions
 - Managing environment variables, custom domains, databases, and buckets for a Compute project
@@ -224,7 +223,7 @@ The existing `prisma-cli`, `prisma-client-api`, driver adapter, and earlier-vers
 
 The `prisma-compute` skill covers the Composer-based deploy flow of the Prisma 8 CLI. For API details it defers to the version-matched `prisma-platform-core-concepts` and `prisma-composer-core-concepts` skills, which `prisma skills sync` installs from the `prisma` and `@prisma/composer` packages.
 
-If you're upgrading from Prisma 6, use the `prisma-upgrade-v7` skill for migration-specific guidance.
+To move a PostgreSQL app from Prisma 6 or 7 to Prisma 8, use `prisma-postgres-upgrade`. The `prisma-upgrade-v7` skill is for apps moving from Prisma 6 to 7 and staying there.
 
 ## Contributing
 

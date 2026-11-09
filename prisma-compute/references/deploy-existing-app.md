@@ -1,7 +1,7 @@
-# compute-setup-pr-fixes
+# deploy-existing-app
 
-The Console's setup pull request needs these edits before a `tsc`-built app deploys and works.
-Without a setup pull request, write the same files by hand.
+Deploy an existing Prisma 8 server built with `tsc` on Compute: finish the Console's setup pull
+request, or write the same files without one.
 
 ## Priority
 
@@ -13,11 +13,22 @@ On Compute, `DATABASE_URL` is a reserved variable holding the placeholder `-`. A
 reading it deploys, then fails every query with `P1001` and `host: "base"`. And only the build
 output (`dist/`) ships, so anything the server loads from outside it is missing at runtime.
 
+The app must be on Prisma 8 first. A Prisma ORM 6 or 7 app upgrades with the
+`prisma-postgres-upgrade` skill, then comes back here.
+
 Fixes 1 to 3 and 5 work around current gaps in the setup pull request, which the Console is
 fixing. Read what the pull request already contains first, and only change what it gets wrong.
-For deploy operations beyond these fixes, follow the `prisma-compute` skill. It and the synced
-Composer skill show `module.ts`; this skill uses `module.mjs`, because a `tsc` app's service is
-loaded from `dist/`.
+
+A `tsc` app loads its service from `dist/`, so it uses `module.mjs` and `src/service.mts`
+rather than the `module.ts` and `service.ts` the rest of this skill shows, and deploys with
+`dependencies: "external"` instead of a `bun build` bundle.
+
+## Versions
+
+Install the Composer packages with `--save-exact` at the version that matches the installed
+`@prisma/orm-postgres` (today `0.34.0` for `8.0.0-rc.20`), or the versions the setup pull request
+wrote. The latest Composer release does not work with an older `@prisma/orm-postgres`. Use
+Node.js 24.11 or newer locally: `prisma dev` refuses Node.js 22.
 
 ## What the setup pull request adds
 
@@ -29,10 +40,11 @@ the Composer packages. It keeps the `prisma` and `@prisma/orm-postgres` versions
 
 ## Without a setup pull request
 
-When the user has not connected the repository yet, write these, then apply fixes 1 to 6:
+When the user has not connected the repository in the Console, write these, then apply fixes 1
+to 6. Connecting it later (Console, or the interactive `npx prisma git connect`) opens a setup
+pull request; reconcile it with these files.
 
-- Install `@prisma/composer` and `@prisma/composer-prisma-cloud` at the pinned version, with
-  `--save-exact`.
+- Install `@prisma/composer` and `@prisma/composer-prisma-cloud` at the version above.
 - Add to `prisma.config.ts`:
 
   ```typescript
@@ -43,6 +55,8 @@ When the user has not connected the repository yet, write these, then apply fixe
   composer: composer({ extensions: [prismaCloud(), nodeBuild()], state: prismaState() }),
   ```
 
+  Leave the region for the user (`prismaCloud({ region })` or `PRISMA_REGION`); see
+  `app-region`.
 - `module.mjs`, which provisions the database from the same contract the service uses:
 
   ```javascript
@@ -56,8 +70,8 @@ When the user has not connected the repository yet, write these, then apply fixe
   });
   ```
 
-- `.github/workflows/prisma-deploy.yml` from the `prisma-platform-core-concepts` skill, with
-  `module: module.mjs` added to the `prisma/cloud-deploy-action` inputs. The action looks for
+- `.github/workflows/prisma-deploy.yml` from [`deploy-on-push.md`](deploy-on-push.md), with
+  `module: module.mjs` in the `prisma/cloud-deploy-action` inputs. The action looks for
   `module.ts` by default.
 - `.prisma/`, `.prisma-composer/` and `.alchemy/` in `.gitignore`.
 
@@ -100,23 +114,11 @@ When the user has not connected the repository yet, write these, then apply fixe
    - Listen on `service.port()` and `"0.0.0.0"`, not `process.env.PORT`.
    - Outside a Composer run, `service.load()` throws `missing required config param "url"`. So
      `npm start`, a `tsx` dev script and any `Procfile` stop working. Run locally with
-     `npm run build && npx prisma dev module.mjs` (Node.js 24.11+), and make that the `dev`
-     script. It starts a local Prisma Postgres, applies `migrations/app/`, and prints
-     `dev: ready`. That database is empty.
-   - A seed script must not import `db.ts`. Give it its own client, and seed with
-     `DATABASE_URL="$(npx prisma dev url database)" npx tsx prisma/seed.ts`:
-
-     ```typescript
-     import postgres from "@prisma/orm-postgres/runtime";
-     import { contractFromJson } from "@prisma/orm-postgres/static";
-     import type { Contract } from "../src/prisma/contract.js";
-     import contractJson from "../src/prisma/contract.json"; // no import attribute in a CommonJS .ts file
-
-     const db = postgres({ contract: contractFromJson<Contract>(contractJson), url: process.env["DATABASE_URL"]! });
-     ```
-
-     The `with { type: "json" }` attribute the `prisma-8` skill requires is only valid in `.mts`
-     files such as `service.mts`; in a CommonJS `.ts` file it fails with TS2856.
+     `npm run build && npx prisma dev module.mjs`, and make that the `dev` script. It starts a
+     local Prisma Postgres, applies `migrations/app/`, and prints `dev: ready`. That database is
+     empty.
+   - A seed script must not import `db.ts`. Keep its own `postgres({ contract, url })` client,
+     and seed with `DATABASE_URL="$(npx prisma dev url database)" npx tsx prisma/seed.ts`.
 5. **Ship runtime files.** Copy `views/`, `public/` or similar into `dist/` in `build`
    (`tsc && cp -R views public dist/`) and resolve them from `__dirname`. Otherwise every
    rendered page fails with `Failed to lookup view`.
@@ -153,5 +155,5 @@ export const db = service.load().db.client;
 
 ## References
 
-- [Guide, step 6](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute#6-deploy-on-prisma-compute)
-- `prisma-compute` skill, and the synced `prisma-composer-core-concepts` skill
+- [Deploy an existing app on Prisma Compute](https://www.prisma.io/docs/guides/compute/deploy-existing-app)
+- The synced `prisma-composer-core-concepts` skill

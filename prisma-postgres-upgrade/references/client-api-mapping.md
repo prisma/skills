@@ -1,6 +1,6 @@
 # client-api-mapping
 
-Map each Prisma ORM 6 or 7 call to the Prisma 8 client; five differences break most rewrites.
+Create the Prisma 8 client, then map each Prisma ORM 6 or 7 call to it; five differences break most rewrites.
 
 ## Priority
 
@@ -12,11 +12,28 @@ The Prisma 8 client chains calls instead of taking one options object, and a sch
 through `prisma7Schema(...)` changes a few lookups and types. Some of these compile and then
 fail at runtime or write wrong data.
 
+## The client
+
+One client for the app and the seed script, reading the same `DATABASE_URL` as before:
+
+```typescript
+// src/db.ts
+import postgres from "@prisma/orm-postgres/runtime";
+import { contractFromJson } from "@prisma/orm-postgres/static";
+import type { Contract } from "./prisma/contract.js";
+import contractJson from "./prisma/contract.json";
+
+export const db = postgres({ contract: contractFromJson<Contract>(contractJson), url: process.env["DATABASE_URL"]! });
+```
+
+In a CommonJS `.ts` file, import the JSON without the `with { type: "json" }` attribute the
+`prisma-8` skill shows: the attribute fails there with TS2856 and is only valid in `.mts` files.
+On Compute, `prisma-compute` replaces this client with `service.load().db.client`.
+
 ## Old call to new call
 
-Queries start at `db.orm.public.<Model>`. For the client itself and anything not listed here,
-follow the synced `prisma-8` skill (`references/queries.md`, `references/runtime.md`); on
-Compute the client comes from `service.load().db.client` (see `compute-setup-pr-fixes.md`).
+Queries start at `db.orm.public.<Model>`. For anything not listed here, follow the synced
+`prisma-8` skill (`references/queries.md`, `references/runtime.md`).
 
 | Prisma ORM 6 / 7 | Prisma 8 |
 |------------------|----------|
@@ -27,8 +44,11 @@ Compute the client comes from `service.load().db.client` (see `compute-setup-pr-
 | `findUnique` on an `@unique` or `@@unique` field | `.where({...}).first()` |
 | `create({ data: { ..., votes: { create: {...} } } })` | `.create({ ..., votes: (v) => v.create([{...}]) })` |
 | `deleteMany({ where })` then `.count` | `.where({...}).deleteAndCount()` |
+| `deleteMany()` with no filter (seeds, tests) | `.where((m) => m.id.isNotNull()).deleteAll()`: writes need a filter |
+| `createMany({ data: [...] })` | `.createAll([...])` |
 | `count({ where })` | `.where({...}).aggregate((a) => ({ total: a.count() }))` |
 | `Object.values(PostStatus)` from `@prisma/client` | `db.nativeEnums.public.PostStatus.values` |
+| ``$queryRaw`SELECT 1` `` (health checks) | ``db.execute(db.raw.sql`SELECT 1`.affectedCount().build())`` |
 
 What has no Prisma 8 form yet, such as `increment` in an update, is listed in
 [Coming from Prisma ORM 7](https://www.prisma.io/docs/orm/coming-from-prisma-orm-7#queries).
@@ -66,5 +86,5 @@ const post = await db.orm.public.Post.include("votes", (v) => v.count()).first({
 
 ## References
 
-- [Guide, step 5](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql-compute#5-rewrite-your-queries)
+- [Guide, step 5](https://www.prisma.io/docs/guides/upgrade-prisma-orm/postgresql#5-rewrite-your-queries)
 - The synced `prisma-8` skill, authoritative for the installed client
