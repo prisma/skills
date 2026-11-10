@@ -74,7 +74,7 @@ Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 8 in one pass
 - Exact versions, and why not `@latest` for apps headed to Compute
 - Reading the existing `schema.prisma` with `prisma7Schema(...)`, `contract emit` and `db sign`
 - Prisma 8 owning migrations in `migrations/app/`
-- The Prisma 8 client, query rewrites and the `@prisma/orm-postgres@8.0.0-rc.20` gotchas, including a database time zone other than UTC
+- The Prisma 8 client, query rewrites and the differences that break them, such as `@db.Date` fields reading as strings
 - Verifying with the repository's own checks, before and after
 - Handing Prisma 8 details to the `prisma-8` skill that ships in `@prisma/orm-postgres` (`npx prisma skills sync`)
 

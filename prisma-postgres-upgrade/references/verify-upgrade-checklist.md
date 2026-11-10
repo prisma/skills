@@ -32,16 +32,14 @@ change. Checks the agent writes for itself prove only what the agent expected.
 
 1. **Baseline:** run the type check (`tsc --noEmit` or the repo's script), the build, and the
    test script, then start the app with its own start command and confirm it boots and connects.
-   Record `SHOW timezone` on the database.
 2. **After step 4:** same commands, against the same local database. No file imports
    `@prisma/client` or the generated client.
 3. **After step 5:** a fresh install, then the same commands as the baseline, plus
    `npx prisma db verify` against the signed database. Start the app with its own start command
    again.
 4. **Report:** each command, before and after, pass or fail. List what was not verified,
-   including any behavior the tests do not cover, including the rc.20
-   `DateTime` and `now()` notes in `client-api-mapping.md`. If the database's time zone is not
-   UTC, say so first: new rows store a different time than before.
+   including any behavior the tests do not cover, such as `@db.Date` and `@db.Time` fields that
+   now read as strings (`client-api-mapping.md`).
 
 ## Bad
 
