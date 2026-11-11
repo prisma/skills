@@ -4,7 +4,7 @@ description: Upgrade a PostgreSQL app from Prisma ORM 6 or 7 straight to Prisma 
 license: MIT
 metadata:
   author: prisma
-  version: "2.0.0"
+  version: "2.0.1"
 ---
 
 # Prisma Postgres Upgrade: Prisma ORM 6 or 7 to Prisma 8
@@ -29,8 +29,8 @@ is the source of truth for the steps.
 - Never route a PostgreSQL Prisma ORM 6 app through Prisma ORM 7 first. Prisma 8 reads a
   Prisma ORM 6 `schema.prisma` unchanged, so `prisma-upgrade-v7` is only for apps that stay on 7.
 - Never install `prisma@latest` or `@prisma/orm-postgres@latest` when the app will deploy on
-  Prisma Compute: the latest pair does not work with the Composer version the Console's setup
-  installs, so the deploy fails.
+  Prisma Compute: `latest` can move past the Composer version the Console's setup installs, and
+  then the deploy fails.
 
 ## When to Apply
 
@@ -46,10 +46,17 @@ a project already on Prisma 8 (use the synced `prisma-8` skill), or a new projec
 
 ## Versions
 
-Install exact versions with `--save-exact`. For an app headed to Compute, use the versions the
-Console's setup uses: today `prisma` `8.0.0-rc.27` (dev dependency) and `@prisma/orm-postgres`
-`8.0.0-rc.20`. If the Console's message or an existing setup pull request names other versions,
-use those. Use Node.js 24.11 or newer if the app will run under `prisma dev`.
+Install exact versions with `--save-exact`. For an app headed to Compute, use the exact versions
+the Console's setup installs. Its message or its setup pull request names them, for example
+`prisma` `8.0.0-rc.33` (dev dependency) and `@prisma/orm-postgres` `8.0.0-rc.23`. These are only
+an example: the Console moves to newer versions, so read them from the Console each time.
+
+For an app that will not deploy on Compute, use a matching pair: `npm view prisma@<version>
+dependencies` names the `@prisma/orm-toolchain` version, and `@prisma/orm-postgres` takes the
+same one. Use Node.js 24.11 or newer if the app will run under `prisma dev`.
+
+The date notes in `client-api-mapping` hold for `@prisma/orm-postgres` 8.0.0-rc.22 and later. On
+an older version, follow the synced `prisma-8` skill instead.
 
 ## The path
 
@@ -90,7 +97,6 @@ finished first.
 
 The agent cannot do these; stop and ask:
 
-- Decide what to do about a database time zone other than UTC (see `client-api-mapping`).
 - Sign every other existing database (staging, production) with `npx prisma db sign`. The agent
   has only the local one.
 - Review the change before it ships, especially when the repository has no tests.
@@ -109,6 +115,11 @@ A Prisma ORM 6.19 app (Express 4, EJS, `tsc`, CommonJS) on PostgreSQL 18, with `
 8.0.0-rc.27 and `@prisma/orm-postgres` 8.0.0-rc.20. Two agents with no context and only these
 skills upgraded it: pages and API output were identical before and after against the same
 database, and `prisma db verify` passed.
+
+With `prisma` 8.0.0-rc.33 and `@prisma/orm-postgres` 8.0.0-rc.23, a smaller check on Node.js 24
+and PostgreSQL 18: `contract emit` and `db sign` on a Prisma ORM 6 schema, the client file in
+`client-api-mapping` under TypeScript 5.9 and CommonJS, and the date notes there, with the
+database's time zone set to something other than UTC. The full agent run was not repeated.
 
 ## Hand-off rule
 

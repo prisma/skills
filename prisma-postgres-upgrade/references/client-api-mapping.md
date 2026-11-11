@@ -1,6 +1,6 @@
 # client-api-mapping
 
-Create the Prisma 8 client, then map each Prisma ORM 6 or 7 call to it; five differences break most rewrites.
+Create the Prisma 8 client, then map each Prisma ORM 6 or 7 call to it; four differences break most rewrites.
 
 ## Priority
 
@@ -53,22 +53,25 @@ Queries start at `db.orm.public.<Model>`. For anything not listed here, follow t
 What has no Prisma 8 form yet, such as `increment` in an update, is listed in
 [Coming from Prisma ORM 7](https://www.prisma.io/docs/orm/coming-from-prisma-orm-7#queries).
 
-## The five differences
+## The four differences
 
 1. **Unique lookups use `.first(...)` or `.where(...).first()`.** A 6/7 `@unique` or `@@unique`
    becomes a unique index, which `whereUnique` does not accept, so do not reach for it.
 2. **Enums are under `db.nativeEnums`**, not `db.enums`. The values are the same strings.
-3. **`DateTime` may read as a string** (`"2026-11-06 09:10:48.497"`, UTC, no offset) at
-   `@prisma/orm-postgres@8.0.0-rc.20`. `row.createdAt.toISOString()` then throws at runtime,
-   often in a template `tsc` never checks. Check the installed version's behavior in the
-   `prisma-8` skill before converting.
-4. **`@default(now())` is filled by the database** at rc.20, so a `timestamp` column gets the
-   database's local time where 6/7 sent UTC. If `SHOW timezone` is not `UTC`, tell the user
-   rather than changing data: new rows will store a different time than before, which is a
-   behavior change the user has to decide on.
-5. **Templates and other code `tsc` does not check still read the old shapes.** Search views
-   (`.ejs`, `.hbs`, `.pug`) and plain `.js` files for `_count.`, `.toISOString()` on dates, and
-   enum imports, and change them with the queries.
+3. **`@db.Date` and `@db.Time` fields read as strings**, such as `"2026-11-10"` and
+   `"10:00:00.5"`, where 6/7 read a `Date`. Write them as strings too. `.toISOString()` or
+   `.getTime()` on them throws at runtime, often in a template `tsc` never checks. `DateTime`,
+   `@db.Timestamp` and `@db.Timestamptz` still read and write a JavaScript `Date`, in UTC.
+4. **Templates and other code `tsc` does not check still read the old shapes.** Search views
+   (`.ejs`, `.hbs`, `.pug`) and plain `.js` files for `_count.`, date methods on `@db.Date` and
+   `@db.Time` fields, and enum imports, and change them with the queries.
+
+`@default(now())` and `@updatedAt` work as in 6/7: the client writes the current time in UTC on
+create, and `@updatedAt` again on update, whatever the database's time zone. An `INSERT` from
+outside Prisma still gets the column default.
+
+These date notes hold for `@prisma/orm-postgres` 8.0.0-rc.22 and later. Earlier versions read
+`DateTime` differently, so on those, follow the synced `prisma-8` skill.
 
 ## Bad
 
