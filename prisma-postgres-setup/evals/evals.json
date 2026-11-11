@@ -1,0 +1,34 @@
+{
+  "skill_name": "prisma-postgres-setup",
+  "evaluation_type": "planning",
+  "evals": [
+    {
+      "id": 1,
+      "name": "connected-v0",
+      "source": "Reconstructed from an observed v0 session; evaluated against the proposed ORM 8 policy.",
+      "prompt": "Help me finish database setup for a todo app in v0. Prisma Postgres is already connected to this Vercel project as db_todo_existing. DATABASE_URL is available to the app through .env.development.local, but it is absent from the Bash environment. No ORM is installed yet. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Reuse the connected resource, resolve environment loading, and choose Prisma ORM 8 with the package-owned skill handoff.",
+      "files": [],
+      "expectations": [
+        "Reuses db_todo_existing without proposing another database or requesting a service token.",
+        "Explains loading the intended environment for CLI commands without exposing credentials.",
+        "Defaults to Prisma ORM 8 and hands ORM work to prisma-orm-setup.",
+        "Plans prisma skills sync followed by reading the version-matched prisma-8 skill before implementing ORM code."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "existing-prisma-7",
+      "source": "Synthetic regression check: preserve an existing Prisma 7 app when finishing its database connection.",
+      "prompt": "Help me finish Prisma Postgres setup in our existing PostgreSQL app. It uses prisma@7.10.0, @prisma/client@7.10.0, and prisma/schema.prisma. The intended database is already connected. I have not approved a major-version upgrade. Describe your next steps only; do not install packages, call external services, or change files.",
+      "expected_output": "Reuse the connected database and finish setup through the Prisma 7 database guidance without requiring a major upgrade.",
+      "files": [],
+      "expectations": [
+        "Recognizes the existing Prisma 7 application and preserves its major version without requiring an upgrade to finish setup.",
+        "Hands ORM setup to prisma-orm-setup and its prisma-database-setup route, or directly selects the matching prisma-database-setup guidance.",
+        "Reuses the intended database and preserves the schema and dependencies unless a diagnosed setup issue requires a scoped change.",
+        "Plans to verify environment loading and a read-only query through the existing client without claiming those checks have already run."
+      ]
+    }
+  ]
+}
