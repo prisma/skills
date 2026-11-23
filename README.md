@@ -182,6 +182,16 @@ npx skills add prisma/skills --skill prisma-postgres-setup
 npx skills add prisma/skills --skill prisma-compute
 ```
 
+Or install them with the GitHub CLI:
+
+```bash
+# Install all skills
+gh skill install prisma/skills --all
+
+# Install a specific skill
+gh skill install prisma/skills prisma-cli
+```
+
 List available skills:
 
 ```bash
