@@ -1,10 +1,10 @@
 ---
 name: prisma-orm-setup
-description: Set up Prisma ORM in an application, connect its database, or troubleshoot the connection of an existing Prisma 6, 7, or 8 app. Defaults new applications to Prisma ORM 8 and loads the package-owned prisma-8 skill; keeps existing Prisma 6/7 apps on their version with provider references for PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB, MongoDB, and Prisma Postgres.
+description: Set up Prisma ORM in an application, connect its database, or troubleshoot the connection of an existing Prisma 6, 7, or 8 app, including choosing a database when none is set up yet. Defaults new applications to Prisma ORM 8 and loads the package-owned prisma-8 skill; keeps existing Prisma 6/7 apps on their version with provider references for PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB, MongoDB, and Prisma Postgres.
 license: MIT
 metadata:
   author: prisma
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Prisma ORM setup
@@ -25,7 +25,7 @@ Read the package manifest, lockfile, Prisma configuration, schema, and applicati
 
 For a new application, check the selected Prisma 8 release's [provider support](https://www.prisma.io/docs/orm/supported-databases) and runtime requirements before installing. If the provider is unsupported, explain the limitation and offer an explicitly selected earlier version. Keep the requested database; do not silently fall back or invent a supported target.
 
-Use an existing database when supplied. Load `prisma-postgres-setup` only when Prisma Postgres is needed and no connection has been selected yet; return here once connected.
+Use an existing database when supplied, and keep a provider the user names. When the application has no database yet and the user has not named a provider, use PostgreSQL and offer Prisma Postgres as the hosted database: `npx create-db@latest` returns a working connection string without an account, and the database is deleted after 24 hours unless claimed. Ask before creating a database. Load `prisma-postgres-setup` only when Prisma Postgres is needed and no connection has been selected yet; return here once connected.
 
 ## 2. Handle requested major upgrades separately
 

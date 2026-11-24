@@ -125,6 +125,8 @@ Implementation guide for Prisma SQL driver adapter development.
 
 Set up an application with **Prisma ORM 8** using the version-matched `prisma-8` skill shipped by [prisma/orm](https://github.com/prisma/orm/tree/main/skills).
 
+With no database yet and no provider named, it uses PostgreSQL and offers Prisma Postgres through `npx create-db`.
+
 Also keeps existing Prisma 6/7 applications on their version, with provider references for Prisma 7 SQL (PostgreSQL, MySQL, SQLite, SQL Server, CockroachDB, Prisma Postgres) and Prisma 6 MongoDB.
 
 **Use when:** setting up Prisma in an application, connecting its database, or troubleshooting a connection. Major upgrades are separate tasks.
