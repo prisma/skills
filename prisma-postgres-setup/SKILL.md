@@ -4,7 +4,7 @@ description: Obtain or reuse a Prisma Postgres database and connect an applicati
 license: MIT
 metadata:
   author: prisma
-  version: "2.4.0"
+  version: "2.4.1"
 ---
 
 # Prisma Postgres setup
@@ -24,7 +24,7 @@ Check the user's requested ORM or driver, installed packages, database connectio
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Existing connection or connected integration | Verify its project, database, and environment; reuse it.                                                         |
 | v0, Vercel Marketplace, or a Vercel project  | Read [Marketplace setup](references/vercel-marketplace.md) and use the native integration flow.                  |
-| No database yet and no provider named        | Offer `npx create-db@latest` for a working database now with no account (it is deleted after 24 hours unless claimed, and claiming needs a free Prisma account; read the create-db section in [provisioning](references/provisioning.md)), or a persistent database through [provisioning](references/provisioning.md). Ask which one when the request does not say. |
+| No database yet and no provider named        | Offer `npx create-db@latest` for a working database now with no account (it is deleted after 72 hours unless claimed, and claiming needs a free Prisma account; read the create-db section in [provisioning](references/provisioning.md)), or a persistent database through [provisioning](references/provisioning.md). Ask which one when the request does not say. |
 | Deploying or sharing an app with no hosted database | Offer `npx create-db@latest` (no account, no card) and set its connection string as `DATABASE_URL` on the host. Before the app goes live, give the user the claim URL and the deletion time and ask them to claim it: an unclaimed database is deleted and the deployed app stops working. On a Prisma 8 project that deploys to Prisma Compute, the module declares the database instead; see the `prisma-compute` skill. |
 | Standalone persistent database               | Read [provisioning](references/provisioning.md); use an authenticated CLI, MCP tool, Console, or Management API. |
 | Temporary development database requested     | Read the `create-db` section in [provisioning](references/provisioning.md), including expiry and claiming.       |
